@@ -23,9 +23,11 @@ unsigned int col_dist[VIEW_COLS];
 #define PIX_WALL_Y  0xAAu   /* colour 2 -> COLPF1 */
 #define PIX_WALL_X  0xFFu   /* colour 3 -> COLPF2 */
 
-#define COLOR_FLOOR   0x26
-#define COLOR_WALL_Y  0x08
-#define COLOR_WALL_X  0x0E
+/* Walls sit well below maximum luminance so the bright PMG targets stand out
+ * against them. Luminance, not hue, is what separates colours here. */
+#define COLOR_FLOOR   0x28
+#define COLOR_WALL_Y  0x06
+#define COLOR_WALL_X  0x0A
 #define COLOR_CEILING 0x92
 
 /* Minimap: one pixel per maze cell, so the 20 cell wide map packs into 5 bytes.
