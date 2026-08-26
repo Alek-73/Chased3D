@@ -12,9 +12,10 @@
 #define PMG_PLAYER_SIZE 128
 #define PMG_PLAYER0_OFFSET 0x200
 
-/* Display row 0 lands on this player byte: the display list opens with 24 blank
- * scanlines (12 two-line bytes) and ANTIC starts around byte 16. */
-#define PMG_TOP_OFFSET 28
+/* Display row 0 lands on this player byte: ANTIC starts the display list at
+ * scanline 8 (player byte 4) and the list opens with 24 blank scanlines, which
+ * is 12 more two-line bytes. */
+#define PMG_TOP_OFFSET 16
 
 #define HPOSP0 0xD000
 #define SIZEP0 0xD008
