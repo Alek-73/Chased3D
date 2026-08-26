@@ -65,9 +65,11 @@ _melody_install:
         sta saved_vbi+1
 
         ; SETVBV avoids the race of writing the vector bytes non-atomically.
+        ; Vector 7 is the deferred VBI; 6 is the immediate one, which would
+        ; bypass the OS stage 1 work that updates RTCLOK.
         ldy #<melody_vbi
         ldx #>melody_vbi
-        lda #$06
+        lda #$07
         jsr SETVBV
         rts
 
