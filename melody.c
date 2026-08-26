@@ -57,7 +57,13 @@ void melody_play(const char *melody)
     melody_timer = 0;
     melody_index = 0;
     length = 0;
-    for (index = 0; melody[index + 2] != '\0' && length < MELODY_MAX; index += 3) {
+    for (index = 0; length < MELODY_MAX; index += 3) {
+        /* Every character of the triplet is checked: testing only [index + 2]
+         * reads past the terminator when the string ends on a triplet boundary,
+         * and parses whatever follows it in memory as extra notes. */
+        if (melody[index] == '\0'
+            || melody[index + 1] == '\0'
+            || melody[index + 2] == '\0') break;
         note = melody_note_index((unsigned char)melody[index],
                                  (unsigned char)melody[index + 1]);
         duration = (unsigned char)(melody[index + 2] - '0');
