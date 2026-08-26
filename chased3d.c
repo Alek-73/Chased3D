@@ -7,6 +7,7 @@
 
 #define KBD_SKSTAT 0xD20F
 #define KBD_KBCODE 0xD209
+#define NOCLIK 0x02DB   /* non-zero silences the OS key click */
 #define RTCLOK_LOW 20   /* OS jiffy counter, bumped every vertical blank */
 
 /* Movement is scaled by elapsed jiffies so speed does not change with the
@@ -82,6 +83,7 @@ int main(void)
     minimap_show();
     sprite3d_init();
     melody_install();
+    *(volatile unsigned char *)NOCLIK = 1;
     hud_set_targets(sprite3d_targets_left());
 
     ticks_per_second = (get_tv() == AT_PAL) ? 50 : 60;
