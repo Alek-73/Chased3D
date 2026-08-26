@@ -9,39 +9,43 @@
 
         .export _melody_install
         .export _melody_active
+        .export _melody_timer
         .export _melody_index
         .export _melody_length
-        .export _melody_timer
-        .export _melody_freq
+        .export _melody_freq0
+        .export _melody_freq1
         .export _melody_dur
 
 SETVBV  = $E45C
 VVBLKD  = $0224
 AUDF1   = $D200
 AUDC1   = $D201
+AUDF2   = $D202
 AUDC2   = $D203
 AUDC3   = $D205
 AUDC4   = $D207
 AUDCTL  = $D208
 SKCTL   = $D20F
 
-MELODY_MAX = 16
-NOTE_VOLUME = 10
+MELODY_MAX = 32
+PEAK_VOLUME = $0A
 
         .segment "BSS"
 _melody_active:
+        .res 1
+_melody_timer:
         .res 1
 _melody_index:
         .res 1
 _melody_length:
         .res 1
-_melody_timer:
-        .res 1
-_melody_freq:
+_melody_freq0:
+        .res MELODY_MAX
+_melody_freq1:
         .res MELODY_MAX
 _melody_dur:
         .res MELODY_MAX
-melody_vol:
+melody_volume:
         .res 1
 saved_vbi:
         .res 2
@@ -87,40 +91,57 @@ melody_vbi:
         pla
         jmp (saved_vbi)
 
+; Two voices with the volume swelling into each note rather than decaying.
 melody_tick:
         lda _melody_active
-        beq tick_done
+        beq melody_done
         lda _melody_timer
-        beq next_note
-
+        beq load_note
         dec _melody_timer
-        lda melody_vol
-        beq tick_done
-        dec melody_vol
-        lda melody_vol
+        lda melody_volume
+        cmp #PEAK_VOLUME
+        bcs melody_done
+        adc #$02                   ; carry is clear here, from the cmp above
+        sta melody_volume
         ora #$A0                   ; pure tone, distortion off
         sta AUDC1
+        sta AUDC2
         rts
 
-next_note:
+load_note:
         ldx _melody_index
         cpx _melody_length
-        bcs melody_stop
-        lda _melody_freq,x
-        sta AUDF1
-        lda #NOTE_VOLUME
-        sta melody_vol
-        ora #$A0
+        bcc have_note
+        lda #$00
+        sta _melody_active
         sta AUDC1
+        sta AUDC2
+        rts
+
+have_note:
+        lda _melody_freq0,x
+        sta AUDF1
+        lda _melody_freq1,x
+        sta AUDF2
+        ora _melody_freq0,x
+        beq silence_note
+        lda #$00
+        sta melody_volume
+        lda #$A0
+        sta AUDC1
+        sta AUDC2
+        jmp save_note
+
+silence_note:
+        lda #$00
+        sta melody_volume
+        sta AUDC1
+        sta AUDC2
+
+save_note:
         lda _melody_dur,x
         sta _melody_timer
         inx
         stx _melody_index
-        rts
-
-melody_stop:
-        lda #$00
-        sta _melody_active
-        sta AUDC1
-tick_done:
+melody_done:
         rts

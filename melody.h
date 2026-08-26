@@ -2,6 +2,7 @@
 #define MELODY_H_INCLUDED
 
 void melody_install(void);
+void melody_play(const char *melody);
 void melody_pickup(void);
 
 #endif
