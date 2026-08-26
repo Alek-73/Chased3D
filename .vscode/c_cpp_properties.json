@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "Atari cc65",
+            "compilerPath": "C:\\tools\\cc65\\bin\\cl65.exe",
+            "includePath": [
+                "${workspaceFolder}",
+                "C:\\tools\\cc65\\include"
+            ],
+            "defines": [
+                "__ATARI__",
+                "__ATARI_XL__"
+            ],
+            "cStandard": "c89",
+            "intelliSenseMode": "windows-gcc-x86"
+        }
+    ],
+    "version": 4
+}
