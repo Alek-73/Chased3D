@@ -11,6 +11,7 @@ void minimap_build(void);
 void minimap_show(void);
 void minimap_update(unsigned int px, unsigned int py, unsigned int angle);
 void hud_set_fps(unsigned char fps);
+void hud_set_targets(unsigned char remaining);
 
 /* Perpendicular wall distance per ray column; sprites depth test against it. */
 extern unsigned int col_dist[VIEW_COLS];

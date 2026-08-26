@@ -28,6 +28,7 @@
 
 #define MAX_TARGETS 24
 #define RANGE_44 192                    /* 12 cells, in 1/16 cell units */
+#define COLLECT_RADIUS 160              /* 0.625 cell, in 8.8 world units */
 #define TARGET_COLOR 0x1E               /* bright yellow */
 
 #pragma bss-name (push, "PMGRAM")
@@ -43,7 +44,9 @@ static const unsigned char target_sprite[16] = {
 
 static unsigned int target_px[MAX_TARGETS];
 static unsigned int target_py[MAX_TARGETS];
+static unsigned char target_active[MAX_TARGETS];
 static unsigned char target_count;
+static unsigned char targets_left;
 
 static unsigned int cand_dist[PMG_PLAYERS];
 static unsigned char cand_x[PMG_PLAYERS];
@@ -83,15 +86,46 @@ void sprite3d_build_targets(void)
     unsigned char col;
 
     target_count = 0;
-    for (row = 0; row + 1 < MAZE_H; ++row) {
-        for (col = 0; col < MAZE_W; ++col) {
+    for (row = 0; row + 1 < MAZE_H && target_count < MAX_TARGETS; ++row) {
+        for (col = 0; col < MAZE_W && target_count < MAX_TARGETS; ++col) {
             if (maze_map[row][col] != 3 || maze_map[row + 1][col] != 4) continue;
-            if (target_count >= MAX_TARGETS) return;
             target_px[target_count] = ((unsigned int)col << 8) | 0x80;
             target_py[target_count] = (unsigned int)(row + 1) << 8;
+            target_active[target_count] = 1;
             ++target_count;
         }
     }
+    targets_left = target_count;
+}
+
+unsigned char sprite3d_targets_left(void)
+{
+    return targets_left;
+}
+
+/* Box test rather than a true radius: no multiply, and the difference is not
+ * noticeable when walking into a target. */
+unsigned char sprite3d_collect(unsigned int px, unsigned int py)
+{
+    unsigned char i;
+    unsigned char taken;
+    int dx;
+    int dy;
+
+    taken = 0;
+    for (i = 0; i < target_count; ++i) {
+        if (!target_active[i]) continue;
+        dx = (int)target_px[i] - (int)px;
+        if (dx < 0) dx = -dx;
+        if (dx >= COLLECT_RADIUS) continue;
+        dy = (int)target_py[i] - (int)py;
+        if (dy < 0) dy = -dy;
+        if (dy >= COLLECT_RADIUS) continue;
+        target_active[i] = 0;
+        --targets_left;
+        ++taken;
+    }
+    return taken;
 }
 
 static void clear_player(unsigned char player)
@@ -183,6 +217,7 @@ void sprite3d_draw_targets(unsigned int px, unsigned int py, unsigned int angle)
     cand_count = 0;
 
     for (i = 0; i < target_count; ++i) {
+        if (!target_active[i]) continue;
         dx = ((int)target_px[i] - (int)px) >> 4;     /* 1/16 cell units */
         if (dx > RANGE_44 || dx < -RANGE_44) continue;
         dy = ((int)target_py[i] - (int)py) >> 4;

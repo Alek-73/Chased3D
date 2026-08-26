@@ -316,6 +316,16 @@ void hud_set_fps(unsigned char fps)
     hud_line[5] = (unsigned char)((16 + (fps % 10)) | HUD_COLOR);
 }
 
+void hud_set_targets(unsigned char remaining)
+{
+    if (remaining > 99) remaining = 99;
+    hud_line[10] = (unsigned char)(52 | HUD_COLOR);   /* T */
+    hud_line[11] = (unsigned char)(39 | HUD_COLOR);   /* G */
+    hud_line[12] = (unsigned char)(52 | HUD_COLOR);   /* T */
+    hud_line[14] = (unsigned char)((16 + (remaining / 10)) | HUD_COLOR);
+    hud_line[15] = (unsigned char)((16 + (remaining % 10)) | HUD_COLOR);
+}
+
 unsigned char view3d_wall_height(unsigned int dist)
 {
     dist >>= 4;

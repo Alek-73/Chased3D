@@ -80,6 +80,7 @@ int main(void)
     view3d_init();
     minimap_show();
     sprite3d_init();
+    hud_set_targets(sprite3d_targets_left());
 
     ticks_per_second = (get_tv() == AT_PAL) ? 50 : 60;
     last_tick = *(volatile unsigned char *)RTCLOK_LOW;
@@ -99,6 +100,10 @@ int main(void)
         else if (key == KEY_S) step_forward(-1);
         else if (key == KEY_A) player_angle -= TURN_PER_TICK * frame_ticks;
         else if (key == KEY_D) player_angle += TURN_PER_TICK * frame_ticks;
+
+        if (sprite3d_collect(player_x, player_y)) {
+            hud_set_targets(sprite3d_targets_left());
+        }
 
         view3d_render(player_x, player_y, player_angle);
         sprite3d_draw_targets(player_x, player_y, player_angle);
