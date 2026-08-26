@@ -3,6 +3,7 @@
 #include "trig3d.h"
 #include "view3d.h"
 #include "sprite3d.h"
+#include "melody.h"
 
 #define KBD_SKSTAT 0xD20F
 #define KBD_KBCODE 0xD209
@@ -80,6 +81,7 @@ int main(void)
     view3d_init();
     minimap_show();
     sprite3d_init();
+    melody_install();
     hud_set_targets(sprite3d_targets_left());
 
     ticks_per_second = (get_tv() == AT_PAL) ? 50 : 60;
@@ -103,6 +105,7 @@ int main(void)
 
         if (sprite3d_collect(player_x, player_y)) {
             hud_set_targets(sprite3d_targets_left());
+            melody_pickup();
         }
 
         view3d_render(player_x, player_y, player_angle);
