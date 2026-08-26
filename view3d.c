@@ -16,6 +16,8 @@
 #define HEIGHT_STEPS 400
 static unsigned char height_table[HEIGHT_STEPS];
 
+unsigned int col_dist[VIEW_COLS];
+
 #define PIX_CEILING 0x00u   /* colour 0 -> COLBK  */
 #define PIX_FLOOR   0x55u   /* colour 1 -> COLPF0 */
 #define PIX_WALL_Y  0xAAu   /* colour 2 -> COLPF1 */
@@ -177,6 +179,7 @@ static void cast_column(unsigned char col, unsigned int ray_angle,
     dda_cast();
 
     if (!dda_hit) {
+        col_dist[col] = 0xFFFFu;
         draw_open_column(col);
         return;
     }
@@ -194,6 +197,7 @@ static void cast_column(unsigned char col, unsigned int ray_angle,
     ray_mag = cos_rel[col];
     ray_dist = ((ray_dist >> 8) * ray_mag)
              + (((ray_dist & 0x00FFu) * ray_mag) >> 8);
+    col_dist[col] = ray_dist;
 
     ray_dist >>= 4;
     if (ray_dist >= HEIGHT_STEPS) ray_dist = HEIGHT_STEPS - 1;
@@ -308,6 +312,13 @@ void hud_set_fps(unsigned char fps)
     hud_line[2] = (unsigned char)(51 | HUD_COLOR);   /* S */
     hud_line[4] = (unsigned char)((16 + (fps / 10)) | HUD_COLOR);
     hud_line[5] = (unsigned char)((16 + (fps % 10)) | HUD_COLOR);
+}
+
+unsigned char view3d_wall_height(unsigned int dist)
+{
+    dist >>= 4;
+    if (dist >= HEIGHT_STEPS) dist = HEIGHT_STEPS - 1;
+    return height_table[dist];
 }
 
 void view3d_init(void)

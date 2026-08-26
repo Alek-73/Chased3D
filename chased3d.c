@@ -2,6 +2,7 @@
 #include "maze.h"
 #include "trig3d.h"
 #include "view3d.h"
+#include "sprite3d.h"
 
 #define KBD_SKSTAT 0xD20F
 #define KBD_KBCODE 0xD209
@@ -69,6 +70,7 @@ int main(void)
 
     maze_load_level(1);
     minimap_build();
+    sprite3d_build_targets();
 
     /* Start in the open corridor at the top of the map, facing +X. */
     player_x = (1u << 8) | 0x80u;
@@ -77,6 +79,7 @@ int main(void)
 
     view3d_init();
     minimap_show();
+    sprite3d_init();
 
     ticks_per_second = (get_tv() == AT_PAL) ? 50 : 60;
     last_tick = *(volatile unsigned char *)RTCLOK_LOW;
@@ -98,6 +101,7 @@ int main(void)
         else if (key == KEY_D) player_angle += TURN_PER_TICK * frame_ticks;
 
         view3d_render(player_x, player_y, player_angle);
+        sprite3d_draw_targets(player_x, player_y, player_angle);
         minimap_update(player_x, player_y, player_angle);
 
         ++frames;
