@@ -9,6 +9,7 @@
  * masked sprite into it would cost a read-modify-write per pixel. */
 
 #define PMG_PLAYERS 4
+#define PMG_TARGET_PLAYERS 3
 #define PMG_PLAYER_SIZE 128
 #define PMG_PLAYER0_OFFSET 0x200
 
@@ -30,6 +31,7 @@
 #define RANGE_44 192                    /* 12 cells, in 1/16 cell units */
 #define COLLECT_RADIUS 160              /* 0.625 cell, in 8.8 world units */
 #define TARGET_COLOR 0x1E               /* bright yellow */
+#define PURSUER_COLOR 0x34              /* original pursuer PMG color */
 
 #pragma bss-name (push, "PMGRAM")
 static unsigned char pmg_ram[1024];
@@ -42,18 +44,37 @@ static const unsigned char target_sprite[16] = {
     128, 128, 128, 128, 128, 128, 255, 255
 };
 
+static const unsigned char pursuer_sprite[22] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 66, 153, 189, 255,
+    189, 153, 66, 0, 0, 0, 0, 0, 0, 0
+};
+
+/* Open-door glyph: an outlined arch, drawn in the same color as targets since
+ * the original revealed the exit as a target-colored character too. */
+static const unsigned char exit_sprite[16] = {
+    60, 66, 129, 129, 129, 129, 129, 129,
+    129, 129, 129, 129, 129, 129, 129, 255
+};
+
+static unsigned int exit_px;
+static unsigned int exit_py;
+
 static unsigned int target_px[MAX_TARGETS];
 static unsigned int target_py[MAX_TARGETS];
 static unsigned char target_active[MAX_TARGETS];
 static unsigned char target_count;
 static unsigned char targets_left;
 
-static unsigned int cand_dist[PMG_PLAYERS];
-static unsigned char cand_x[PMG_PLAYERS];
-static unsigned char cand_top[PMG_PLAYERS];
-static unsigned char cand_height[PMG_PLAYERS];
+static unsigned int cand_dist[PMG_TARGET_PLAYERS];
+static unsigned char cand_x[PMG_TARGET_PLAYERS];
+static unsigned char cand_top[PMG_TARGET_PLAYERS];
+static unsigned char cand_height[PMG_TARGET_PLAYERS];
 static unsigned char cand_count;
 static unsigned char last_used;
+static unsigned char projected_x;
+static unsigned char projected_top;
+static unsigned char projected_height;
+static unsigned int projected_dist;
 
 void sprite3d_init(void)
 {
@@ -73,7 +94,8 @@ void sprite3d_init(void)
 
     for (player = 0; player < PMG_PLAYERS; ++player) {
         *(volatile unsigned char *)(SIZEP0 + player) = 0;
-        *(volatile unsigned char *)(PCOLR0 + player) = TARGET_COLOR;
+        *(volatile unsigned char *)(PCOLR0 + player) =
+            player == 0 ? PURSUER_COLOR : TARGET_COLOR;
     }
     last_used = 0;
 }
@@ -101,6 +123,28 @@ void sprite3d_build_targets(void)
 unsigned char sprite3d_targets_left(void)
 {
     return targets_left;
+}
+
+/* Cached once per level: the exit tile is fixed for the level's lifetime,
+ * unlike targets which disappear as they are collected. */
+void sprite3d_locate_exit(void)
+{
+    exit_px = ((unsigned int)maze_exit_col << 8) | 0x80;
+    exit_py = ((unsigned int)maze_exit_row << 8) | 0x80;
+}
+
+unsigned char sprite3d_reached_exit(unsigned int px, unsigned int py)
+{
+    int dx;
+    int dy;
+
+    if (!maze_exit_found || targets_left != 0) return 0;
+    dx = (int)exit_px - (int)px;
+    if (dx < 0) dx = -dx;
+    if (dx >= COLLECT_RADIUS) return 0;
+    dy = (int)exit_py - (int)py;
+    if (dy < 0) dy = -dy;
+    return dy < COLLECT_RADIUS;
 }
 
 /* Box test rather than a true radius: no multiply, and the difference is not
@@ -139,8 +183,22 @@ static void clear_player(unsigned char player)
     }
 }
 
+/* Called on a reposition so a sprite left undrawn by a failed projection on
+ * the next frame does not keep showing at its old screen position. */
+void sprite3d_clear_all(void)
+{
+    unsigned char player;
+
+    for (player = 0; player < PMG_PLAYERS; ++player) {
+        clear_player(player);
+    }
+    last_used = 0;
+}
+
+
 static void draw_billboard(unsigned char player, unsigned char sx,
-                           unsigned char top, unsigned char height)
+                           unsigned char top, unsigned char height,
+                           const unsigned char *sprite, unsigned char sprite_rows)
 {
     unsigned char *dest;
     unsigned char i;
@@ -148,28 +206,34 @@ static void draw_billboard(unsigned char player, unsigned char sx,
     unsigned char width;
     unsigned int acc;
     unsigned int step;
+    int left;
 
     /* Player width only scales in hardware by 1x, 2x or 4x. */
     if (height >= 48) { size = 3; width = 32; }
     else if (height >= 24) { size = 1; width = 16; }
     else { size = 0; width = 8; }
 
+    left = (int)sx - (width >> 1);
+    if (left < VIEW_LEFT_PX) left = VIEW_LEFT_PX;
+    if (left + width > VIEW_RIGHT_PX + 1)
+        left = VIEW_RIGHT_PX + 1 - width;
+
     dest = pmg_ram + PMG_PLAYER0_OFFSET + ((unsigned int)player << 7);
     for (i = 0; i < PMG_PLAYER_SIZE; ++i) {
         dest[i] = 0;
     }
 
-    step = (16u << 8) / height;
+    step = ((unsigned int)sprite_rows << 8) / height;
     acc = 0;
     dest += PMG_TOP_OFFSET + top;
     for (i = 0; i < height; ++i) {
-        dest[i] = target_sprite[acc >> 8];
+        dest[i] = sprite[acc >> 8];
         acc += step;
     }
 
     *(volatile unsigned char *)(SIZEP0 + player) = size;
     *(volatile unsigned char *)(HPOSP0 + player) =
-        (unsigned char)(48 + sx - (width >> 1));
+        (unsigned char)(48 + left);
 }
 
 static void add_candidate(unsigned int dist, unsigned char sx,
@@ -177,9 +241,9 @@ static void add_candidate(unsigned int dist, unsigned char sx,
 {
     unsigned char slot;
 
-    if (cand_count == PMG_PLAYERS && dist >= cand_dist[PMG_PLAYERS - 1]) return;
+    if (cand_count == PMG_TARGET_PLAYERS && dist >= cand_dist[PMG_TARGET_PLAYERS - 1]) return;
 
-    slot = cand_count < PMG_PLAYERS ? cand_count : (unsigned char)(PMG_PLAYERS - 1);
+    slot = cand_count < PMG_TARGET_PLAYERS ? cand_count : (unsigned char)(PMG_TARGET_PLAYERS - 1);
     while (slot > 0 && cand_dist[slot - 1] > dist) {
         cand_dist[slot] = cand_dist[slot - 1];
         cand_x[slot] = cand_x[slot - 1];
@@ -191,16 +255,17 @@ static void add_candidate(unsigned int dist, unsigned char sx,
     cand_x[slot] = sx;
     cand_top[slot] = top;
     cand_height[slot] = height;
-    if (cand_count < PMG_PLAYERS) ++cand_count;
+    if (cand_count < PMG_TARGET_PLAYERS) ++cand_count;
 }
 
-void sprite3d_draw_targets(unsigned int px, unsigned int py, unsigned int angle)
+static unsigned char project_object(unsigned int px, unsigned int py,
+                                    unsigned int angle, unsigned int object_x,
+                                    unsigned int object_y)
 {
-    unsigned char i;
     unsigned char idx;
+    unsigned char column;
     unsigned char height;
     unsigned char top;
-    unsigned char column;
     int cos_h;
     int sin_h;
     int dx;
@@ -209,50 +274,98 @@ void sprite3d_draw_targets(unsigned int px, unsigned int py, unsigned int angle)
     int right;
     int limit;
     int screen_x;
-    unsigned int dist;
 
     idx = (unsigned char)(angle >> 8);
-    cos_h = sin3d[(unsigned char)(idx + 64)] >> 1;   /* halved to keep products in range */
+    cos_h = sin3d[(unsigned char)(idx + 64)] >> 1;
     sin_h = sin3d[idx] >> 1;
+    dx = ((int)object_x - (int)px) >> 4;
+    dy = ((int)object_y - (int)py) >> 4;
+    if (dx > RANGE_44 || dx < -RANGE_44 || dy > RANGE_44 || dy < -RANGE_44)
+        return 0;
+
+    forward = ((dx * cos_h) >> 7) + ((dy * sin_h) >> 7);
+    if (forward <= 8) return 0;
+    right = ((-dx * sin_h) >> 7) + ((dy * cos_h) >> 7);
+    limit = (forward * 5) >> 3;
+    if (right > limit || right < -limit) return 0;
+
+    screen_x = VIEW_CENTER_PX + ((right * PROJ_X) / forward);
+    if (screen_x < VIEW_LEFT_PX || screen_x > VIEW_RIGHT_PX) return 0;
+    column = (unsigned char)((screen_x - VIEW_LEFT_PX) >> 3);
+    if (column >= VIEW_COLS) return 0;
+
+    projected_dist = (unsigned int)forward << 4;
+    if (projected_dist > col_dist[column]) return 0;
+    height = view3d_wall_height(projected_dist);
+    top = height >= VIEW_ROWS ? 0 : (unsigned char)((VIEW_ROWS - height) >> 1);
+    if (height > VIEW_ROWS) height = VIEW_ROWS;
+    projected_x = (unsigned char)screen_x;
+    projected_top = top;
+    projected_height = height;
+    return 1;
+}
+
+void sprite3d_draw_targets(unsigned int px, unsigned int py, unsigned int angle)
+{
+    unsigned char i;
     cand_count = 0;
 
     for (i = 0; i < target_count; ++i) {
         if (!target_active[i]) continue;
-        dx = ((int)target_px[i] - (int)px) >> 4;     /* 1/16 cell units */
-        if (dx > RANGE_44 || dx < -RANGE_44) continue;
-        dy = ((int)target_py[i] - (int)py) >> 4;
-        if (dy > RANGE_44 || dy < -RANGE_44) continue;
-
-        forward = ((dx * cos_h) >> 7) + ((dy * sin_h) >> 7);
-        if (forward <= 8) continue;                  /* behind the camera or on top of it */
-
-        right = ((-dx * sin_h) >> 7) + ((dy * cos_h) >> 7);
-        limit = (forward * 5) >> 3;                  /* just outside the 60 degree view */
-        if (right > limit || right < -limit) continue;
-
-        screen_x = VIEW_CENTER_PX + ((right * PROJ_X) / forward);
-        if (screen_x < VIEW_LEFT_PX || screen_x > VIEW_RIGHT_PX) continue;
-
-        column = (unsigned char)((screen_x - VIEW_LEFT_PX) >> 3);
-        if (column >= VIEW_COLS) continue;
-
-        dist = (unsigned int)forward << 4;
-        if (dist >= col_dist[column]) continue;      /* hidden behind a wall */
-
-        height = view3d_wall_height(dist);
-        top = height >= VIEW_ROWS
-            ? 0
-            : (unsigned char)((VIEW_ROWS - height) >> 1);
-        if (height > VIEW_ROWS) height = VIEW_ROWS;
-
-        add_candidate(dist, (unsigned char)screen_x, top, height);
+        if (project_object(px, py, angle, target_px[i], target_py[i]))
+            add_candidate(projected_dist, projected_x, projected_top,
+                          projected_height);
     }
+    if (targets_left == 0 && maze_exit_found
+        && project_object(px, py, angle, exit_px, exit_py))
+        add_candidate(projected_dist, projected_x, projected_top, projected_height);
 
+    /* When no targets remain, the only candidate this frame is the exit. */
     for (i = 0; i < cand_count; ++i) {
-        draw_billboard(i, cand_x[i], cand_top[i], cand_height[i]);
+        draw_billboard((unsigned char)(i + 1), cand_x[i], cand_top[i],
+                       cand_height[i],
+                       targets_left == 0 ? exit_sprite : target_sprite, 16);
     }
-    for (i = cand_count; i < last_used; ++i) {
+    for (i = (unsigned char)(cand_count + 1); i <= last_used; ++i) {
         clear_player(i);
     }
-    last_used = cand_count;
+    last_used = (unsigned char)(cand_count + 1);
+}
+
+void sprite3d_draw_pursuer(unsigned int px, unsigned int py, unsigned int angle,
+                           unsigned int pursuer_x, unsigned int pursuer_y)
+{
+    int dx;
+    int dy;
+    int abs_dx;
+    int abs_dy;
+    int steps;
+    int i;
+    unsigned int sx;
+    unsigned int sy;
+
+    *(volatile unsigned char *)SIZEP0 = 0;
+    if (!project_object(px, py, angle, pursuer_x, pursuer_y)) return;
+
+    /* The column-distance test above is only an approximation: it can miss a
+     * wall that does not line up with the pursuer's own ray column, so a
+     * real line-of-sight check confirms no wall actually lies in between. */
+    dx = (int)pursuer_x - (int)px;
+    dy = (int)pursuer_y - (int)py;
+    abs_dx = dx < 0 ? -dx : dx;
+    abs_dy = dy < 0 ? -dy : dy;
+    steps = (abs_dx > abs_dy ? abs_dx : abs_dy) / 64;
+    if (steps < 2) steps = 2;
+    for (i = 1; i <= steps; ++i) {
+        sx = (unsigned int)((int)px + dx * i / steps);
+        sy = (unsigned int)((int)py + dy * i / steps);
+        if (maze_solid((unsigned char)(sx >> 8), (unsigned char)(sy >> 8))) return;
+    }
+
+    if (projected_height > 32) {
+        projected_height = 32;
+        projected_top = (VIEW_ROWS - 32) >> 1;
+    }
+    draw_billboard(0, projected_x, projected_top, projected_height,
+                   pursuer_sprite, 22);
 }

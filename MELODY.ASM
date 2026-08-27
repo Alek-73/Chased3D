@@ -15,6 +15,10 @@
         .export _melody_freq0
         .export _melody_freq1
         .export _melody_dur
+        .export _melody_threat_level
+        .export _melody_threat_freq
+        .export _melody_threat_dur
+        .export _melody_threat_length
 
 SETVBV  = $E45C
 VVBLKD  = $0224
@@ -22,6 +26,7 @@ AUDF1   = $D200
 AUDC1   = $D201
 AUDF2   = $D202
 AUDC2   = $D203
+AUDF3   = $D204
 AUDC3   = $D205
 AUDC4   = $D207
 AUDCTL  = $D208
@@ -45,6 +50,20 @@ _melody_freq1:
         .res MELODY_MAX
 _melody_dur:
         .res MELODY_MAX
+_melody_threat_level:
+        .res 1
+_melody_threat_freq:
+        .res 16
+_melody_threat_dur:
+        .res 16
+_melody_threat_length:
+        .res 1
+threat_index:
+        .res 1
+threat_timer:
+        .res 1
+threat_frequency:
+        .res 1
 melody_volume:
         .res 1
 saved_vbi:
@@ -59,6 +78,9 @@ _melody_install:
         sta AUDC2
         sta AUDC3
         sta AUDC4
+        sta _melody_threat_level
+        sta threat_index
+        sta threat_timer
         sta _melody_active
         lda #$03
         sta SKCTL
@@ -84,6 +106,7 @@ melody_vbi:
         tya
         pha
         jsr melody_tick
+        jsr threat_tick
         pla
         tay
         pla
@@ -144,4 +167,43 @@ save_note:
         inx
         stx _melody_index
 melody_done:
+        rts
+
+threat_tick:
+        lda _melody_threat_level
+        beq threat_silence
+        lda threat_timer
+        beq threat_load_note
+        dec threat_timer
+        lda threat_frequency
+        beq threat_silence
+        sta AUDF3
+        lda _melody_threat_level
+        ora #$A0
+        sta AUDC3
+        rts
+
+threat_load_note:
+        ldx threat_index
+        cpx _melody_threat_length
+        bcc threat_have_note
+        ldx #$00
+        stx threat_index
+threat_have_note:
+        lda _melody_threat_freq,x
+        sta threat_frequency
+        lda _melody_threat_dur,x
+        sta threat_timer
+        inc threat_index
+        lda threat_frequency
+        beq threat_silence
+        sta AUDF3
+        lda _melody_threat_level
+        ora #$A0
+        sta AUDC3
+        rts
+
+threat_silence:
+        lda #$00
+        sta AUDC3
         rts

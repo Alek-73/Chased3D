@@ -1,4 +1,5 @@
 #include <atari.h>
+#include <stdlib.h>
 #include "maze.h"
 #include "trig3d.h"
 #include "view3d.h"
@@ -16,11 +17,34 @@
 #define MOVE_PER_TICK 20
 #define TURN_PER_TICK 400u
 #define MAX_TICKS 6
+#define PURSUER_PER_TICK 8
+#define THREAT_DISTANCE 4096
+
+/* Same triplet string the original BASIC game plays when the pursuer catches
+ * the player (line 305 of chased1V3.BAS). */
+#define CAUGHT_MELODY "A14C28B18A14G14A11"
+#define STARTING_LIVES 3
+
+#define PLAYER_START_X ((1u << 8) | 0x80u)
+#define PLAYER_START_Y ((1u << 8) | 0x80u)
+#define PLAYER_START_ANGLE 0
+#define PURSUER_START_X ((18u << 8) | 0x80u)
+#define PURSUER_START_Y ((57u << 8) | 0x80u)
+#define LEVEL_MAX 5
+
+/* Same melodies as chased1V3.BAS lines 460 and 464: a level-clear jingle
+ * followed by the loading tune while the next level is prepared. */
+#define LEVEL_CLEAR_MELODY "C12C14E18B08C14A14G18F14E18D18E14D14C14P01"
+#define LEVEL_LOAD_MELODY "C14C14E14C18F18C18E18C14D14P04"
 
 static unsigned char frame_ticks = 1;
+static unsigned char lives = STARTING_LIVES;
+static unsigned char level = 1;
 static unsigned int player_x;
 static unsigned int player_y;
 static unsigned int player_angle;
+static unsigned int pursuer_x;
+static unsigned int pursuer_y;
 
 /* SKSTAT bit 2 clears while a key is held, which gives continuous movement. */
 static unsigned char read_key(void)
@@ -61,6 +85,148 @@ static void step_forward(signed char direction)
     try_move((dir_x * step) >> 8, (dir_y * step) >> 8);
 }
 
+/* Ticks before a stale target is abandoned, matching the original's
+ * TARGETCNT threshold (chased1V3.BAS line 1004). */
+#define RETARGET_STALE_TICKS 50
+
+static signed char pursuer_dir_x = 0;
+static signed char pursuer_dir_y = 0;
+static unsigned char pursuer_target_col;
+static unsigned char pursuer_target_row;
+static unsigned char pursuer_retarget_timer = RETARGET_STALE_TICKS + 1;
+
+/* Aims at a snapshot of the player's tile rather than their live position,
+ * and keeps heading that way until it goes stale, is reached, or is blocked -
+ * same navigation algorithm as chased1V3.BAS lines 900-1022. */
+static void move_pursuer(void)
+{
+    static const signed char dir_x[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
+    static const signed char dir_y[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
+    unsigned char col;
+    unsigned char row;
+    unsigned char next_col;
+    unsigned char next_row;
+    unsigned char need_retarget;
+    unsigned char i;
+    unsigned char best;
+    int best_distance;
+    int distance;
+    int candidate_x;
+    int candidate_y;
+
+    col = (unsigned char)(pursuer_x >> 8);
+    row = (unsigned char)(pursuer_y >> 8);
+
+    pursuer_retarget_timer += frame_ticks;
+    need_retarget = pursuer_retarget_timer > RETARGET_STALE_TICKS;
+    if (col == pursuer_target_col && row == pursuer_target_row) need_retarget = 1;
+    if (!need_retarget && (pursuer_dir_x != 0 || pursuer_dir_y != 0)) {
+        next_col = (unsigned char)(col + pursuer_dir_x);
+        next_row = (unsigned char)(row + pursuer_dir_y);
+        if (maze_solid(next_col, row) || maze_solid(col, next_row)) need_retarget = 1;
+    }
+
+    if (need_retarget) {
+        pursuer_target_col = (unsigned char)(player_x >> 8);
+        pursuer_target_row = (unsigned char)(player_y >> 8);
+        pursuer_retarget_timer = 0;
+
+        best = 0;
+        best_distance = 32767;
+        for (i = 0; i < 8; ++i) {
+            next_col = (unsigned char)(col + dir_x[i]);
+            next_row = (unsigned char)(row + dir_y[i]);
+            if (maze_solid(next_col, row) || maze_solid(col, next_row)) continue;
+            distance = abs((int)next_col - (int)pursuer_target_col)
+                     + abs((int)next_row - (int)pursuer_target_row);
+            if (distance < best_distance) {
+                best_distance = distance;
+                best = i;
+            }
+        }
+        pursuer_dir_x = dir_x[best];
+        pursuer_dir_y = dir_y[best];
+    }
+
+    candidate_x = (int)pursuer_x + pursuer_dir_x * PURSUER_PER_TICK * frame_ticks;
+    candidate_y = (int)pursuer_y + pursuer_dir_y * PURSUER_PER_TICK * frame_ticks;
+    if (!maze_solid((unsigned char)(candidate_x >> 8), row))
+        pursuer_x = (unsigned int)candidate_x;
+    if (!maze_solid((unsigned char)(pursuer_x >> 8), (unsigned char)(candidate_y >> 8)))
+        pursuer_y = (unsigned int)candidate_y;
+}
+
+/* Same maze cell as the original BASIC game's tile-equality catch test. */
+static unsigned char pursuer_caught_player(void)
+{
+    return (player_x >> 8) == (pursuer_x >> 8)
+        && (player_y >> 8) == (pursuer_y >> 8);
+}
+
+/* Repositions player and pursuer to their starting spots, used both after a
+ * catch and after finishing a level. */
+static void reset_positions(void)
+{
+    player_x = PLAYER_START_X;
+    player_y = PLAYER_START_Y;
+    player_angle = PLAYER_START_ANGLE;
+    pursuer_x = PURSUER_START_X;
+    pursuer_y = PURSUER_START_Y;
+    pursuer_dir_x = 0;
+    pursuer_dir_y = 0;
+    pursuer_retarget_timer = RETARGET_STALE_TICKS + 1;
+    sprite3d_clear_all();
+}
+
+static void handle_catch(void)
+{
+    melody_set_threat_level(0);
+    melody_play(CAUGHT_MELODY);
+    while (melody_playing()) waitvsync();
+
+    if (--lives == 0) lives = STARTING_LIVES;
+
+    reset_positions();
+}
+
+static void update_threat_sound(void)
+{
+    int distance;
+    unsigned char level_signal;
+
+    distance = abs((int)player_x - (int)pursuer_x)
+             + abs((int)player_y - (int)pursuer_y);
+    if (distance >= THREAT_DISTANCE) {
+        level_signal = 0;
+    } else {
+        level_signal = (unsigned char)((THREAT_DISTANCE - distance) >> 8);
+        if (level_signal == 0) level_signal = 1;
+        if (level_signal > 15) level_signal = 15;
+    }
+    melody_set_threat_level(level_signal);
+}
+
+/* Reached once all targets are collected and the exit becomes walkable;
+ * mirrors chased1V3.BAS lines 460-469. */
+static void handle_level_clear(void)
+{
+    melody_set_threat_level(0);
+    melody_play(LEVEL_CLEAR_MELODY);
+    while (melody_playing()) waitvsync();
+
+    level = (level >= LEVEL_MAX) ? 1 : (unsigned char)(level + 1);
+    maze_load_level(level);
+    minimap_build();
+    sprite3d_build_targets();
+    sprite3d_locate_exit();
+    hud_set_targets(sprite3d_targets_left());
+
+    melody_play(LEVEL_LOAD_MELODY);
+    while (melody_playing()) waitvsync();
+
+    reset_positions();
+}
+
 int main(void)
 {
     unsigned char key;
@@ -73,16 +239,20 @@ int main(void)
     maze_load_level(1);
     minimap_build();
     sprite3d_build_targets();
+    sprite3d_locate_exit();
 
     /* Start in the open corridor at the top of the map, facing +X. */
-    player_x = (1u << 8) | 0x80u;
-    player_y = (1u << 8) | 0x80u;
-    player_angle = 0;
+    player_x = PLAYER_START_X;
+    player_y = PLAYER_START_Y;
+    player_angle = PLAYER_START_ANGLE;
+    pursuer_x = PURSUER_START_X;
+    pursuer_y = PURSUER_START_Y;
 
     view3d_init();
     minimap_show();
     sprite3d_init();
     melody_install();
+    melody_threat_play("A02A02E12A02A02E12");
     *(volatile unsigned char *)NOCLIK = 1;
     hud_set_targets(sprite3d_targets_left());
 
@@ -105,14 +275,22 @@ int main(void)
         else if (key == KEY_A) player_angle -= TURN_PER_TICK * frame_ticks;
         else if (key == KEY_D) player_angle += TURN_PER_TICK * frame_ticks;
 
+        move_pursuer();
+        update_threat_sound();
+        if (pursuer_caught_player()) handle_catch();
         if (sprite3d_collect(player_x, player_y)) {
             hud_set_targets(sprite3d_targets_left());
             melody_pickup();
         }
+        if (sprite3d_targets_left() == 0) maze_set_exit_open(1);
+        if (sprite3d_reached_exit(player_x, player_y)) handle_level_clear();
 
         view3d_render(player_x, player_y, player_angle);
         sprite3d_draw_targets(player_x, player_y, player_angle);
-        minimap_update(player_x, player_y, player_angle);
+        sprite3d_draw_pursuer(player_x, player_y, player_angle,
+                      pursuer_x, pursuer_y);
+        minimap_update(player_x, player_y, player_angle,
+                   pursuer_x, pursuer_y);
 
         ++frames;
         now = *(volatile unsigned char *)RTCLOK_LOW;

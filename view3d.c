@@ -80,6 +80,7 @@ static unsigned char view_dlist[104];
 static unsigned char minimap_bits[MAZE_H][MINI_BYTES];
 static unsigned char marker_row = 0xFF;
 static unsigned char nose_row = 0xFF;
+static unsigned char pursuer_row = 0xFF;
 
 /* Facing quantised to 8 compass points; angle 0 is +X with +Y running down. */
 static const signed char dir_dx[8] = {  1,  1,  0, -1, -1, -1,  0,  1 };
@@ -283,7 +284,8 @@ static void minimap_plot(unsigned char col, unsigned char row, unsigned char val
     *dest = (unsigned char)((*dest & ~(0x03 << shift)) | (value << shift));
 }
 
-void minimap_update(unsigned int px, unsigned int py, unsigned int angle)
+void minimap_update(unsigned int px, unsigned int py, unsigned int angle,
+                    unsigned int pursuer_x, unsigned int pursuer_y)
 {
     unsigned char col;
     unsigned char row;
@@ -291,6 +293,7 @@ void minimap_update(unsigned int px, unsigned int py, unsigned int angle)
 
     minimap_restore_row(marker_row);
     minimap_restore_row(nose_row);
+    minimap_restore_row(pursuer_row);
 
     col = (unsigned char)(px >> 8);
     row = (unsigned char)(py >> 8);
@@ -300,6 +303,9 @@ void minimap_update(unsigned int px, unsigned int py, unsigned int angle)
     minimap_plot((unsigned char)(col + dir_dx[facing]), nose_row, 0x01);
     minimap_plot(col, row, 0x03);
     marker_row = row;
+
+    pursuer_row = (unsigned char)(pursuer_y >> 8);
+    minimap_plot((unsigned char)(pursuer_x >> 8), pursuer_row, 0x01);
 }
 
 /* ANTIC mode 6 uses internal character codes, not ATASCII; bits 6-7 pick the

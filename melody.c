@@ -1,6 +1,7 @@
 #include "melody.h"
 
 #define MELODY_MAX 32
+#define THREAT_MELODY_MAX 16
 #define REST 16
 
 extern unsigned char melody_active;
@@ -10,6 +11,9 @@ extern unsigned char melody_length;
 extern unsigned char melody_freq0[];
 extern unsigned char melody_freq1[];
 extern unsigned char melody_dur[];
+extern unsigned char melody_threat_freq[];
+extern unsigned char melody_threat_dur[];
+extern unsigned char melody_threat_length;
 
 /* A0 B0 C1 D1 E1 F1 G1 A1 B1 C2 D2 E2 F2 G2 A2 B2, then a rest. */
 static const unsigned char note_frequency[17] = {
@@ -82,4 +86,39 @@ void melody_play(const char *melody)
 void melody_pickup(void)
 {
     melody_play("C11E11G11C22");
+}
+
+unsigned char melody_playing(void)
+{
+    return melody_active;
+}
+
+void melody_threat_play(const char *melody)
+{
+    unsigned int index;
+    unsigned char note;
+    unsigned char duration;
+    unsigned char length;
+
+    length = 0;
+    for (index = 0; length < THREAT_MELODY_MAX; index += 3) {
+        if (melody[index] == '\0' || melody[index + 1] == '\0'
+            || melody[index + 2] == '\0') break;
+        note = melody_note_index((unsigned char)melody[index],
+                                 (unsigned char)melody[index + 1]);
+        duration = (unsigned char)(melody[index + 2] - '0');
+        if (duration != 1 && duration != 2 && duration != 4) duration = 1;
+        melody_threat_freq[length] = note_frequency[note];
+        melody_threat_dur[length] = (unsigned char)(duration * 5);
+        ++length;
+    }
+    melody_threat_length = length;
+}
+
+void melody_set_threat_level(unsigned char level)
+{
+    extern unsigned char melody_threat_level;
+
+    if (level > 15) level = 15;
+    melody_threat_level = level;
 }

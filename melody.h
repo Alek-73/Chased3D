@@ -4,5 +4,8 @@
 void melody_install(void);
 void melody_play(const char *melody);
 void melody_pickup(void);
+unsigned char melody_playing(void);
+void melody_threat_play(const char *melody);
+void melody_set_threat_level(unsigned char level);
 
 #endif

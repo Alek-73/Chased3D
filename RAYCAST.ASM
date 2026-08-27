@@ -14,6 +14,7 @@
         .export _dda_cast
 
         .import _maze_row_lo, _maze_row_hi
+        .import _maze_exit_open
 
 MAZE_W = 20
 MAZE_H = 59
@@ -55,8 +56,10 @@ _dda_cast:
         lda #$00
         sta _dda_hit
         ldx _dda_steps
-        beq dda_done
+        bne dda_start
+        jmp dda_done
 
+dda_start:
 dda_loop:
         lda _dda_side_x
         cmp _dda_side_y
@@ -69,7 +72,9 @@ dda_loop:
         adc _dda_step_x
         sta _dda_map_x
         cmp #MAZE_W                ; unsigned test also catches the $FF underflow
-        bcs dda_done
+        bcc dda_x_ok
+        jmp dda_done
+dda_x_ok:
         clc
         lda _dda_side_x
         adc _dda_delta_x
@@ -87,7 +92,9 @@ dda_step_y:
         adc _dda_step_y
         sta _dda_map_y
         cmp #MAZE_H
-        bcs dda_done
+        bcc dda_y_ok
+        jmp dda_done
+dda_y_ok:
         clc
         lda _dda_side_y
         adc _dda_delta_y
@@ -107,14 +114,23 @@ dda_tile:
         ldy _dda_map_x
         lda (dda_ptr),y
         cmp #$01
-        beq dda_wall
+        beq dda_wall_near
         cmp #$02
-        beq dda_wall
+        beq dda_wall_near
+        cmp #$05                   ; exit gate: solid only while closed
+        bne dda_continue
+        lda _maze_exit_open
+        beq dda_wall_near
+dda_continue:
         dex
-        bne dda_loop
+        beq dda_done
+        jmp dda_loop
 
 dda_done:
         rts
+
+dda_wall_near:
+        jmp dda_wall
 
 dda_wall:
         lda #$01
