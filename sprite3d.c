@@ -1,4 +1,5 @@
 #include <atari.h>
+#include <stdlib.h>
 #include "maze.h"
 #include "trig3d.h"
 #include "view3d.h"
@@ -33,6 +34,7 @@
 #define COLLECT_RADIUS 160              /* 0.625 cell, in 8.8 world units */
 #define TARGET_COLOR 0x1E               /* bright yellow */
 #define PURSUER_COLOR 0x34              /* original pursuer PMG color */
+#define LASER_COLOR 0xC8                 /* bright green */
 #define DECOY_COLOR 154                  /* BASIC COLOR2, used by screen code 138 */
 
 #pragma bss-name (push, "PMGRAM")
@@ -56,15 +58,22 @@ static const unsigned char decoy_sprite[8] = {
     18, 22, 24, 60, 60, 24, 104, 72
 };
 
-/* Open-door glyph: an outlined arch, drawn in the same color as targets since
- * the original revealed the exit as a target-colored character too. */
+/* Thick upward arrow marking the open exit. */
 static const unsigned char exit_sprite[16] = {
-    60, 66, 129, 129, 129, 129, 129, 129,
-    129, 129, 129, 129, 129, 129, 129, 255
+     24,  60, 126, 255, 255,  60,  60,  60,
+     60,  60,  60,  60,  60,  60,  60,  60
+};
+
+static const unsigned char laser_sprite[16] = {
+     0, 129,  36,  90,  24, 126,  60, 255,
+    255,  60, 126,  24,  90,  36, 129,   0
 };
 
 static unsigned int exit_px;
 static unsigned int exit_py;
+static unsigned int laser_px;
+static unsigned int laser_py;
+static unsigned char laser_found;
 
 static unsigned int target_px[MAX_TARGETS];
 static unsigned int target_py[MAX_TARGETS];
@@ -82,6 +91,7 @@ static unsigned char projected_x;
 static unsigned char projected_top;
 static unsigned char projected_height;
 static unsigned int projected_dist;
+static unsigned char cand_limit;
 
 static void draw_billboard(unsigned char player, unsigned char sx,
                            unsigned char top, unsigned char height,
@@ -131,6 +141,50 @@ void sprite3d_build_targets(void)
         }
     }
     targets_left = target_count;
+}
+
+/* Reservoir sampling chooses a new tile without storing a candidate list. */
+void sprite3d_build_laser(unsigned int avoid_x, unsigned int avoid_y)
+{
+    unsigned char row;
+    unsigned char col;
+    unsigned char count;
+    unsigned char fallback_col;
+    unsigned char fallback_row;
+    unsigned char fallback_found;
+    unsigned char old_col;
+    unsigned char old_row;
+
+    old_col = (unsigned char)(laser_px >> 8);
+    old_row = (unsigned char)(laser_py >> 8);
+    count = 0;
+    fallback_found = 0;
+    for (row = 0; row < MAZE_H; ++row) {
+        for (col = 0; col < MAZE_W; ++col) {
+            if (maze_map[row][col] != 6) continue;
+            if (!fallback_found) {
+                fallback_col = col;
+                fallback_row = row;
+                fallback_found = 1;
+            }
+            if (laser_found && col == old_col && row == old_row) continue;
+            if (col == (unsigned char)(avoid_x >> 8)
+                && row == (unsigned char)(avoid_y >> 8)) continue;
+            ++count;
+            if ((unsigned int)rand() % count != 0) continue;
+            laser_px = ((unsigned int)col << 8) | 0x80;
+            laser_py = ((unsigned int)row << 8) | 0x80;
+        }
+    }
+    if (count != 0) {
+        laser_found = 1;
+    } else if (fallback_found) {
+        laser_px = ((unsigned int)fallback_col << 8) | 0x80;
+        laser_py = ((unsigned int)fallback_row << 8) | 0x80;
+        laser_found = 1;
+    } else {
+        laser_found = 0;
+    }
 }
 
 unsigned char sprite3d_targets_left(void)
@@ -183,6 +237,20 @@ unsigned char sprite3d_collect(unsigned int px, unsigned int py)
         ++taken;
     }
     return taken;
+}
+
+unsigned char sprite3d_hit_laser(unsigned int px, unsigned int py)
+{
+    int dx;
+    int dy;
+
+    if (!laser_found) return 0;
+    dx = (int)laser_px - (int)px;
+    if (dx < 0) dx = -dx;
+    if (dx >= COLLECT_RADIUS) return 0;
+    dy = (int)laser_py - (int)py;
+    if (dy < 0) dy = -dy;
+    return dy < COLLECT_RADIUS;
 }
 
 static void clear_player(unsigned char player)
@@ -263,9 +331,9 @@ static void add_candidate(unsigned int dist, unsigned char sx,
 {
     unsigned char slot;
 
-    if (cand_count == PMG_TARGET_PLAYERS && dist >= cand_dist[PMG_TARGET_PLAYERS - 1]) return;
+    if (cand_count == cand_limit && dist >= cand_dist[cand_limit - 1]) return;
 
-    slot = cand_count < PMG_TARGET_PLAYERS ? cand_count : (unsigned char)(PMG_TARGET_PLAYERS - 1);
+    slot = cand_count < cand_limit ? cand_count : (unsigned char)(cand_limit - 1);
     while (slot > 0 && cand_dist[slot - 1] > dist) {
         cand_dist[slot] = cand_dist[slot - 1];
         cand_x[slot] = cand_x[slot - 1];
@@ -277,7 +345,7 @@ static void add_candidate(unsigned int dist, unsigned char sx,
     cand_x[slot] = sx;
     cand_top[slot] = top;
     cand_height[slot] = height;
-    if (cand_count < PMG_TARGET_PLAYERS) ++cand_count;
+    if (cand_count < cand_limit) ++cand_count;
 }
 
 static unsigned char project_object(unsigned int px, unsigned int py,
@@ -387,7 +455,21 @@ void sprite3d_draw_decoy(unsigned char active, unsigned int px, unsigned int py,
 void sprite3d_draw_targets(unsigned int px, unsigned int py, unsigned int angle)
 {
     unsigned char i;
+    unsigned char first_player;
+    unsigned char used;
+
     cand_count = 0;
+    first_player = 1;
+
+    if (laser_found && project_object(px, py, angle, laser_px, laser_py)) {
+        *(volatile unsigned char *)(PCOLR0 + 1) = LASER_COLOR;
+        draw_billboard(1, projected_x, projected_top, projected_height,
+                       laser_sprite, 16);
+        first_player = 2;
+    } else {
+        *(volatile unsigned char *)(PCOLR0 + 1) = TARGET_COLOR;
+    }
+    cand_limit = (unsigned char)(PMG_PLAYERS - first_player);
 
     for (i = 0; i < target_count; ++i) {
         if (!target_active[i]) continue;
@@ -401,14 +483,15 @@ void sprite3d_draw_targets(unsigned int px, unsigned int py, unsigned int angle)
 
     /* When no targets remain, the only candidate this frame is the exit. */
     for (i = 0; i < cand_count; ++i) {
-        draw_billboard((unsigned char)(i + 1), cand_x[i], cand_top[i],
+        draw_billboard((unsigned char)(i + first_player), cand_x[i], cand_top[i],
                        cand_height[i],
                        targets_left == 0 ? exit_sprite : target_sprite, 16);
     }
-    for (i = (unsigned char)(cand_count + 1); i <= last_used; ++i) {
+    used = (unsigned char)(first_player + cand_count - 1);
+    for (i = (unsigned char)(used + 1); i <= last_used; ++i) {
         clear_player(i);
     }
-    last_used = (unsigned char)(cand_count + 1);
+    last_used = used;
 }
 
 void sprite3d_draw_pursuer(unsigned int px, unsigned int py, unsigned int angle,

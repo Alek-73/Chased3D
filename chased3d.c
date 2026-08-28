@@ -8,6 +8,7 @@
 
 #define KBD_SKSTAT 0xD20F
 #define KBD_KBCODE 0xD209
+#define POKEY_RANDOM 0xD20A
 #define NOCLIK 0x02DB   /* non-zero silences the OS key click */
 #define RTCLOK_LOW 20   /* OS jiffy counter, bumped every vertical blank */
 
@@ -20,6 +21,8 @@
 #define PURSUER_PER_TICK 8
 #define THREAT_DISTANCE 4096
 #define DECOY_CAPTURE_TICKS 40
+#define DECOY_RECHARGE_TICKS 200
+#define LASER_SECONDS 5
 
 /* Same triplet string the original BASIC game plays when the pursuer catches
  * the player (line 305 of chased1V3.BAS). */
@@ -37,6 +40,9 @@
  * followed by the loading tune while the next level is prepared. */
 #define LEVEL_CLEAR_MELODY "C12C14E18B08C14A14G18F14E18D18E14D14C14P01"
 #define LEVEL_LOAD_MELODY "C14C14E14C18F18C18E18C14D14P04"
+#define DECOY_DEPLOY_MELODY "C21G21C22"
+#define DECOY_TRAPPED_MELODY "G11D11G02"
+#define DECOY_READY_MELODY "C21E21G21C22"
 
 static unsigned char frame_ticks = 1;
 static unsigned char lives = STARTING_LIVES;
@@ -51,6 +57,9 @@ static unsigned int decoy_y;
 static unsigned char decoy_active;
 static unsigned char decoy_available = 1;
 static unsigned char decoy_capture_ticks;
+static unsigned char decoy_recharge_ticks = DECOY_RECHARGE_TICKS;
+static unsigned int laser_elapsed_ticks;
+static unsigned int laser_period_ticks;
 
 /* SKSTAT bit 2 clears while a key is held, which gives continuous movement. */
 static unsigned char read_key(void)
@@ -126,11 +135,13 @@ static void move_pursuer(void)
     if (decoy_active
         && col == (unsigned char)(decoy_x >> 8)
         && row == (unsigned char)(decoy_y >> 8)) {
+        if (decoy_capture_ticks == 0) melody_play(DECOY_TRAPPED_MELODY);
         decoy_capture_ticks += frame_ticks;
         if (decoy_capture_ticks < DECOY_CAPTURE_TICKS) return;
         decoy_active = 0;
-        decoy_available = 1;
+        decoy_available = 0;
         decoy_capture_ticks = 0;
+        decoy_recharge_ticks = 0;
         pursuer_retarget_timer = RETARGET_STALE_TICKS + 1;
     }
 
@@ -190,7 +201,34 @@ static void deploy_decoy(void)
     decoy_active = 1;
     decoy_available = 0;
     decoy_capture_ticks = 0;
+    decoy_recharge_ticks = 0;
     pursuer_retarget_timer = RETARGET_STALE_TICKS + 1;
+    melody_play(DECOY_DEPLOY_MELODY);
+}
+
+static void update_decoy_recharge(void)
+{
+    unsigned int next;
+
+    if (!decoy_active && decoy_recharge_ticks < DECOY_RECHARGE_TICKS) {
+        next = (unsigned int)decoy_recharge_ticks + frame_ticks;
+        decoy_recharge_ticks = next >= DECOY_RECHARGE_TICKS
+            ? DECOY_RECHARGE_TICKS : (unsigned char)next;
+        if (decoy_recharge_ticks >= DECOY_RECHARGE_TICKS)
+            melody_play(DECOY_READY_MELODY);
+    }
+    if (!decoy_active && decoy_recharge_ticks >= DECOY_RECHARGE_TICKS)
+        decoy_available = 1;
+    hud_set_decoy(decoy_recharge_ticks, DECOY_RECHARGE_TICKS);
+}
+
+static void update_laser(void)
+{
+    laser_elapsed_ticks += frame_ticks;
+    if (laser_elapsed_ticks < laser_period_ticks) return;
+    laser_elapsed_ticks = 0;
+    sprite3d_build_laser(player_x, player_y);
+    melody_laser_buzz();
 }
 
 /* Repositions player and pursuer to their starting spots, used both after a
@@ -208,6 +246,7 @@ static void reset_positions(void)
     decoy_active = 0;
     decoy_available = 1;
     decoy_capture_ticks = 0;
+    decoy_recharge_ticks = DECOY_RECHARGE_TICKS;
     sprite3d_clear_all();
 }
 
@@ -250,7 +289,9 @@ static void handle_level_clear(void)
     level = (level >= LEVEL_MAX) ? 1 : (unsigned char)(level + 1);
     maze_load_level(level);
     minimap_build();
+    minimap_show();
     sprite3d_build_targets();
+    sprite3d_build_laser(player_x, player_y);
     sprite3d_locate_exit();
     hud_set_targets(sprite3d_targets_left());
 
@@ -258,6 +299,8 @@ static void handle_level_clear(void)
     while (melody_playing()) waitvsync();
 
     reset_positions();
+    laser_elapsed_ticks = 0;
+    melody_laser_buzz();
 }
 
 int main(void)
@@ -270,9 +313,12 @@ int main(void)
     unsigned char frames;
     unsigned char previous_key;
 
+    srand(((unsigned int)*(volatile unsigned char *)POKEY_RANDOM << 8)
+          | *(volatile unsigned char *)RTCLOK_LOW);
     maze_load_level(1);
     minimap_build();
     sprite3d_build_targets();
+    sprite3d_build_laser(PLAYER_START_X, PLAYER_START_Y);
     sprite3d_locate_exit();
 
     /* Start in the open corridor at the top of the map, facing +X. */
@@ -287,10 +333,14 @@ int main(void)
     sprite3d_init();
     melody_install();
     melody_threat_play("A02A02E12A02A02E12");
+    melody_laser_buzz();
     *(volatile unsigned char *)NOCLIK = 1;
     hud_set_targets(sprite3d_targets_left());
+    hud_set_decoy(decoy_recharge_ticks, DECOY_RECHARGE_TICKS);
 
     ticks_per_second = (get_tv() == AT_PAL) ? 50 : 60;
+    laser_period_ticks = (unsigned int)ticks_per_second * LASER_SECONDS;
+    laser_elapsed_ticks = 0;
     last_tick = *(volatile unsigned char *)RTCLOK_LOW;
     prev_tick = last_tick;
     frames = 0;
@@ -312,9 +362,12 @@ int main(void)
         else if (key == KEY_SPACE && previous_key != KEY_SPACE) deploy_decoy();
         previous_key = key;
 
+        update_decoy_recharge();
+        update_laser();
         move_pursuer();
         update_threat_sound();
-        if (pursuer_caught_player()) handle_catch();
+        if (pursuer_caught_player() || sprite3d_hit_laser(player_x, player_y))
+            handle_catch();
         if (sprite3d_collect(player_x, player_y)) {
             hud_set_targets(sprite3d_targets_left());
             melody_pickup();

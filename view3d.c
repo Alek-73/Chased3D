@@ -34,6 +34,9 @@ unsigned int col_dist[VIEW_COLS];
  * It owns the left 5 screen bytes; the 3D view starts after it so that the
  * raycaster never overwrites the map. */
 #define MINI_BYTES 5
+#define DECOY_BAR_TOP (MAZE_H + 2)
+#define DECOY_BAR_HEIGHT 6
+#define DECOY_BAR_INNER_WIDTH (MAZE_W - 2)
 
 extern unsigned char col3d_x;
 extern unsigned char col3d_row;
@@ -330,6 +333,33 @@ void hud_set_targets(unsigned char remaining)
     hud_line[12] = (unsigned char)(52 | HUD_COLOR);   /* T */
     hud_line[14] = (unsigned char)((16 + (remaining / 10)) | HUD_COLOR);
     hud_line[15] = (unsigned char)((16 + (remaining % 10)) | HUD_COLOR);
+}
+
+void hud_set_decoy(unsigned char progress, unsigned char maximum)
+{
+    unsigned char filled;
+    unsigned char col;
+    unsigned char row;
+    unsigned char value;
+    unsigned char shift;
+    unsigned char *dest;
+
+    filled = maximum == 0 ? DECOY_BAR_INNER_WIDTH
+        : (unsigned char)(((unsigned int)progress * DECOY_BAR_INNER_WIDTH) / maximum);
+    if (filled > DECOY_BAR_INNER_WIDTH) filled = DECOY_BAR_INNER_WIDTH;
+
+    for (row = 0; row < DECOY_BAR_HEIGHT; ++row) {
+        dest = view_buffer + (unsigned int)(DECOY_BAR_TOP + row) * VIEW_STRIDE;
+        for (col = 0; col < MAZE_W; ++col) {
+            if (row == 0 || row == DECOY_BAR_HEIGHT - 1 || col == 0 || col == MAZE_W - 1)
+                value = 2;
+            else
+                value = col <= filled ? 3 : 0;
+            shift = (unsigned char)(6 - ((col & 3) << 1));
+            dest[col >> 2] = (unsigned char)(
+                (dest[col >> 2] & ~(0x03 << shift)) | (value << shift));
+        }
+    }
 }
 
 unsigned char view3d_wall_height(unsigned int dist)

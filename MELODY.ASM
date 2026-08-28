@@ -8,6 +8,7 @@
 ; and shared temporaries that an interrupt would corrupt mid-call.
 
         .export _melody_install
+        .export _melody_laser_buzz
         .export _melody_active
         .export _melody_timer
         .export _melody_index
@@ -28,6 +29,7 @@ AUDF2   = $D202
 AUDC2   = $D203
 AUDF3   = $D204
 AUDC3   = $D205
+AUDF4   = $D206
 AUDC4   = $D207
 AUDCTL  = $D208
 SKCTL   = $D20F
@@ -66,6 +68,8 @@ threat_frequency:
         .res 1
 melody_volume:
         .res 1
+laser_buzz_timer:
+        .res 1
 saved_vbi:
         .res 2
 
@@ -81,6 +85,7 @@ _melody_install:
         sta _melody_threat_level
         sta threat_index
         sta threat_timer
+        sta laser_buzz_timer
         sta _melody_active
         lda #$03
         sta SKCTL
@@ -107,6 +112,7 @@ melody_vbi:
         pha
         jsr melody_tick
         jsr threat_tick
+        jsr laser_buzz_tick
         pla
         tay
         pla
@@ -167,6 +173,26 @@ save_note:
         inx
         stx _melody_index
 melody_done:
+        rts
+
+_melody_laser_buzz:
+        lda #$20
+        sta AUDF4
+        lda #$88                   ; poly noise, volume 8
+        sta AUDC4
+        lda #$18                   ; short burst, independent of frame rate
+        sta laser_buzz_timer
+        rts
+
+laser_buzz_tick:
+        lda laser_buzz_timer
+        beq laser_buzz_silence
+        dec laser_buzz_timer
+        bne laser_buzz_done
+laser_buzz_silence:
+        lda #$00
+        sta AUDC4
+laser_buzz_done:
         rts
 
 threat_tick:
