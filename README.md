@@ -12,6 +12,7 @@ The player walks freely through a 20 x 59 grid maze rendered in real time, with 
 | `S` | Walk backward |
 | `A` | Turn left |
 | `D` | Turn right |
+| `Space` | Deploy decoy |
 | `Esc` | Quit |
 
 Keys are read straight from POKEY (`SKSTAT` / `KBCODE`) rather than through CIO, so holding a key gives continuous movement without waiting for the OS auto-repeat delay.

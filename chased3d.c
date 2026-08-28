@@ -19,6 +19,7 @@
 #define MAX_TICKS 6
 #define PURSUER_PER_TICK 8
 #define THREAT_DISTANCE 4096
+#define DECOY_CAPTURE_TICKS 40
 
 /* Same triplet string the original BASIC game plays when the pursuer catches
  * the player (line 305 of chased1V3.BAS). */
@@ -45,6 +46,11 @@ static unsigned int player_y;
 static unsigned int player_angle;
 static unsigned int pursuer_x;
 static unsigned int pursuer_y;
+static unsigned int decoy_x;
+static unsigned int decoy_y;
+static unsigned char decoy_active;
+static unsigned char decoy_available = 1;
+static unsigned char decoy_capture_ticks;
 
 /* SKSTAT bit 2 clears while a key is held, which gives continuous movement. */
 static unsigned char read_key(void)
@@ -117,6 +123,17 @@ static void move_pursuer(void)
     col = (unsigned char)(pursuer_x >> 8);
     row = (unsigned char)(pursuer_y >> 8);
 
+    if (decoy_active
+        && col == (unsigned char)(decoy_x >> 8)
+        && row == (unsigned char)(decoy_y >> 8)) {
+        decoy_capture_ticks += frame_ticks;
+        if (decoy_capture_ticks < DECOY_CAPTURE_TICKS) return;
+        decoy_active = 0;
+        decoy_available = 1;
+        decoy_capture_ticks = 0;
+        pursuer_retarget_timer = RETARGET_STALE_TICKS + 1;
+    }
+
     pursuer_retarget_timer += frame_ticks;
     need_retarget = pursuer_retarget_timer > RETARGET_STALE_TICKS;
     if (col == pursuer_target_col && row == pursuer_target_row) need_retarget = 1;
@@ -127,8 +144,10 @@ static void move_pursuer(void)
     }
 
     if (need_retarget) {
-        pursuer_target_col = (unsigned char)(player_x >> 8);
-        pursuer_target_row = (unsigned char)(player_y >> 8);
+        pursuer_target_col = (unsigned char)(
+            (decoy_active ? decoy_x : player_x) >> 8);
+        pursuer_target_row = (unsigned char)(
+            (decoy_active ? decoy_y : player_y) >> 8);
         pursuer_retarget_timer = 0;
 
         best = 0;
@@ -163,6 +182,17 @@ static unsigned char pursuer_caught_player(void)
         && (player_y >> 8) == (pursuer_y >> 8);
 }
 
+static void deploy_decoy(void)
+{
+    if (!decoy_available) return;
+    decoy_x = player_x;
+    decoy_y = player_y;
+    decoy_active = 1;
+    decoy_available = 0;
+    decoy_capture_ticks = 0;
+    pursuer_retarget_timer = RETARGET_STALE_TICKS + 1;
+}
+
 /* Repositions player and pursuer to their starting spots, used both after a
  * catch and after finishing a level. */
 static void reset_positions(void)
@@ -175,6 +205,9 @@ static void reset_positions(void)
     pursuer_dir_x = 0;
     pursuer_dir_y = 0;
     pursuer_retarget_timer = RETARGET_STALE_TICKS + 1;
+    decoy_active = 0;
+    decoy_available = 1;
+    decoy_capture_ticks = 0;
     sprite3d_clear_all();
 }
 
@@ -235,6 +268,7 @@ int main(void)
     unsigned char prev_tick;
     unsigned char now;
     unsigned char frames;
+    unsigned char previous_key;
 
     maze_load_level(1);
     minimap_build();
@@ -260,6 +294,7 @@ int main(void)
     last_tick = *(volatile unsigned char *)RTCLOK_LOW;
     prev_tick = last_tick;
     frames = 0;
+    previous_key = 0xFF;
 
     for (;;) {
         now = *(volatile unsigned char *)RTCLOK_LOW;
@@ -274,6 +309,8 @@ int main(void)
         else if (key == KEY_S) step_forward(-1);
         else if (key == KEY_A) player_angle -= TURN_PER_TICK * frame_ticks;
         else if (key == KEY_D) player_angle += TURN_PER_TICK * frame_ticks;
+        else if (key == KEY_SPACE && previous_key != KEY_SPACE) deploy_decoy();
+        previous_key = key;
 
         move_pursuer();
         update_threat_sound();
@@ -289,6 +326,8 @@ int main(void)
         sprite3d_draw_targets(player_x, player_y, player_angle);
         sprite3d_draw_pursuer(player_x, player_y, player_angle,
                       pursuer_x, pursuer_y);
+        sprite3d_draw_decoy(decoy_active, player_x, player_y, player_angle,
+                    decoy_x, decoy_y);
         minimap_update(player_x, player_y, player_angle,
                    pursuer_x, pursuer_y);
 

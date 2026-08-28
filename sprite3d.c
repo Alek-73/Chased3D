@@ -11,6 +11,7 @@
 #define PMG_PLAYERS 4
 #define PMG_TARGET_PLAYERS 3
 #define PMG_PLAYER_SIZE 128
+#define PMG_MISSILE_OFFSET 0x180
 #define PMG_PLAYER0_OFFSET 0x200
 
 /* Display row 0 lands on this player byte. Derived from the display list (24
@@ -32,6 +33,7 @@
 #define COLLECT_RADIUS 160              /* 0.625 cell, in 8.8 world units */
 #define TARGET_COLOR 0x1E               /* bright yellow */
 #define PURSUER_COLOR 0x34              /* original pursuer PMG color */
+#define DECOY_COLOR 154                  /* BASIC COLOR2, used by screen code 138 */
 
 #pragma bss-name (push, "PMGRAM")
 static unsigned char pmg_ram[1024];
@@ -47,6 +49,11 @@ static const unsigned char target_sprite[16] = {
 static const unsigned char pursuer_sprite[22] = {
     0, 0, 0, 0, 0, 0, 0, 0, 66, 153, 189, 255,
     189, 153, 66, 0, 0, 0, 0, 0, 0, 0
+};
+
+/* Custom character 10 from chased1V3.BAS lines 16007 and 194. */
+static const unsigned char decoy_sprite[8] = {
+    18, 22, 24, 60, 60, 24, 104, 72
 };
 
 /* Open-door glyph: an outlined arch, drawn in the same color as targets since
@@ -76,6 +83,10 @@ static unsigned char projected_top;
 static unsigned char projected_height;
 static unsigned int projected_dist;
 
+static void draw_billboard(unsigned char player, unsigned char sx,
+                           unsigned char top, unsigned char height,
+                           const unsigned char *sprite, unsigned char sprite_rows);
+
 void sprite3d_init(void)
 {
     unsigned int i;
@@ -86,11 +97,13 @@ void sprite3d_init(void)
     }
 
     ANTIC.pmbase = (unsigned char)((unsigned int)pmg_ram >> 8);
-    OS.sdmctl = 0x2A;                   /* normal playfield, DL DMA, player DMA */
+    OS.sdmctl = 0x2E;                   /* normal playfield, DL, player+missile DMA */
     ANTIC.dmactl = OS.sdmctl;
-    GTIA_WRITE.gractl = 0x02;
-    OS.gprior = 0x01;                   /* players in front of the playfield */
+    GTIA_WRITE.gractl = 0x03;
+    OS.gprior = 0x11;                   /* players in front + missiles as Player 4 */
     GTIA_WRITE.prior = OS.gprior;
+    OS.color3 = DECOY_COLOR;
+    GTIA_WRITE.colpf3 = DECOY_COLOR;
 
     for (player = 0; player < PMG_PLAYERS; ++player) {
         *(volatile unsigned char *)(SIZEP0 + player) = 0;
@@ -183,6 +196,15 @@ static void clear_player(unsigned char player)
     }
 }
 
+static void clear_decoy(void)
+{
+    unsigned char *dest;
+    unsigned char i;
+
+    dest = pmg_ram + PMG_MISSILE_OFFSET;
+    for (i = 0; i < PMG_PLAYER_SIZE; ++i) dest[i] = 0;
+}
+
 /* Called on a reposition so a sprite left undrawn by a failed projection on
  * the next frame does not keep showing at its old screen position. */
 void sprite3d_clear_all(void)
@@ -192,9 +214,9 @@ void sprite3d_clear_all(void)
     for (player = 0; player < PMG_PLAYERS; ++player) {
         clear_player(player);
     }
+    clear_decoy();
     last_used = 0;
 }
-
 
 static void draw_billboard(unsigned char player, unsigned char sx,
                            unsigned char top, unsigned char height,
@@ -284,6 +306,11 @@ static unsigned char project_object(unsigned int px, unsigned int py,
         return 0;
 
     forward = ((dx * cos_h) >> 7) + ((dy * sin_h) >> 7);
+    /* Anything behind the camera must be rejected even if the object is only
+     * slightly off the direct forward axis; the coarse projection test is not
+     * precise enough to keep a stale billboard from appearing when the player
+     * turns away. */
+    if (forward <= 0) return 0;
     if (forward <= 8) return 0;
     right = ((-dx * sin_h) >> 7) + ((dy * cos_h) >> 7);
     limit = (forward * 5) >> 3;
@@ -303,6 +330,58 @@ static unsigned char project_object(unsigned int px, unsigned int py,
     projected_top = top;
     projected_height = height;
     return 1;
+}
+
+void sprite3d_draw_decoy(unsigned char active, unsigned int px, unsigned int py,
+                         unsigned int angle, unsigned int decoy_x,
+                         unsigned int decoy_y)
+{
+    unsigned char *dest;
+    unsigned char i;
+    unsigned char height;
+    unsigned char size;
+    unsigned char missile_width;
+    unsigned char width;
+    unsigned int acc;
+    unsigned int step;
+    int left;
+
+    clear_decoy();
+    if (!active || !project_object(px, py, angle, decoy_x, decoy_y)) return;
+
+    height = projected_height;
+    if (height > 32) {
+        height = 32;
+        projected_top = (VIEW_ROWS - 32) >> 1;
+    }
+    if (height >= 24) {
+        size = 0x55;
+        missile_width = 4;
+        width = 16;
+    } else {
+        size = 0;
+        missile_width = 2;
+        width = 8;
+    }
+
+    left = (int)projected_x - (width >> 1);
+    if (left < VIEW_LEFT_PX) left = VIEW_LEFT_PX;
+    if (left + width > VIEW_RIGHT_PX + 1)
+        left = VIEW_RIGHT_PX + 1 - width;
+
+    dest = pmg_ram + PMG_MISSILE_OFFSET + PMG_TOP_OFFSET + projected_top;
+    step = ((unsigned int)8 << 8) / height;
+    acc = 0;
+    for (i = 0; i < height; ++i) {
+        dest[i] = decoy_sprite[acc >> 8];
+        acc += step;
+    }
+
+    *(volatile unsigned char *)0xD00C = size;
+    for (i = 0; i < 4; ++i) {
+        *(volatile unsigned char *)(0xD004 + i) =
+            (unsigned char)(48 + left + i * missile_width);
+    }
 }
 
 void sprite3d_draw_targets(unsigned int px, unsigned int py, unsigned int angle)
@@ -344,6 +423,7 @@ void sprite3d_draw_pursuer(unsigned int px, unsigned int py, unsigned int angle,
     unsigned int sx;
     unsigned int sy;
 
+    clear_player(0);
     *(volatile unsigned char *)SIZEP0 = 0;
     if (!project_object(px, py, angle, pursuer_x, pursuer_y)) return;
 
