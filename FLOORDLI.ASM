@@ -12,7 +12,7 @@ WSYNC  = $D40A
 NMIEN  = $D40E
 COLPF0 = $D016
 
-        .segment "CODE"
+        .segment "PAGE6CODE"
 
 _floor_dli_install:
         lda #$40                   ; keep VBI on, disable DLI while vector changes
@@ -66,12 +66,12 @@ floor_dli_restore:
         pla
         rti
 
-        .segment "BSS"
+        .segment "PAGE6BSS"
 floor_dli_stage:
         .res 1
 floor_dli_rotation:
         .res 1
 
-        .segment "RODATA"
+        .segment "PAGE6DATA"
 floor_colors:
         .byte $22, $24, $26, $28, $26, $24

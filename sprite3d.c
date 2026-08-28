@@ -41,6 +41,8 @@
 static unsigned char pmg_ram[1024];
 #pragma bss-name (pop)
 
+#pragma rodata-name (push, "PAGE6DATA")
+
 /* Charset characters 5 and 6 stacked: the same glyphs the 2D game drew for
  * tiles 3 and 4, here read as one upright 8 x 16 billboard. */
 static const unsigned char target_sprite[16] = {
@@ -68,6 +70,8 @@ static const unsigned char laser_sprite[16] = {
      0, 129,  36,  90,  24, 126,  60, 255,
     255,  60, 126,  24,  90,  36, 129,   0
 };
+
+#pragma rodata-name (pop)
 
 static unsigned int exit_px;
 static unsigned int exit_py;
