@@ -23,6 +23,7 @@
 #define DECOY_CAPTURE_TICKS 40
 #define DECOY_RECHARGE_TICKS 200
 #define LASER_SECONDS 5
+#define FLOOR_SCROLL_DISTANCE 256
 
 /* Same triplet string the original BASIC game plays when the pursuer catches
  * the player (line 305 of chased1V3.BAS). */
@@ -60,6 +61,7 @@ static unsigned char decoy_capture_ticks;
 static unsigned char decoy_recharge_ticks = DECOY_RECHARGE_TICKS;
 static unsigned int laser_elapsed_ticks;
 static unsigned int laser_period_ticks;
+static int floor_motion_units;
 
 /* SKSTAT bit 2 clears while a key is held, which gives continuous movement. */
 static unsigned char read_key(void)
@@ -88,6 +90,11 @@ static void step_forward(signed char direction)
     int dir_x;
     int dir_y;
     int step;
+    int moved_x;
+    int moved_y;
+    int moved;
+    unsigned int old_x;
+    unsigned int old_y;
 
     step = (int)MOVE_PER_TICK * (int)frame_ticks;
     idx = (unsigned char)(player_angle >> 8);
@@ -97,7 +104,22 @@ static void step_forward(signed char direction)
         dir_x = -dir_x;
         dir_y = -dir_y;
     }
+    old_x = player_x;
+    old_y = player_y;
     try_move((dir_x * step) >> 8, (dir_y * step) >> 8);
+    moved_x = abs((int)player_x - (int)old_x);
+    moved_y = abs((int)player_y - (int)old_y);
+    moved = moved_x > moved_y
+        ? moved_x + (moved_y >> 1) : moved_y + (moved_x >> 1);
+    floor_motion_units += direction > 0 ? moved : -moved;
+    while (floor_motion_units >= FLOOR_SCROLL_DISTANCE) {
+        view3d_floor_motion(1);
+        floor_motion_units -= FLOOR_SCROLL_DISTANCE;
+    }
+    while (floor_motion_units <= -FLOOR_SCROLL_DISTANCE) {
+        view3d_floor_motion(-1);
+        floor_motion_units += FLOOR_SCROLL_DISTANCE;
+    }
 }
 
 /* Ticks before a stale target is abandoned, matching the original's
@@ -247,6 +269,7 @@ static void reset_positions(void)
     decoy_available = 1;
     decoy_capture_ticks = 0;
     decoy_recharge_ticks = DECOY_RECHARGE_TICKS;
+    floor_motion_units = 0;
     sprite3d_clear_all();
 }
 

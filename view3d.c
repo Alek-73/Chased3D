@@ -14,6 +14,8 @@
 /* Wall height by distance, indexed by dist >> 4, so the per-ray divide becomes
  * a table read. */
 #define HEIGHT_STEPS 400
+#define FLOOR_BANDS 6
+#define FLOOR_BAND_ROWS 7
 static unsigned char height_table[HEIGHT_STEPS];
 
 unsigned int col_dist[VIEW_COLS];
@@ -58,6 +60,8 @@ extern unsigned char dda_side;
 extern unsigned char dda_hit;
 extern unsigned char dda_steps;
 extern void dda_cast(void);
+extern void floor_dli_install(void);
+extern void floor_dli_set_rotation(unsigned char rotation);
 
 /* cc65 puts function locals on a software stack reached through (sp),y, so the
  * per-ray values are file scope statics to get direct absolute addressing. */
@@ -84,6 +88,8 @@ static unsigned char minimap_bits[MAZE_H][MINI_BYTES];
 static unsigned char marker_row = 0xFF;
 static unsigned char nose_row = 0xFF;
 static unsigned char pursuer_row = 0xFF;
+static unsigned char floor_phase;
+static unsigned char floor_rotation;
 
 /* Facing quantised to 8 compass points; angle 0 is +X with +Y running down. */
 static const signed char dir_dx[8] = {  1,  1,  0, -1, -1, -1,  0,  1 };
@@ -226,6 +232,40 @@ void view3d_render(unsigned int px, unsigned int py, unsigned int angle)
     for (col = 0; col < VIEW_COLS; ++col) {
         cast_column(col, angle + (unsigned int)ray_offset[col], px, py);
     }
+}
+
+static void set_floor_dlis(void)
+{
+    unsigned char i;
+    unsigned char row;
+
+    for (row = HORIZON - 1; row < VIEW_ROWS; ++row)
+        view_dlist[5 + row] &= 0x7F;
+    for (i = 0; i < FLOOR_BANDS; ++i) {
+        row = (unsigned char)(HORIZON + floor_phase + i * FLOOR_BAND_ROWS);
+        view_dlist[5 + row - 1] |= 0x80;
+    }
+}
+
+void view3d_floor_motion(signed char direction)
+{
+    if (direction > 0) {
+        if (++floor_phase >= FLOOR_BAND_ROWS) {
+            floor_phase = 0;
+            floor_rotation = floor_rotation == 0
+                ? FLOOR_BANDS - 1 : (unsigned char)(floor_rotation - 1);
+            floor_dli_set_rotation(floor_rotation);
+        }
+    } else {
+        if (floor_phase == 0) {
+            floor_phase = FLOOR_BAND_ROWS - 1;
+            if (++floor_rotation >= FLOOR_BANDS) floor_rotation = 0;
+            floor_dli_set_rotation(floor_rotation);
+        } else {
+            --floor_phase;
+        }
+    }
+    set_floor_dlis();
 }
 
 /* The maze is static, so pack it into a bitmap once instead of every frame. */
@@ -392,9 +432,7 @@ void view3d_init(void)
     view_dlist[n++] = 0x4D;                        /* mode D + load memory scan */
     view_dlist[n++] = (unsigned char)addr;
     view_dlist[n++] = (unsigned char)(addr >> 8);
-    for (i = 1; i < VIEW_ROWS; ++i) {
-        view_dlist[n++] = 0x0D;
-    }
+    for (i = 1; i < VIEW_ROWS; ++i) view_dlist[n++] = 0x0D;
     addr = (unsigned int)hud_line;
     view_dlist[n++] = 0x46;                        /* mode 6 text + load memory scan */
     view_dlist[n++] = (unsigned char)addr;
@@ -412,4 +450,8 @@ void view3d_init(void)
     OS.sdlst = view_dlist;
     OS.sdmctl = 0x22;
     ANTIC.dmactl = 0x22;
+    floor_phase = 0;
+    floor_rotation = 0;
+    set_floor_dlis();
+    floor_dli_install();
 }

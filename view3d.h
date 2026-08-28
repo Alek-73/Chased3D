@@ -6,6 +6,7 @@
 
 void view3d_init(void);
 void view3d_render(unsigned int px, unsigned int py, unsigned int angle);
+void view3d_floor_motion(signed char direction);
 unsigned char view3d_wall_height(unsigned int dist);
 void minimap_build(void);
 void minimap_show(void);

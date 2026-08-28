@@ -23,8 +23,12 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw "ca65 failed with exit code $LASTEXITCODE."
     }
+    & $ca65 -g FLOORDLI.ASM -o FLOORDLI.o
+    if ($LASTEXITCODE -ne 0) {
+        throw "ca65 failed with exit code $LASTEXITCODE."
+    }
     & $cl65 -t atari -C chased3d.cfg --start-addr 0x4000 -O -g `
-        -m Chased3D.map -Ln Chased3D.lbl -o Chased3D.XEX chased3d.c view3d.c maze.c trig3d.c sprite3d.c melody.c COLUMN3D.o RAYCAST.o MELODY.o
+        -m Chased3D.map -Ln Chased3D.lbl -o Chased3D.XEX chased3d.c view3d.c maze.c trig3d.c sprite3d.c melody.c COLUMN3D.o RAYCAST.o MELODY.o FLOORDLI.o
     if ($LASTEXITCODE -ne 0) {
         throw "cl65 failed with exit code $LASTEXITCODE."
     }
