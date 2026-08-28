@@ -48,29 +48,24 @@ extern void col3d_fill_down(void);
 extern void col3d_fill_up(void);
 extern void col3d_fill_span(void);
 
-extern unsigned char dda_map_x;
-extern unsigned char dda_map_y;
-extern unsigned char dda_step_x;
-extern unsigned char dda_step_y;
 extern unsigned int dda_side_x;
 extern unsigned int dda_side_y;
 extern unsigned int dda_delta_x;
 extern unsigned int dda_delta_y;
 extern unsigned char dda_side;
 extern unsigned char dda_hit;
-extern unsigned char dda_steps;
-extern void dda_cast(void);
+extern unsigned int ray_setup_angle;
+extern unsigned int ray_setup_px;
+extern unsigned int ray_setup_py;
+extern void ray_setup_and_cast(void);
 extern void floor_dli_install(void);
 extern void floor_dli_set_rotation(unsigned char rotation);
 
 /* cc65 puts function locals on a software stack reached through (sp),y, so the
  * per-ray values are file scope statics to get direct absolute addressing. */
-static int ray_dir_x;
-static int ray_dir_y;
 static unsigned int ray_dist;
 static unsigned int ray_height;
 static unsigned int ray_mag;
-static unsigned char ray_idx;
 static unsigned char ray_top;
 static unsigned char ray_bottom;
 static unsigned char ray_wall;
@@ -94,18 +89,6 @@ static unsigned char floor_rotation;
 /* Facing quantised to 8 compass points; angle 0 is +X with +Y running down. */
 static const signed char dir_dx[8] = {  1,  1,  0, -1, -1, -1,  0,  1 };
 static const signed char dir_dy[8] = {  0,  1,  1,  1,  0, -1, -1, -1 };
-
-/* (frac * delta) >> 8. Splitting delta into bytes keeps this to two 8x8
- * multiplies, which cc65 does far more cheaply than a 16x16 one. */
-static unsigned int scale_frac(unsigned int frac, unsigned int delta)
-{
-    unsigned char f;
-
-    if (frac >= 256u) return delta;
-    f = (unsigned char)frac;
-    return ((unsigned int)f * (unsigned char)(delta >> 8))
-         + (((unsigned int)f * (unsigned char)delta) >> 8);
-}
 
 static void draw_open_byte(unsigned char x)
 {
@@ -160,35 +143,10 @@ static void draw_wall_column(unsigned char col, unsigned char top,
 static void cast_column(unsigned char col, unsigned int ray_angle,
                         unsigned int px, unsigned int py)
 {
-    ray_idx = (unsigned char)(ray_angle >> 8);
-    ray_dir_x = sin3d[(unsigned char)(ray_idx + 64)];
-    ray_dir_y = sin3d[ray_idx];
-
-    dda_map_x = (unsigned char)(px >> 8);
-    dda_map_y = (unsigned char)(py >> 8);
-
-    ray_mag = (unsigned int)(ray_dir_x < 0 ? -ray_dir_x : ray_dir_x);
-    dda_delta_x = recip3d[ray_mag];
-    ray_mag = (unsigned int)(ray_dir_y < 0 ? -ray_dir_y : ray_dir_y);
-    dda_delta_y = recip3d[ray_mag];
-
-    if (ray_dir_x < 0) {
-        dda_step_x = 0xFF;
-        dda_side_x = scale_frac(px & 0x00FFu, dda_delta_x);
-    } else {
-        dda_step_x = 1;
-        dda_side_x = scale_frac(256u - (px & 0x00FFu), dda_delta_x);
-    }
-    if (ray_dir_y < 0) {
-        dda_step_y = 0xFF;
-        dda_side_y = scale_frac(py & 0x00FFu, dda_delta_y);
-    } else {
-        dda_step_y = 1;
-        dda_side_y = scale_frac(256u - (py & 0x00FFu), dda_delta_y);
-    }
-
-    dda_steps = MAX_STEPS;
-    dda_cast();
+    ray_setup_angle = ray_angle;
+    ray_setup_px = px;
+    ray_setup_py = py;
+    ray_setup_and_cast();
 
     if (!dda_hit) {
         col_dist[col] = 0xFFFFu;
@@ -204,8 +162,6 @@ static void cast_column(unsigned char col, unsigned int ray_angle,
         ray_wall = PIX_WALL_Y;
     }
 
-    /* Multiply by cos(relative angle) to turn the ray length into a
-     * perpendicular distance, which removes the fisheye bow. */
     ray_mag = cos_rel[col];
     ray_dist = ((ray_dist >> 8) * ray_mag)
              + (((ray_dist & 0x00FFu) * ray_mag) >> 8);

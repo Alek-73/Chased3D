@@ -92,6 +92,10 @@ static unsigned char projected_top;
 static unsigned char projected_height;
 static unsigned int projected_dist;
 static unsigned char cand_limit;
+static unsigned char player_clear_top[PMG_PLAYERS];
+static unsigned char player_clear_height[PMG_PLAYERS];
+static unsigned char decoy_clear_top;
+static unsigned char decoy_clear_height;
 
 static void draw_billboard(unsigned char player, unsigned char sx,
                            unsigned char top, unsigned char height,
@@ -119,7 +123,11 @@ void sprite3d_init(void)
         *(volatile unsigned char *)(SIZEP0 + player) = 0;
         *(volatile unsigned char *)(PCOLR0 + player) =
             player == 0 ? PURSUER_COLOR : TARGET_COLOR;
+        player_clear_top[player] = 0;
+        player_clear_height[player] = 0;
     }
+    decoy_clear_top = 0;
+    decoy_clear_height = 0;
     last_used = 0;
 }
 
@@ -258,10 +266,10 @@ static void clear_player(unsigned char player)
     unsigned char *dest;
     unsigned char i;
 
-    dest = pmg_ram + PMG_PLAYER0_OFFSET + ((unsigned int)player << 7);
-    for (i = 0; i < PMG_PLAYER_SIZE; ++i) {
-        dest[i] = 0;
-    }
+    dest = pmg_ram + PMG_PLAYER0_OFFSET + ((unsigned int)player << 7)
+        + player_clear_top[player];
+    for (i = 0; i < player_clear_height[player]; ++i) dest[i] = 0;
+    player_clear_height[player] = 0;
 }
 
 static void clear_decoy(void)
@@ -269,8 +277,9 @@ static void clear_decoy(void)
     unsigned char *dest;
     unsigned char i;
 
-    dest = pmg_ram + PMG_MISSILE_OFFSET;
-    for (i = 0; i < PMG_PLAYER_SIZE; ++i) dest[i] = 0;
+    dest = pmg_ram + PMG_MISSILE_OFFSET + decoy_clear_top;
+    for (i = 0; i < decoy_clear_height; ++i) dest[i] = 0;
+    decoy_clear_height = 0;
 }
 
 /* Called on a reposition so a sprite left undrawn by a failed projection on
@@ -308,10 +317,8 @@ static void draw_billboard(unsigned char player, unsigned char sx,
     if (left + width > VIEW_RIGHT_PX + 1)
         left = VIEW_RIGHT_PX + 1 - width;
 
+    clear_player(player);
     dest = pmg_ram + PMG_PLAYER0_OFFSET + ((unsigned int)player << 7);
-    for (i = 0; i < PMG_PLAYER_SIZE; ++i) {
-        dest[i] = 0;
-    }
 
     step = ((unsigned int)sprite_rows << 8) / height;
     acc = 0;
@@ -320,6 +327,8 @@ static void draw_billboard(unsigned char player, unsigned char sx,
         dest[i] = sprite[acc >> 8];
         acc += step;
     }
+    player_clear_top[player] = (unsigned char)(PMG_TOP_OFFSET + top);
+    player_clear_height[player] = height;
 
     *(volatile unsigned char *)(SIZEP0 + player) = size;
     *(volatile unsigned char *)(HPOSP0 + player) =
@@ -444,6 +453,8 @@ void sprite3d_draw_decoy(unsigned char active, unsigned int px, unsigned int py,
         dest[i] = decoy_sprite[acc >> 8];
         acc += step;
     }
+    decoy_clear_top = (unsigned char)(PMG_TOP_OFFSET + projected_top);
+    decoy_clear_height = height;
 
     *(volatile unsigned char *)0xD00C = size;
     for (i = 0; i < 4; ++i) {
@@ -497,32 +508,42 @@ void sprite3d_draw_targets(unsigned int px, unsigned int py, unsigned int angle)
 void sprite3d_draw_pursuer(unsigned int px, unsigned int py, unsigned int angle,
                            unsigned int pursuer_x, unsigned int pursuer_y)
 {
-    int dx;
-    int dy;
-    int abs_dx;
-    int abs_dy;
-    int steps;
-    int i;
-    unsigned int sx;
-    unsigned int sy;
+    signed char col;
+    signed char row;
+    signed char target_col;
+    signed char target_row;
+    signed char dx;
+    signed char dy;
+    signed char step_x;
+    signed char step_y;
+    int error;
+    int twice_error;
 
     clear_player(0);
     *(volatile unsigned char *)SIZEP0 = 0;
     if (!project_object(px, py, angle, pursuer_x, pursuer_y)) return;
 
-    /* The column-distance test above is only an approximation: it can miss a
-     * wall that does not line up with the pursuer's own ray column, so a
-     * real line-of-sight check confirms no wall actually lies in between. */
-    dx = (int)pursuer_x - (int)px;
-    dy = (int)pursuer_y - (int)py;
-    abs_dx = dx < 0 ? -dx : dx;
-    abs_dy = dy < 0 ? -dy : dy;
-    steps = (abs_dx > abs_dy ? abs_dx : abs_dy) / 64;
-    if (steps < 2) steps = 2;
-    for (i = 1; i <= steps; ++i) {
-        sx = (unsigned int)((int)px + dx * i / steps);
-        sy = (unsigned int)((int)py + dy * i / steps);
-        if (maze_solid((unsigned char)(sx >> 8), (unsigned char)(sy >> 8))) return;
+    col = (signed char)(px >> 8);
+    row = (signed char)(py >> 8);
+    target_col = (signed char)(pursuer_x >> 8);
+    target_row = (signed char)(pursuer_y >> 8);
+    dx = target_col > col ? target_col - col : col - target_col;
+    dy = target_row > row ? row - target_row : target_row - row;
+    step_x = col < target_col ? 1 : -1;
+    step_y = row < target_row ? 1 : -1;
+    error = dx + dy;
+    while (col != target_col || row != target_row) {
+        twice_error = error << 1;
+        if (twice_error >= dy) {
+            error += dy;
+            col += step_x;
+        }
+        if (twice_error <= dx) {
+            error += dx;
+            row += step_y;
+        }
+        if (col == target_col && row == target_row) break;
+        if (maze_solid((unsigned char)col, (unsigned char)row)) return;
     }
 
     if (projected_height > 32) {
