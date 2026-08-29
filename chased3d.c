@@ -9,6 +9,7 @@
 #define KBD_SKSTAT 0xD20F
 #define KBD_KBCODE 0xD209
 #define POKEY_RANDOM 0xD20A
+#define PORTB 0xD301
 #define NOCLIK 0x02DB   /* non-zero silences the OS key click */
 #define RTCLOK_LOW 20   /* OS jiffy counter, bumped every vertical blank */
 
@@ -328,6 +329,7 @@ static void handle_level_clear(void)
 
 int main(void)
 {
+    unsigned char saved_portb;
     unsigned char key;
     unsigned char ticks_per_second;
     unsigned char last_tick;
@@ -335,6 +337,11 @@ int main(void)
     unsigned char now;
     unsigned char frames;
     unsigned char previous_key;
+
+    saved_portb = *(volatile unsigned char *)PORTB;
+    *(volatile unsigned char *)PORTB = saved_portb | 0x02;
+    OS.sdmctl = 0;
+    ANTIC.dmactl = 0;
 
     srand(((unsigned int)*(volatile unsigned char *)POKEY_RANDOM << 8)
           | *(volatile unsigned char *)RTCLOK_LOW);
@@ -416,5 +423,6 @@ int main(void)
         }
         waitvsync();
     }
+    *(volatile unsigned char *)PORTB = saved_portb;
     return 0;
 }

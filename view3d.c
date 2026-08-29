@@ -16,7 +16,9 @@
 #define HEIGHT_STEPS 400
 #define FLOOR_BANDS 6
 #define FLOOR_BAND_ROWS 7
+#pragma bss-name (push, "HIGHBSS")
 static unsigned char height_table[HEIGHT_STEPS];
+#pragma bss-name (pop)
 
 unsigned int col_dist[VIEW_COLS];
 
@@ -79,7 +81,10 @@ static unsigned char hud_line[20];
 static unsigned char view_dlist[104];
 #pragma bss-name (pop)
 
+#pragma bss-name (push, "HIGHBSS")
 static unsigned char minimap_bits[MAZE_H][MINI_BYTES];
+#pragma bss-name (pop)
+
 static unsigned char marker_row = 0xFF;
 static unsigned char nose_row = 0xFF;
 static unsigned char pursuer_row = 0xFF;

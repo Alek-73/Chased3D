@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include "maze.h"
 
+#pragma bss-name (push, "HIGHBSS")
 unsigned char maze_map[MAZE_H][MAZE_W];
 unsigned char maze_row_lo[MAZE_H];
 unsigned char maze_row_hi[MAZE_H];
+#pragma bss-name (pop)
+
 unsigned char maze_exit_col;
 unsigned char maze_exit_row;
 unsigned char maze_exit_found;
