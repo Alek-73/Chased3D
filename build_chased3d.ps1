@@ -32,6 +32,14 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw "cl65 failed with exit code $LASTEXITCODE."
     }
+
+    & .\update_dos25_atr.ps1 -AtrPath .\Chased3D.atr -Files @{
+        "CHASED3D.XEX" = ".\Chased3D.XEX"
+        "L2.CSV" = ".\L2.csv"
+        "L3.CSV" = ".\L3.csv"
+        "L4.CSV" = ".\L4.csv"
+        "L5.CSV" = ".\L5.csv"
+    }
 }
 finally {
     Pop-Location

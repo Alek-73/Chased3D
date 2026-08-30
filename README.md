@@ -4,6 +4,8 @@ A first-person raycast 3D maze for the Atari 8-bit (800XL / 130XE class), writte
 
 The player walks freely through a 20 x 59 grid maze rendered in real time, with a top-down minimap and an FPS readout.
 
+See the [visual program map](ARCHITECTURE.md) for the flow between the game modules, cc65 C runtime, Atari hardware and OS, and DOS 2.5.
+
 ## Controls
 
 | Key | Action |
@@ -27,7 +29,9 @@ Requires cc65 and PowerShell. The build script looks for `ca65.exe` and `cl65.ex
 .\build_chased3d.ps1
 ```
 
-This produces `Chased3D.XEX`, plus `Chased3D.map` and `Chased3D.lbl` for debugging.
+This produces `Chased3D.XEX`, plus `Chased3D.map` and `Chased3D.lbl` for debugging. After linking, the build also replaces `CHASED3D.XEX` and `L2.CSV` through `L5.CSV` inside the existing DOS 2.5 `Chased3D.atr`. The boot sectors, `DOS.SYS`, and `DUP.SYS` are preserved.
+
+The ATR updater replaces existing DOS 2.5 sector chains rather than recreating the image. It fails instead of corrupting the disk if a generated file no longer fits the same number of sectors. The `mkatr` tool installed under `C:\A8\mkatr` is not used for this step because that version creates SpartaDOS / BW-DOS filesystems, not DOS 2.5 images.
 
 To run it in [Altirra](https://www.virtualdub.org/altirra.html):
 

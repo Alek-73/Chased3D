@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chased3D Program Map</title>
+  <meta name="description" content="Visual architecture map of Chased3D, cc65, Atari OS, DOS 2.5, and Atari 8-bit hardware.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f4f1e9;
+      --ink: #17211d;
+      --muted: #5c665f;
+      --line: #c7c8bd;
+      --panel: #fffdf7;
+      --game: #d7ead3;
+      --game-strong: #315a2d;
+      --asm: #ffe0a8;
+      --asm-strong: #8a5812;
+      --runtime: #d9e8f5;
+      --runtime-strong: #35617f;
+      --os: #e8ddf2;
+      --os-strong: #674982;
+      --dos: #f2d8d5;
+      --dos-strong: #89453d;
+      --hardware: #dedede;
+      --hardware-strong: #4a4a4a;
+      --shadow: 0 12px 30px rgb(23 33 29 / 8%);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image:
+        linear-gradient(rgb(23 33 29 / 4%) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(23 33 29 / 4%) 1px, transparent 1px);
+      background-size: 24px 24px;
+      font-family: "Space Grotesk", sans-serif;
+      line-height: 1.55;
+    }
+
+    a { color: inherit; }
+
+    .shell {
+      width: min(1480px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    header {
+      min-height: min(540px, 78vh);
+      display: grid;
+      align-content: center;
+      padding: 72px 0 54px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow,
+    .section-index,
+    code,
+    pre,
+    th,
+    .legend {
+      font-family: "IBM Plex Mono", monospace;
+    }
+
+    .eyebrow {
+      margin: 0 0 18px;
+      color: var(--game-strong);
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 880px;
+      margin: 0;
+      font-size: clamp(3rem, 8vw, 7.5rem);
+      line-height: 0.92;
+      letter-spacing: 0;
+    }
+
+    .lede {
+      max-width: 760px;
+      margin: 28px 0 0;
+      color: var(--muted);
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      margin-top: 34px;
+      font-size: 0.76rem;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .swatch {
+      width: 12px;
+      height: 12px;
+      border: 1px solid currentColor;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--line);
+      background: rgb(244 241 233 / 94%);
+      backdrop-filter: blur(12px);
+    }
+
+    nav .shell {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      padding-block: 10px;
+    }
+
+    nav a {
+      flex: 0 0 auto;
+      padding: 7px 11px;
+      border: 1px solid transparent;
+      text-decoration: none;
+      font-size: 0.86rem;
+    }
+
+    nav a:hover,
+    nav a:focus-visible {
+      border-color: var(--ink);
+      background: var(--panel);
+      outline: none;
+    }
+
+    main { padding-bottom: 80px; }
+
+    section {
+      padding: 64px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: 90px minmax(0, 720px);
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    .section-index {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(1.8rem, 4vw, 3.2rem);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .section-copy {
+      max-width: 760px;
+      margin: 12px 0 0;
+      color: var(--muted);
+    }
+
+    .diagram {
+      min-height: 260px;
+      overflow-x: auto;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .diagram .mermaid {
+      display: grid;
+      min-width: 760px;
+      place-items: center;
+    }
+
+    .diagram svg { max-width: none !important; }
+
+    .note {
+      margin-top: 14px;
+      padding-left: 14px;
+      border-left: 4px solid var(--asm-strong);
+      color: var(--muted);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .panel {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel);
+    }
+
+    .panel h3 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+    }
+
+    .panel p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    th,
+    td {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #ece9df;
+      font-size: 0.74rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    td:first-child {
+      width: 20%;
+      font-weight: 600;
+    }
+
+    code {
+      padding: 1px 4px;
+      background: #ece9df;
+      font-size: 0.88em;
+    }
+
+    .memory {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 720px);
+      margin-top: 24px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.82rem;
+    }
+
+    .addr,
+    .region {
+      min-height: 52px;
+      padding: 12px;
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .addr {
+      display: grid;
+      align-items: start;
+      border-right: 1px solid var(--ink);
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .region { background: var(--panel); }
+    .region.os { background: var(--os); }
+    .region.asm { background: var(--asm); }
+    .region.dos { background: var(--dos); }
+    .region.game { background: var(--game); }
+    .region.runtime { background: var(--runtime); }
+    .region.hardware { background: var(--hardware); }
+
+    footer {
+      padding: 34px 0 54px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    footer a { color: var(--ink); }
+
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 20px, 1480px); }
+      header { min-height: 70vh; padding-top: 46px; }
+      h1 { font-size: clamp(3rem, 17vw, 5.4rem); }
+      section { padding: 46px 0; }
+      .section-head { grid-template-columns: 1fr; gap: 6px; }
+      .split { grid-template-columns: 1fr; }
+      .diagram { padding: 8px; }
+      .memory { grid-template-columns: 68px minmax(0, 1fr); font-size: 0.72rem; }
+      .addr, .region { padding: 9px 7px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="shell">
+      <p class="eyebrow">Atari 8-bit / 6502 / cc65</p>
+      <h1>Chased3D<br>program map</h1>
+      <p class="lede">A visual trace from the C game loop through optimized 6502 assembly, the cc65 runtime, Atari OS and DOS 2.5, down to ANTIC, GTIA, POKEY, and PIA.</p>
+      <div class="legend" aria-label="Diagram color legend">
+        <span><i class="swatch" style="background:var(--game)"></i>Game C</span>
+        <span><i class="swatch" style="background:var(--asm)"></i>6502 assembly</span>
+        <span><i class="swatch" style="background:var(--runtime)"></i>cc65 runtime</span>
+        <span><i class="swatch" style="background:var(--os)"></i>Atari OS</span>
+        <span><i class="swatch" style="background:var(--dos)"></i>DOS 2.5</span>
+        <span><i class="swatch" style="background:var(--hardware)"></i>Hardware</span>
+      </div>
+    </div>
+  </header>
+
+  <nav aria-label="Architecture sections">
+    <div class="shell">
+      <a href="#layers">Layers</a>
+      <a href="#loop">Main loop</a>
+      <a href="#interrupts">Interrupts</a>
+      <a href="#runtime">Runtime and DOS</a>
+      <a href="#hardware">Registers</a>
+      <a href="#memory">Memory</a>
+      <a href="#build">Build</a>
+    </div>
+  </nav>
+
+  <main>
+    <section id="layers">
+      <div class="shell">
+        <div class="section-head">
+          <span class="section-index">01 / SYSTEM</span>
+          <div><h2>Layer map</h2><p class="section-copy">Solid arrows show calls or data flow. Hardware arrows represent direct memory-mapped I/O; OS and DOS arrows represent managed services.</p></div>
+        </div>
+        <div class="diagram"><pre class="mermaid">
+flowchart TB
+  subgraph GAME["Chased3D game code"]
+    MAIN["chased3d.c<br/>loop, input, movement,<br/>pursuer, game state"]
+    MAZE["maze.c<br/>levels, collision,<br/>exit, CSV loading"]
+    VIEW["view3d.c<br/>display, ray projection,<br/>minimap, HUD"]
+    SPRITE["sprite3d.c<br/>objects and<br/>PMG projection"]
+    MUSIC["melody.c<br/>melody parser"]
+    TRIG["trig3d.c<br/>fixed-point tables"]
+  end
+  subgraph ASM["6502 fast paths"]
+    RAY["RAYCAST.ASM<br/>DDA traversal"]
+    COLUMN["COLUMN3D.ASM<br/>column blitter"]
+    DLI["FLOORDLI.ASM<br/>floor DLI"]
+    VBI["MELODY.ASM<br/>audio VBI"]
+  end
+  subgraph CRT["cc65 Atari runtime"]
+    START["XEX startup / exit<br/>BSS, C stack, main"]
+    LIBC["stdlib<br/>abs, rand, srand"]
+    STDIO["stdio<br/>fopen, fgetc, fclose"]
+    ATARI["atari.h<br/>waitvsync, get_tv"]
+  end
+  subgraph OS["Atari OS"]
+    SETVBV["SETVBV $E45C"]
+    SHADOW["vectors and shadows<br/>SDLST, SDMCTL, RTCLOK"]
+    CIO["CIO / IOCBs"]
+  end
+  subgraph DOS["DOS 2.5"]
+    LOADER["XEX loader"]
+    FMS["D: file system"]
+    DISK["L3-L5 CSV files"]
+  end
+  subgraph HW["Atari hardware"]
+    CPU["6502 + RAM"]
+    ANTIC["ANTIC<br/>display and PMG DMA"]
+    GTIA["GTIA<br/>colors and sprites"]
+    POKEY["POKEY<br/>keys, random, audio"]
+    PIA["PIA PORTB<br/>BASIC ROM control"]
+  end
+  MAIN --> MAZE &amp; VIEW &amp; SPRITE &amp; MUSIC &amp; LIBC &amp; ATARI
+  VIEW --> TRIG &amp; RAY &amp; COLUMN &amp; DLI
+  SPRITE --> TRIG &amp; VIEW &amp; LIBC
+  MUSIC --> VBI
+  START --> MAIN
+  MAZE --> STDIO --> CIO --> FMS --> DISK
+  LOADER --> START
+  ATARI --> SHADOW
+  VBI --> SETVBV --> SHADOW
+  SHADOW --> ANTIC &amp; GTIA
+  MAIN -->|"SKSTAT / KBCODE / RANDOM"| POKEY
+  MAIN -->|"PORTB"| PIA
+  VIEW --> ANTIC &amp; GTIA
+  DLI --> ANTIC
+  SPRITE --> ANTIC &amp; GTIA
+  VBI --> POKEY
+  CPU --- GAME
+  CPU --- ASM
+  classDef game fill:#d7ead3,stroke:#315a2d,color:#152813
+  classDef asm fill:#ffe0a8,stroke:#8a5812,color:#352104
+  classDef crt fill:#d9e8f5,stroke:#35617f,color:#132b3b
+  classDef os fill:#e8ddf2,stroke:#674982,color:#291b35
+  classDef dos fill:#f2d8d5,stroke:#89453d,color:#351916
+  classDef hw fill:#dedede,stroke:#4a4a4a,color:#171717
+  class MAIN,MAZE,VIEW,SPRITE,MUSIC,TRIG game
+  class RAY,COLUMN,DLI,VBI asm
+  class START,LIBC,STDIO,ATARI crt
+  class SETVBV,SHADOW,CIO os
+  class LOADER,FMS,DISK dos
+  class CPU,ANTIC,GTIA,POKEY,PIA hw
+        </pre></div>
+        <p class="note">Keyboard input bypasses CIO and reads POKEY directly, allowing continuous movement without waiting for OS key repeat.</p>
+      </div>
+    </section>
+
+    <section id="loop">
+      <div class="shell">
+        <div class="section-head">
+          <span class="section-index">02 / FRAME</span>
+          <div><h2>Main-loop flow</h2><p class="section-copy">DOS starts the XEX once. Initialization installs the video and audio systems, then simulation and rendering repeat until Escape.</p></div>
+        </div>
+        <div class="diagram"><pre class="mermaid">
+flowchart LR
+  BOOT["DOS loads XEX"] --> CRT["cc65 startup"] --> INIT["main initialization"]
+  INIT --> LEVEL["load level<br/>build objects"] --> VIDEO["display list, PMG,<br/>DLI, audio VBI"] --> TICK
+  subgraph FRAME["one loop pass"]
+    TICK["RTCLOK<br/>frame_ticks"] --> KEY["POKEY keyboard"]
+    KEY --> SIM["movement, decoy,<br/>laser, pursuer"]
+    SIM --> RULES["catch, targets,<br/>exit rules"]
+    RULES --> RENDER["raycast walls"]
+    RENDER --> OBJECTS["PMG objects"]
+    OBJECTS --> MAP["minimap + FPS"]
+    MAP --> VSYNC["waitvsync"]
+  end
+  VSYNC --> TICK
+  KEY -->|"Escape"| RESTORE["restore PORTB"] --> EXIT["cc65 exit to DOS"]
+        </pre></div>
+      </div>
+    </section>
+
+    <section id="interrupts">
+      <div class="shell">
+        <div class="section-head">
+          <span class="section-index">03 / ASYNC</span>
+          <div><h2>Interrupt paths</h2><p class="section-copy">Audio timing remains stable while rendering spans several frames. Floor shading changes at precise scanline boundaries.</p></div>
+        </div>
+        <div class="diagram"><pre class="mermaid">
+sequenceDiagram
+  participant Game as C main loop
+  participant AtariOS as Atari OS VBI
+  participant Audio as MELODY ASM
+  participant Video as ANTIC display DMA
+  participant Floor as FLOORDLI ASM
+  participant Sound as POKEY audio
+  Game->>Game: Update and render
+  Video-->>Floor: DLI at floor band
+  Floor->>Video: Write WSYNC and COLPF0
+  AtariOS-->>Audio: Deferred VBI vector seven
+  Audio->>Sound: Update four audio channels
+  Audio-->>AtariOS: Chain saved VBI
+  Game->>AtariOS: Wait for vertical blank
+        </pre></div>
+        <div class="split" style="margin-top:18px">
+          <article class="panel"><h3>Display-list interrupt</h3><p>Installed at <code>VDSLST $0200</code>. It waits on <code>WSYNC</code>, rotates six luminance values, writes <code>COLPF0</code>, and returns with <code>RTI</code>.</p></article>
+          <article class="panel"><h3>Deferred vertical blank</h3><p>Installed atomically through <code>SETVBV $E45C</code>. It updates melody, threat, and laser channels, then chains to the OS routine saved from <code>VVBLKD $0224</code>.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="runtime">
+      <div class="shell">
+        <div class="section-head">
+          <span class="section-index">04 / SERVICES</span>
+          <div><h2>Runtime, OS, DOS</h2><p class="section-copy">The game mixes direct hardware access with cooperative OS services. Disk levels take the full C runtime to DOS path.</p></div>
+        </div>
+        <div class="diagram"><pre class="mermaid">
+flowchart LR
+  LOAD["maze_load_level()"] --> FOPEN["fopen / fgetc / fclose"]
+  FOPEN --> CRTIO["cc65 stdio<br/>file descriptor layer"]
+  CRTIO --> CIO["Atari OS CIO<br/>IOCB request"]
+  CIO --> DDEV["DOS 2.5<br/>D: handler / FMS"]
+  DDEV --> CSV["L3.CSV<br/>L4.CSV<br/>L5.CSV"]
+  classDef game fill:#d7ead3,stroke:#315a2d
+  classDef crt fill:#d9e8f5,stroke:#35617f
+  classDef os fill:#e8ddf2,stroke:#674982
+  classDef dos fill:#f2d8d5,stroke:#89453d
+  class LOAD game
+  class FOPEN,CRTIO crt
+  class CIO os
+  class DDEV,CSV dos
+        </pre></div>
+        <div class="split" style="margin-top:18px">
+          <article class="panel"><h3>cc65 runtime</h3><p>XEX startup and exit, BSS setup, a 1 KB software C stack, constructors, <code>waitvsync()</code>, <code>get_tv()</code>, stdlib, and stdio.</p></article>
+          <article class="panel"><h3>DOS 2.5</h3><p>The loader reads the XEX and calls RUNAD. Resident FMS later services only levels 3-5; levels 1-2 come from embedded data.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="hardware">
+      <div class="shell">
+        <div class="section-head">
+          <span class="section-index">05 / I/O</span>
+          <div><h2>Hardware registers</h2><p class="section-copy">All addresses are in the 6502 memory map. Writes here bypass OS abstractions unless an OS shadow is explicitly named.</p></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Chip</th><th>Registers</th><th>Role</th></tr></thead>
+            <tbody>
+              <tr><td>POKEY</td><td><code>AUDF1-AUDF4</code> / <code>AUDC1-AUDC4</code> <code>$D200-$D207</code>, <code>AUDCTL $D208</code></td><td>Four-channel melody, threat tone, and laser noise.</td></tr>
+              <tr><td>POKEY</td><td><code>KBCODE $D209</code>, <code>RANDOM $D20A</code>, <code>SKSTAT/SKCTL $D20F</code></td><td>Held-key polling, random seed, and keyboard/audio initialization.</td></tr>
+              <tr><td>GTIA</td><td><code>HPOSP0-3 $D000-$D003</code>, missile positions <code>$D004-$D007</code>, sizes <code>$D008-$D00C</code></td><td>Positions and scales targets, pursuer, laser, exit, and decoy.</td></tr>
+              <tr><td>GTIA</td><td><code>PRIOR $D01B</code>, <code>GRACTL $D01D</code>, <code>COLPF0 $D016</code>, player/playfield colors</td><td>PMG enable, overlap priority, and display colors.</td></tr>
+              <tr><td>ANTIC</td><td><code>DMACTL $D400</code>, <code>PMBASE $D407</code>, <code>WSYNC $D40A</code>, <code>NMIEN $D40E</code></td><td>Display and PMG DMA, aligned PMG base, scanline timing, and DLI enable.</td></tr>
+              <tr><td>PIA</td><td><code>PORTB $D301</code></td><td>Disables BASIC ROM to expose RAM at <code>$A000-$BFFF</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="memory">
+      <div class="shell">
+        <div class="section-head">
+          <span class="section-index">06 / ADDRESS</span>
+          <div><h2>Memory map</h2><p class="section-copy">Linker regions come from <a href="chased3d.cfg">chased3d.cfg</a>. Exact symbol ends come from <a href="Chased3D.lbl">Chased3D.lbl</a> after each build.</p></div>
+        </div>
+        <div class="memory" role="img" aria-label="Chased3D 6502 address-space map">
+          <div class="addr">$0000</div><div class="region os">OS zero page</div>
+          <div class="addr">$0082</div><div class="region runtime">cc65 ZEROPAGE / EXTZP through $00FF</div>
+          <div class="addr">$0100</div><div class="region hardware">6502 hardware stack</div>
+          <div class="addr">$0200</div><div class="region os">OS vectors and shadow registers</div>
+          <div class="addr">$0600</div><div class="region asm">PAGE6 DLI code, data, and BSS through $06FF</div>
+          <div class="addr">$0700</div><div class="region dos">DOS 2.5 and OS-managed RAM</div>
+          <div class="addr">$1C20</div><div class="region">Free / reserved gap below game load address</div>
+          <div class="addr">$4000</div><div class="region game">XEX startup, game code, tables, data, and ordinary BSS</div>
+          <div class="addr">$9C00</div><div class="region runtime">1 KB cc65 software C stack below $A000</div>
+          <div class="addr">$A000</div><div class="region game">SCREEN, DLIST, PMGRAM, HIGHBSS beneath disabled BASIC ROM</div>
+          <div class="addr">$C000</div><div class="region os">OS ROM and hardware windows through $FFFF</div>
+        </div>
+        <p class="note">SCREEN is 4 KB aligned; DLIST and PMGRAM are 1 KB aligned to satisfy ANTIC DMA addressing boundaries.</p>
+      </div>
+    </section>
+
+    <section id="build">
+      <div class="shell">
+        <div class="section-head">
+          <span class="section-index">07 / TOOLCHAIN</span>
+          <div><h2>Build graph</h2><p class="section-copy">PowerShell coordinates ca65 and cl65. Python is needed only when regenerating fixed-point tables.</p></div>
+        </div>
+        <div class="diagram"><pre class="mermaid">
+flowchart LR
+  PY["gen_trig3d.py<br/>optional"] --> TABLES["trig3d.c / .h"]
+  ASMSRC["4 assembly sources"] -->|"ca65 -g"| OBJ["4 object files"]
+  CSRC["6 C sources"] --> CL65["cl65 -t atari<br/>-O -g"]
+  TABLES --> CL65
+  OBJ --> CL65
+  CFG["chased3d.cfg"] --> CL65
+  CL65 --> XEX["Chased3D.XEX"]
+  CL65 --> LABELS["Chased3D.lbl"]
+  CL65 --> LINKMAP["Chased3D.map"]
+  CSV["L3-L5 CSV"] --> ATR["Chased3D.atr<br/>DOS 2.5 disk"]
+  XEX --> ATR
+        </pre></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell">Source detail: <a href="ARCHITECTURE.md">ARCHITECTURE.md</a> · Project: <a href="README.md">README.md</a></div>
+  </footer>
+
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: "base",
+      securityLevel: "loose",
+      flowchart: { curve: "basis", htmlLabels: true, useMaxWidth: false },
+      sequence: { useMaxWidth: false },
+      themeVariables: {
+        fontFamily: "IBM Plex Mono, monospace",
+        fontSize: "14px",
+        primaryColor: "#fffdf7",
+        primaryTextColor: "#17211d",
+        primaryBorderColor: "#4a4a4a",
+        lineColor: "#4a4a4a",
+        secondaryColor: "#d9e8f5",
+        tertiaryColor: "#f4f1e9",
+        clusterBkg: "#f4f1e9",
+        clusterBorder: "#8b8e84",
+        noteBkgColor: "#ffe0a8",
+        noteBorderColor: "#8a5812"
+      }
+    });
+  </script>
+</body>
+</html>
