@@ -23,8 +23,8 @@ $buildHeader = @"
 #ifndef BUILD_NUMBER_H
 #define BUILD_NUMBER_H
 
-#define BUILD_DIGIT_100 $([int]($displayBuild / 100))
-#define BUILD_DIGIT_10 $([int](($displayBuild / 10) % 10))
+#define BUILD_DIGIT_100 $([int][Math]::Floor($displayBuild / 100))
+#define BUILD_DIGIT_10 $([int]([Math]::Floor($displayBuild / 10) % 10))
 #define BUILD_DIGIT_1 $($displayBuild % 10)
 
 #endif
