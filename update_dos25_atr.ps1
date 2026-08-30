@@ -3,7 +3,9 @@ param(
     [string]$AtrPath,
 
     [Parameter(Mandatory = $true)]
-    [hashtable]$Files
+    [hashtable]$Files,
+
+    [hashtable]$RenameFiles = @{}
 )
 
 $ErrorActionPreference = "Stop"
@@ -22,6 +24,20 @@ function Get-DosName([string]$path) {
         throw "'$path' does not fit an Atari DOS 8.3 filename."
     }
     return $name.PadRight(8) + $extension.PadRight(3)
+}
+
+function Find-DosEntry([byte[]]$image, [string]$dosFileName) {
+    $directoryName = Get-DosName $dosFileName
+    for ($sector = 361; $sector -le 368; ++$sector) {
+        $directoryOffset = Get-SectorOffset $sector
+        for ($entry = 0; $entry -lt 8; ++$entry) {
+            $candidate = $directoryOffset + ($entry * 16)
+            if (($image[$candidate] -band 0x40) -eq 0) { continue }
+            $candidateName = [System.Text.Encoding]::ASCII.GetString($image, $candidate + 5, 11)
+            if ($candidateName -eq $directoryName) { return $candidate }
+        }
+    }
+    return -1
 }
 
 function Test-SectorFree([byte[]]$image, [int]$sector) {
@@ -59,23 +75,21 @@ if (($image[4] + (256 * $image[5])) -ne 128) {
     throw "'$AtrPath' does not use 128-byte sectors."
 }
 
+foreach ($oldDosFileName in $RenameFiles.Keys) {
+    $newDosFileName = $RenameFiles[$oldDosFileName]
+    $oldEntryOffset = Find-DosEntry $image $oldDosFileName
+    $newEntryOffset = Find-DosEntry $image $newDosFileName
+    if ($newEntryOffset -ge 0) { continue }
+    if ($oldEntryOffset -lt 0) {
+        throw "DOS file '$oldDosFileName' is not present in '$AtrPath'."
+    }
+    $newDirectoryName = Get-DosName $newDosFileName
+    [System.Text.Encoding]::ASCII.GetBytes($newDirectoryName).CopyTo($image, $oldEntryOffset + 5)
+}
+
 foreach ($dosFileName in $Files.Keys) {
     $sourcePath = (Resolve-Path $Files[$dosFileName]).Path
-    $directoryName = Get-DosName $dosFileName
-    $entryOffset = -1
-
-    for ($sector = 361; $sector -le 368 -and $entryOffset -lt 0; ++$sector) {
-        $directoryOffset = Get-SectorOffset $sector
-        for ($entry = 0; $entry -lt 8; ++$entry) {
-            $candidate = $directoryOffset + ($entry * 16)
-            if (($image[$candidate] -band 0x40) -eq 0) { continue }
-            $candidateName = [System.Text.Encoding]::ASCII.GetString($image, $candidate + 5, 11)
-            if ($candidateName -eq $directoryName) {
-                $entryOffset = $candidate
-                break
-            }
-        }
-    }
+    $entryOffset = Find-DosEntry $image $dosFileName
 
     if ($entryOffset -lt 0) {
         throw "DOS file '$dosFileName' is not present in '$AtrPath'."

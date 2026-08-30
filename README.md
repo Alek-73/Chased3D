@@ -29,17 +29,21 @@ Requires cc65 and PowerShell. The build script looks for `ca65.exe` and `cl65.ex
 .\build_chased3d.ps1
 ```
 
-This produces `Chased3D.XEX`, plus `Chased3D.map` and `Chased3D.lbl` for debugging. After linking, the build also replaces `CHASED3D.XEX` and `L2.CSV` through `L5.CSV` inside the existing DOS 2.5 `Chased3D.atr`. The boot sectors, `DOS.SYS`, and `DUP.SYS` are preserved.
+This produces `Chased3D.XEX`, plus `Chased3D.map` and `Chased3D.lbl` for debugging. After linking, the build installs the executable as `AUTORUN.SYS` and replaces `L2.CSV` through `L5.CSV` inside the existing DOS 2.5 `Chased3D.atr`. The boot sectors, `DOS.SYS`, and `DUP.SYS` are preserved.
 
 The ATR updater replaces existing DOS 2.5 sector chains rather than recreating the image. It grows or shrinks chains through the DOS VTOC while preserving the boot and system files. The `mkatr` tool installed under `C:\A8\mkatr` is not used for this step because that version creates SpartaDOS / BW-DOS filesystems, not DOS 2.5 images.
+
+[`BOOT.ASM`](BOOT.ASM) runs before the cc65 C runtime, disables the built-in BASIC ROM, and normalizes OS `MEMTOP` before the software stack is initialized. This allows the same XEX to boot whether BASIC is enabled or disabled. The original `PORTB` and `MEMTOP` values are restored when the game exits.
 
 Each completely successful build increments `build_number.txt`. The last three digits are compiled into the debug HUD as `Bnnn`; failed links or ATR updates do not advance the counter.
 
 To run it in [Altirra](https://www.virtualdub.org/altirra.html):
 
 ```powershell
-Altirra64.exe Chased3D.XEX
+Altirra64.exe Chased3D.atr
 ```
+
+Boot the ATR rather than the host XEX. DOS 2.5 starts `AUTORUN.SYS` automatically and remains resident to service the later `D:L2.CSV` through `D:L5.CSV` level reads.
 
 `gen_trig3d.py` regenerates `trig3d.c` / `trig3d.h` (sine, reciprocal, ray-offset and fisheye tables). Only needed if you change the column count or field of view. It requires Python and writes the tables as literal data, so the build itself has no Python dependency.
 
@@ -127,6 +131,7 @@ Only tiles 1 and 2 are solid. Targets and gates are walkable and currently have 
 | File | Purpose |
 | --- | --- |
 | `chased3d.c` | Entry point, input, movement, collision, FPS timing |
+| `BOOT.ASM` | Pre-runtime BASIC disable and `MEMTOP` normalization |
 | `view3d.c` / `.h` | Raycaster, display list setup, minimap, HUD |
 | `maze.c` / `.h` | Level data, CSV loader, row address tables |
 | `trig3d.c` / `.h` | Generated fixed-point tables |

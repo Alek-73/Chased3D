@@ -10,6 +10,7 @@
 #define KBD_KBCODE 0xD209
 #define POKEY_RANDOM 0xD20A
 #define PORTB 0xD301
+#define PBCTL 0xD303
 #define NOCLIK 0x02DB   /* non-zero silences the OS key click */
 #define RTCLOK_LOW 20   /* OS jiffy counter, bumped every vertical blank */
 
@@ -26,6 +27,9 @@
 #define DECOY_RECHARGE_TICKS 200
 #define LASER_SECONDS 5
 #define FLOOR_SCROLL_DISTANCE 256
+
+extern unsigned char startup_portb;
+extern unsigned char startup_memtop[2];
 
 /* Same triplet string the original BASIC game plays when the pursuer catches
  * the player (line 305 of chased1V3.BAS). */
@@ -409,7 +413,6 @@ static void handle_level_clear(void)
 
 int main(void)
 {
-    unsigned char saved_portb;
     unsigned char key;
     unsigned char ticks_per_second;
     unsigned char last_tick;
@@ -418,8 +421,8 @@ int main(void)
     unsigned char frames;
     unsigned char previous_key;
 
-    saved_portb = *(volatile unsigned char *)PORTB;
-    *(volatile unsigned char *)PORTB = saved_portb | 0x02;
+    *(volatile unsigned char *)PBCTL |= 0x04;
+    *(volatile unsigned char *)PORTB |= 0x02;
     OS.sdmctl = 0;
     ANTIC.dmactl = 0;
 
@@ -503,6 +506,8 @@ int main(void)
         }
         waitvsync();
     }
-    *(volatile unsigned char *)PORTB = saved_portb;
+    *(volatile unsigned char *)0x02E5 = startup_memtop[0];
+    *(volatile unsigned char *)0x02E6 = startup_memtop[1];
+    *(volatile unsigned char *)PORTB = startup_portb;
     return 0;
 }

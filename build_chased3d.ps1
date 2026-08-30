@@ -33,6 +33,10 @@ $buildHeader = @"
 
 Push-Location $root
 try {
+    & $ca65 -g BOOT.ASM -o BOOT.o
+    if ($LASTEXITCODE -ne 0) {
+        throw "ca65 failed with exit code $LASTEXITCODE."
+    }
     & $ca65 -g COLUMN3D.ASM -o COLUMN3D.o
     if ($LASTEXITCODE -ne 0) {
         throw "ca65 failed with exit code $LASTEXITCODE."
@@ -50,13 +54,15 @@ try {
         throw "ca65 failed with exit code $LASTEXITCODE."
     }
     & $cl65 -t atari -C chased3d.cfg --start-addr 0x4000 -O -g `
-        -m Chased3D.map -Ln Chased3D.lbl -o Chased3D.XEX chased3d.c view3d.c maze.c trig3d.c sprite3d.c melody.c COLUMN3D.o RAYCAST.o MELODY.o FLOORDLI.o
+        -m Chased3D.map -Ln Chased3D.lbl -o Chased3D.XEX chased3d.c view3d.c maze.c trig3d.c sprite3d.c melody.c BOOT.o COLUMN3D.o RAYCAST.o MELODY.o FLOORDLI.o
     if ($LASTEXITCODE -ne 0) {
         throw "cl65 failed with exit code $LASTEXITCODE."
     }
 
-    & .\update_dos25_atr.ps1 -AtrPath .\Chased3D.atr -Files @{
-        "CHASED3D.XEX" = ".\Chased3D.XEX"
+    & .\update_dos25_atr.ps1 -AtrPath .\Chased3D.atr -RenameFiles @{
+        "CHASED3D.XEX" = "AUTORUN.SYS"
+    } -Files @{
+        "AUTORUN.SYS" = ".\Chased3D.XEX"
         "L2.CSV" = ".\L2.csv"
         "L3.CSV" = ".\L3.csv"
         "L4.CSV" = ".\L4.csv"
