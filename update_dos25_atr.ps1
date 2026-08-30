@@ -24,6 +24,32 @@ function Get-DosName([string]$path) {
     return $name.PadRight(8) + $extension.PadRight(3)
 }
 
+function Test-SectorFree([byte[]]$image, [int]$sector) {
+    $vtocOffset = Get-SectorOffset 360
+    $bitmapOffset = $vtocOffset + 10 + [Math]::Floor($sector / 8)
+    $mask = 0x80 -shr ($sector % 8)
+    return ($image[$bitmapOffset] -band $mask) -ne 0
+}
+
+function Set-SectorAllocation([byte[]]$image, [int]$sector, [bool]$allocated) {
+    $vtocOffset = Get-SectorOffset 360
+    $bitmapOffset = $vtocOffset + 10 + [Math]::Floor($sector / 8)
+    $mask = 0x80 -shr ($sector % 8)
+    $currentlyFree = ($image[$bitmapOffset] -band $mask) -ne 0
+    if ($allocated -eq (-not $currentlyFree)) { return }
+
+    $freeSectors = $image[$vtocOffset + 3] + (256 * $image[$vtocOffset + 4])
+    if ($allocated) {
+        $image[$bitmapOffset] = $image[$bitmapOffset] -band (0xFF -bxor $mask)
+        --$freeSectors
+    } else {
+        $image[$bitmapOffset] = $image[$bitmapOffset] -bor $mask
+        ++$freeSectors
+    }
+    $image[$vtocOffset + 3] = $freeSectors -band 0xFF
+    $image[$vtocOffset + 4] = ($freeSectors -shr 8) -band 0xFF
+}
+
 $resolvedAtr = (Resolve-Path $AtrPath).Path
 $image = [System.IO.File]::ReadAllBytes($resolvedAtr)
 if ($image.Length -ne 133136 -or $image[0] -ne 0x96 -or $image[1] -ne 0x02) {
@@ -58,27 +84,19 @@ foreach ($dosFileName in $Files.Keys) {
     $allocatedSectors = $image[$entryOffset + 1] + (256 * $image[$entryOffset + 2])
     $source = [System.IO.File]::ReadAllBytes($sourcePath)
     $requiredSectors = [int][Math]::Ceiling($source.Length / 125.0)
-    if ($requiredSectors -ne $allocatedSectors) {
-        throw "DOS file '$dosFileName' needs $requiredSectors sectors but its existing chain has $allocatedSectors. Recreate the DOS 2.5 image with matching allocation before building."
-    }
+    if ($requiredSectors -eq 0) { $requiredSectors = 1 }
 
     $sector = $image[$entryOffset + 3] + (256 * $image[$entryOffset + 4])
     $visited = @{}
-    $sourceOffset = 0
+    $chain = New-Object System.Collections.Generic.List[int]
     for ($index = 0; $index -lt $allocatedSectors; ++$index) {
         if ($visited.ContainsKey($sector)) {
             throw "DOS file '$dosFileName' has a cyclic sector chain at sector $sector."
         }
         $visited[$sector] = $true
-
+        $chain.Add($sector)
         $offset = Get-SectorOffset $sector
         $nextSector = (($image[$offset + 125] -band 0x03) * 256) + $image[$offset + 126]
-        $chunkLength = [Math]::Min(125, $source.Length - $sourceOffset)
-        [Array]::Clear($image, $offset, 125)
-        [Array]::Copy($source, $sourceOffset, $image, $offset, $chunkLength)
-        $image[$offset + 127] = $chunkLength
-        $sourceOffset += $chunkLength
-
         if ($index -eq $allocatedSectors - 1) {
             if ($nextSector -ne 0) {
                 throw "DOS file '$dosFileName' has more sectors than its directory entry declares."
@@ -88,6 +106,46 @@ foreach ($dosFileName in $Files.Keys) {
         }
         $sector = $nextSector
     }
+
+    if ($requiredSectors -gt $allocatedSectors) {
+        $needed = $requiredSectors - $allocatedSectors
+        for ($candidate = 1; $candidate -lt 720 -and $needed -gt 0; ++$candidate) {
+            if (-not (Test-SectorFree $image $candidate)) { continue }
+            Set-SectorAllocation $image $candidate $true
+            $chain.Add($candidate)
+            --$needed
+        }
+        if ($needed -ne 0) {
+            throw "DOS file '$dosFileName' needs $needed more sectors, but the DOS 2.5 primary VTOC has no room."
+        }
+    } elseif ($requiredSectors -lt $allocatedSectors) {
+        for ($index = $allocatedSectors - 1; $index -ge $requiredSectors; --$index) {
+            $releasedSector = $chain[$index]
+            Set-SectorAllocation $image $releasedSector $false
+            [Array]::Clear($image, (Get-SectorOffset $releasedSector), 128)
+            $chain.RemoveAt($index)
+        }
+    }
+
+    $fileNumber = $image[(Get-SectorOffset $chain[0]) + 125] -band 0xFC
+    $sourceOffset = 0
+    for ($index = 0; $index -lt $requiredSectors; ++$index) {
+        $sector = $chain[$index]
+        $nextSector = if ($index + 1 -lt $requiredSectors) { $chain[$index + 1] } else { 0 }
+        $offset = Get-SectorOffset $sector
+        $chunkLength = [Math]::Min(125, $source.Length - $sourceOffset)
+        [Array]::Clear($image, $offset, 125)
+        if ($chunkLength -gt 0) {
+            [Array]::Copy($source, $sourceOffset, $image, $offset, $chunkLength)
+        }
+        $image[$offset + 125] = $fileNumber -bor (($nextSector -shr 8) -band 0x03)
+        $image[$offset + 126] = $nextSector -band 0xFF
+        $image[$offset + 127] = $chunkLength
+        $sourceOffset += $chunkLength
+    }
+
+    $image[$entryOffset + 1] = $requiredSectors -band 0xFF
+    $image[$entryOffset + 2] = ($requiredSectors -shr 8) -band 0xFF
 }
 
 $temporaryPath = "$resolvedAtr.tmp"

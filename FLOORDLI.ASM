@@ -1,16 +1,20 @@
         .setcpu "6502"
 
-; Four horizontal floor luminance bands. Each DLI is attached to the mode line
-; before a band boundary; WSYNC makes the new COLPF0 value start cleanly on
-; the following scanline.
+; Six horizontal floor luminance bands plus a final HUD boundary. Each DLI is
+; attached to the mode line before a boundary; WSYNC makes the new color start
+; cleanly on the following scanline.
 
         .export _floor_dli_install
         .export _floor_dli_set_rotation
 
 VDSLST = $0200
 WSYNC  = $D40A
+VCOUNT = $D40B
 NMIEN  = $D40E
 COLPF0 = $D016
+COLBK  = $D01A
+
+HUD_VCOUNT = 104
 
         .segment "PAGE6CODE"
 
@@ -39,7 +43,15 @@ floor_dli:
         tya
         pha
 
+        lda VCOUNT
+        cmp #HUD_VCOUNT
+        bcs floor_dli_hud
         ldx floor_dli_stage
+        cpx #$06
+        bcc floor_dli_band
+        ldx #$00
+        stx floor_dli_stage
+floor_dli_band:
         txa
         clc
         adc floor_dli_rotation
@@ -53,10 +65,12 @@ floor_dli_color:
         sta COLPF0
 
         inc floor_dli_stage
-        lda floor_dli_stage
-        cmp #$06
-        bcc floor_dli_restore
+        jmp floor_dli_restore
+
+floor_dli_hud:
         lda #$00
+        sta WSYNC
+        sta COLBK
         sta floor_dli_stage
 floor_dli_restore:
         pla

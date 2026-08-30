@@ -2,6 +2,7 @@
 #include "maze.h"
 #include "trig3d.h"
 #include "view3d.h"
+#include "build_number.h"
 
 /* ANTIC mode D: 160x96, 4 colours, 2 bits per pixel, 40 bytes per row.
  * One ray column == one byte == 4 pixels, so no bit masking is ever needed. */
@@ -206,6 +207,7 @@ static void set_floor_dlis(void)
         row = (unsigned char)(HORIZON + floor_phase + i * FLOOR_BAND_ROWS);
         view_dlist[5 + row - 1] |= 0x80;
     }
+    view_dlist[5 + VIEW_ROWS - 1] |= 0x80;
 }
 
 void view3d_floor_motion(signed char direction)
@@ -375,6 +377,11 @@ void view3d_init(void)
     unsigned int addr;
     unsigned char i;
     unsigned char n;
+
+    hud_line[16] = 34 | HUD_COLOR;   /* B */
+    hud_line[17] = (16 + BUILD_DIGIT_100) | HUD_COLOR;
+    hud_line[18] = (16 + BUILD_DIGIT_10) | HUD_COLOR;
+    hud_line[19] = (16 + BUILD_DIGIT_1) | HUD_COLOR;
 
     for (addr = 0; addr < HEIGHT_STEPS; ++addr) {
         n = (addr <= (DIST_MIN >> 4))

@@ -126,8 +126,9 @@ void maze_load_level(unsigned char requested_level)
             }
         }
     } else {
-        if (requested_level == 3) level_name = "D:L3.CSV";
-        else if (requested_level == 4) level_name = "D:L4.CSV";
+        if (requested_level == 3) level_name = "D:L2.CSV";
+        else if (requested_level == 4) level_name = "D:L3.CSV";
+        else if (requested_level == 5) level_name = "D:L4.CSV";
         else level_name = "D:L5.CSV";
         file = fopen(level_name, "r");
         if (file == 0) return;

@@ -31,7 +31,9 @@ Requires cc65 and PowerShell. The build script looks for `ca65.exe` and `cl65.ex
 
 This produces `Chased3D.XEX`, plus `Chased3D.map` and `Chased3D.lbl` for debugging. After linking, the build also replaces `CHASED3D.XEX` and `L2.CSV` through `L5.CSV` inside the existing DOS 2.5 `Chased3D.atr`. The boot sectors, `DOS.SYS`, and `DUP.SYS` are preserved.
 
-The ATR updater replaces existing DOS 2.5 sector chains rather than recreating the image. It fails instead of corrupting the disk if a generated file no longer fits the same number of sectors. The `mkatr` tool installed under `C:\A8\mkatr` is not used for this step because that version creates SpartaDOS / BW-DOS filesystems, not DOS 2.5 images.
+The ATR updater replaces existing DOS 2.5 sector chains rather than recreating the image. It grows or shrinks chains through the DOS VTOC while preserving the boot and system files. The `mkatr` tool installed under `C:\A8\mkatr` is not used for this step because that version creates SpartaDOS / BW-DOS filesystems, not DOS 2.5 images.
+
+Each completely successful build increments `build_number.txt`. The last three digits are compiled into the debug HUD as `Bnnn`; failed links or ATR updates do not advance the counter.
 
 To run it in [Altirra](https://www.virtualdub.org/altirra.html):
 

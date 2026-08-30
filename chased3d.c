@@ -20,6 +20,7 @@
 #define TURN_PER_TICK 400u
 #define MAX_TICKS 6
 #define PURSUER_PER_TICK 8
+#define PURSUER_STUCK_TICKS 200
 #define THREAT_DISTANCE 4096
 #define DECOY_CAPTURE_TICKS 40
 #define DECOY_RECHARGE_TICKS 200
@@ -31,11 +32,9 @@
 #define CAUGHT_MELODY "A14C28B18A14G14A11"
 #define STARTING_LIVES 3
 
-#define PLAYER_START_X ((1u << 8) | 0x80u)
+#define PLAYER_START_X ((6u << 8) | 0x80u)
 #define PLAYER_START_Y ((1u << 8) | 0x80u)
 #define PLAYER_START_ANGLE 0
-#define PURSUER_START_X ((18u << 8) | 0x80u)
-#define PURSUER_START_Y ((57u << 8) | 0x80u)
 #define LEVEL_MAX 5
 
 /* Same melodies as chased1V3.BAS lines 460 and 464: a level-clear jingle
@@ -45,6 +44,7 @@
 #define DECOY_DEPLOY_MELODY "C21G21C22"
 #define DECOY_TRAPPED_MELODY "G11D11G02"
 #define DECOY_READY_MELODY "C21E21G21C22"
+#define PURSUER_RESPAWN_MELODY "C21E21G21E21C22"
 
 static unsigned char frame_ticks = 1;
 static unsigned char lives = STARTING_LIVES;
@@ -132,6 +132,71 @@ static signed char pursuer_dir_y = 0;
 static unsigned char pursuer_target_col;
 static unsigned char pursuer_target_row;
 static unsigned char pursuer_retarget_timer = RETARGET_STALE_TICKS + 1;
+static unsigned char pursuer_stuck_col;
+static unsigned char pursuer_stuck_row;
+static unsigned int pursuer_stuck_ticks;
+
+static void place_pursuer_at_start(void)
+{
+    unsigned char col;
+    unsigned char row;
+
+    for (row = MAZE_H - 2; row > 0; --row) {
+        for (col = MAZE_W - 2; col > 0; --col) {
+            if (maze_map[row][col] != 0) continue;
+            pursuer_x = ((unsigned int)col << 8) | 0x80u;
+            pursuer_y = ((unsigned int)row << 8) | 0x80u;
+            pursuer_stuck_col = col;
+            pursuer_stuck_row = row;
+            pursuer_stuck_ticks = 0;
+            return;
+        }
+    }
+}
+
+static void respawn_pursuer(void)
+{
+    unsigned char col;
+    unsigned char row;
+    unsigned char chosen_col;
+    unsigned char chosen_row;
+    unsigned char player_col;
+    unsigned char player_row;
+    unsigned char current_col;
+    unsigned char current_row;
+    unsigned int choices;
+
+    player_col = (unsigned char)(player_x >> 8);
+    player_row = (unsigned char)(player_y >> 8);
+    current_col = (unsigned char)(pursuer_x >> 8);
+    current_row = (unsigned char)(pursuer_y >> 8);
+    choices = 0;
+    for (row = 0; row < MAZE_H; ++row) {
+        for (col = 0; col < MAZE_W; ++col) {
+            if (maze_solid(col, row)) continue;
+            if (col == player_col && row == player_row) continue;
+            if (col == current_col && row == current_row) continue;
+            if (decoy_active
+                && col == (unsigned char)(decoy_x >> 8)
+                && row == (unsigned char)(decoy_y >> 8)) continue;
+            ++choices;
+            if ((unsigned int)rand() % choices != 0) continue;
+            chosen_col = col;
+            chosen_row = row;
+        }
+    }
+    if (choices == 0) return;
+
+    pursuer_x = ((unsigned int)chosen_col << 8) | 0x80u;
+    pursuer_y = ((unsigned int)chosen_row << 8) | 0x80u;
+    pursuer_dir_x = 0;
+    pursuer_dir_y = 0;
+    pursuer_retarget_timer = RETARGET_STALE_TICKS + 1;
+    pursuer_stuck_col = chosen_col;
+    pursuer_stuck_row = chosen_row;
+    pursuer_stuck_ticks = 0;
+    melody_play(PURSUER_RESPAWN_MELODY);
+}
 
 /* Aims at a snapshot of the player's tile rather than their live position,
  * and keeps heading that way until it goes stale, is reached, or is blocked -
@@ -160,7 +225,12 @@ static void move_pursuer(void)
         && row == (unsigned char)(decoy_y >> 8)) {
         if (decoy_capture_ticks == 0) melody_play(DECOY_TRAPPED_MELODY);
         decoy_capture_ticks += frame_ticks;
-        if (decoy_capture_ticks < DECOY_CAPTURE_TICKS) return;
+        if (decoy_capture_ticks < DECOY_CAPTURE_TICKS) {
+            pursuer_stuck_col = col;
+            pursuer_stuck_row = row;
+            pursuer_stuck_ticks = 0;
+            return;
+        }
         decoy_active = 0;
         decoy_available = 0;
         decoy_capture_ticks = 0;
@@ -207,6 +277,17 @@ static void move_pursuer(void)
         pursuer_x = (unsigned int)candidate_x;
     if (!maze_solid((unsigned char)(pursuer_x >> 8), (unsigned char)(candidate_y >> 8)))
         pursuer_y = (unsigned int)candidate_y;
+
+    col = (unsigned char)(pursuer_x >> 8);
+    row = (unsigned char)(pursuer_y >> 8);
+    if (col != pursuer_stuck_col || row != pursuer_stuck_row) {
+        pursuer_stuck_col = col;
+        pursuer_stuck_row = row;
+        pursuer_stuck_ticks = 0;
+    } else {
+        pursuer_stuck_ticks += frame_ticks;
+        if (pursuer_stuck_ticks >= PURSUER_STUCK_TICKS) respawn_pursuer();
+    }
 }
 
 /* Same maze cell as the original BASIC game's tile-equality catch test. */
@@ -261,8 +342,7 @@ static void reset_positions(void)
     player_x = PLAYER_START_X;
     player_y = PLAYER_START_Y;
     player_angle = PLAYER_START_ANGLE;
-    pursuer_x = PURSUER_START_X;
-    pursuer_y = PURSUER_START_Y;
+    place_pursuer_at_start();
     pursuer_dir_x = 0;
     pursuer_dir_y = 0;
     pursuer_retarget_timer = RETARGET_STALE_TICKS + 1;
@@ -346,17 +426,17 @@ int main(void)
     srand(((unsigned int)*(volatile unsigned char *)POKEY_RANDOM << 8)
           | *(volatile unsigned char *)RTCLOK_LOW);
     maze_load_level(1);
+    //maze_load_level(6);
     minimap_build();
     sprite3d_build_targets();
     sprite3d_build_laser(PLAYER_START_X, PLAYER_START_Y);
     sprite3d_locate_exit();
 
-    /* Start in the open corridor at the top of the map, facing +X. */
+    /* Start on row 1, column 6, facing +X. */
     player_x = PLAYER_START_X;
     player_y = PLAYER_START_Y;
     player_angle = PLAYER_START_ANGLE;
-    pursuer_x = PURSUER_START_X;
-    pursuer_y = PURSUER_START_Y;
+    place_pursuer_at_start();
 
     view3d_init();
     minimap_show();

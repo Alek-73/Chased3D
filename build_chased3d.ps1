@@ -4,10 +4,32 @@ $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $toolBin = if ($env:CC65_BIN) { $env:CC65_BIN } else { "C:\tools\cc65\bin" }
 $ca65 = Join-Path $toolBin "ca65.exe"
 $cl65 = Join-Path $toolBin "cl65.exe"
+$buildNumberPath = Join-Path $root "build_number.txt"
+$buildHeaderPath = Join-Path $root "build_number.h"
 
 if (-not (Test-Path $ca65) -or -not (Test-Path $cl65)) {
     throw "cc65 tools not found in $toolBin. Set CC65_BIN or install ca65.exe and cl65.exe there."
 }
+
+$currentBuild = 0
+if (Test-Path $buildNumberPath) {
+    if (-not [int]::TryParse((Get-Content -Raw $buildNumberPath).Trim(), [ref]$currentBuild) -or $currentBuild -lt 0) {
+        throw "build_number.txt must contain a non-negative integer."
+    }
+}
+$nextBuild = $currentBuild + 1
+$displayBuild = $nextBuild % 1000
+$buildHeader = @"
+#ifndef BUILD_NUMBER_H
+#define BUILD_NUMBER_H
+
+#define BUILD_DIGIT_100 $([int]($displayBuild / 100))
+#define BUILD_DIGIT_10 $([int](($displayBuild / 10) % 10))
+#define BUILD_DIGIT_1 $($displayBuild % 10)
+
+#endif
+"@
+[System.IO.File]::WriteAllText($buildHeaderPath, $buildHeader)
 
 Push-Location $root
 try {
@@ -40,6 +62,8 @@ try {
         "L4.CSV" = ".\L4.csv"
         "L5.CSV" = ".\L5.csv"
     }
+    [System.IO.File]::WriteAllText($buildNumberPath, "$nextBuild`r`n")
+    Write-Host "Successful build number: $nextBuild"
 }
 finally {
     Pop-Location
