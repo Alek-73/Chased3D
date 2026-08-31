@@ -1,0 +1,333 @@
+ca65 V2.19 - Git 547d923
+Main file   : C:\Users\Alex\Chased3D\RAYCAST.ASM
+Current file: C:\Users\Alex\Chased3D\RAYCAST.ASM
+
+000000r 1                       .setcpu "6502"
+000000r 1               
+000000r 1               ; Grid traversal (DDA) for the Chased3D raycaster.
+000000r 1               ;
+000000r 1               ; This is the hot loop of the renderer: up to MAX_STEPS iterations per ray,
+000000r 1               ; times one ray per screen column. In C each step cost roughly 300 cycles
+000000r 1               ; because of 16-bit arithmetic and the map pointer indirection.
+000000r 1               
+000000r 1                       .export _dda_map_x, _dda_map_y
+000000r 1                       .export _dda_step_x, _dda_step_y
+000000r 1                       .export _dda_side_x, _dda_side_y
+000000r 1                       .export _dda_delta_x, _dda_delta_y
+000000r 1                       .export _dda_side, _dda_hit, _dda_steps
+000000r 1                       .export _dda_cast
+000000r 1                       .export _ray_setup_angle, _ray_setup_px, _ray_setup_py
+000000r 1                       .export _ray_setup_and_cast
+000000r 1               
+000000r 1                       .import _maze_row_lo, _maze_row_hi
+000000r 1                       .import _maze_exit_open
+000000r 1                       .import _sin3d, _recip3d
+000000r 1               
+000000r 1               MAZE_W = 20
+000000r 1               MAZE_H = 59
+000000r 1               
+000000r 1                       .segment "ZEROPAGE"
+000000r 1               dda_ptr:
+000000r 1  xx xx                .res 2
+000002r 1               setup_ptr:
+000002r 1  xx xx                .res 2
+000004r 1               
+000004r 1                       .segment "BSS"
+000000r 1               _dda_map_x:
+000000r 1  xx                   .res 1
+000001r 1               _dda_map_y:
+000001r 1  xx                   .res 1
+000002r 1               _dda_step_x:
+000002r 1  xx                   .res 1
+000003r 1               _dda_step_y:
+000003r 1  xx                   .res 1
+000004r 1               _dda_side_x:
+000004r 1  xx xx                .res 2
+000006r 1               _dda_side_y:
+000006r 1  xx xx                .res 2
+000008r 1               _dda_delta_x:
+000008r 1  xx xx                .res 2
+00000Ar 1               _dda_delta_y:
+00000Ar 1  xx xx                .res 2
+00000Cr 1               _dda_side:
+00000Cr 1  xx                   .res 1
+00000Dr 1               _dda_hit:
+00000Dr 1  xx                   .res 1
+00000Er 1               _dda_steps:
+00000Er 1  xx                   .res 1
+00000Fr 1               _ray_setup_angle:
+00000Fr 1  xx xx                .res 2
+000011r 1               _ray_setup_px:
+000011r 1  xx xx                .res 2
+000013r 1               _ray_setup_py:
+000013r 1  xx xx                .res 2
+000015r 1               setup_value:
+000015r 1  xx xx                .res 2
+000017r 1               setup_recip:
+000017r 1  xx xx                .res 2
+000019r 1               setup_scaled:
+000019r 1  xx xx                .res 2
+00001Br 1               setup_offset:
+00001Br 1  xx xx                .res 2
+00001Dr 1               setup_negative:
+00001Dr 1  xx                   .res 1
+00001Er 1               mul_left:
+00001Er 1  xx xx                .res 2
+000020r 1               mul_right:
+000020r 1  xx                   .res 1
+000021r 1               mul_product:
+000021r 1  xx xx                .res 2
+000023r 1               
+000023r 1                       .segment "CODE"
+000000r 1               
+000000r 1               .macro SETUP_AXIS adjust, position, delta, side, step
+000000r 1                       .local positive, full_delta, save_side
+000000r 1                       lda _ray_setup_angle+1
+000000r 1                       clc
+000000r 1                       adc #adjust
+000000r 1                       jsr load_recip
+000000r 1                       lda setup_recip
+000000r 1                       sta delta
+000000r 1                       lda setup_recip+1
+000000r 1                       sta delta+1
+000000r 1               
+000000r 1                       lda setup_negative
+000000r 1                       beq positive
+000000r 1                       lda #$FF
+000000r 1                       sta step
+000000r 1                       lda position
+000000r 1                       jsr scale_recip
+000000r 1                       jmp save_side
+000000r 1               
+000000r 1               positive:
+000000r 1                       lda #$01
+000000r 1                       sta step
+000000r 1                       lda position
+000000r 1                       beq full_delta
+000000r 1                       eor #$FF
+000000r 1                       clc
+000000r 1                       adc #$01
+000000r 1                       jsr scale_recip
+000000r 1                       jmp save_side
+000000r 1               
+000000r 1               full_delta:
+000000r 1                       lda setup_recip
+000000r 1                       sta setup_scaled
+000000r 1                       lda setup_recip+1
+000000r 1                       sta setup_scaled+1
+000000r 1               save_side:
+000000r 1                       lda setup_scaled
+000000r 1                       sta side
+000000r 1                       lda setup_scaled+1
+000000r 1                       sta side+1
+000000r 1               .endmacro
+000000r 1               
+000000r 1               ; Builds both axis deltas and initial side distances, then enters the existing
+000000r 1               ; grid traversal. The high angle byte is the 256-step trigonometric index.
+000000r 1               _ray_setup_and_cast:
+000000r 1  AD rr rr             lda _ray_setup_px+1
+000003r 1  8D rr rr             sta _dda_map_x
+000006r 1  AD rr rr             lda _ray_setup_py+1
+000009r 1  8D rr rr             sta _dda_map_y
+00000Cr 1               
+00000Cr 1  AD rr rr 18          SETUP_AXIS 64, _ray_setup_px, _dda_delta_x, _dda_side_x, _dda_step_x
+000010r 1  69 40 20 rr  
+000014r 1  rr AD rr rr  
+000061r 1  AD rr rr 18          SETUP_AXIS 0,  _ray_setup_py, _dda_delta_y, _dda_side_y, _dda_step_y
+000065r 1  69 00 20 rr  
+000069r 1  rr AD rr rr  
+0000B6r 1               
+0000B6r 1  A9 18                lda #24
+0000B8r 1  8D rr rr             sta _dda_steps
+0000BBr 1  4C rr rr             jmp _dda_cast
+0000BEr 1               
+0000BEr 1               ; A is a sine-table index. Returns abs(sin[index])'s reciprocal in
+0000BEr 1               ; setup_recip and records the original sign in setup_negative.
+0000BEr 1               load_recip:
+0000BEr 1  0A                   asl
+0000BFr 1  8D rr rr             sta setup_offset
+0000C2r 1  A9 00                lda #$00
+0000C4r 1  2A                   rol
+0000C5r 1  8D rr rr             sta setup_offset+1
+0000C8r 1  18                   clc
+0000C9r 1  A9 rr                lda #<_sin3d
+0000CBr 1  6D rr rr             adc setup_offset
+0000CEr 1  85 rr                sta setup_ptr
+0000D0r 1  A9 rr                lda #>_sin3d
+0000D2r 1  6D rr rr             adc setup_offset+1
+0000D5r 1  85 rr                sta setup_ptr+1
+0000D7r 1  A0 00                ldy #$00
+0000D9r 1  B1 rr                lda (setup_ptr),y
+0000DBr 1  8D rr rr             sta setup_value
+0000DEr 1  C8                   iny
+0000DFr 1  B1 rr                lda (setup_ptr),y
+0000E1r 1  8D rr rr             sta setup_value+1
+0000E4r 1  30 08                bmi load_recip_negative
+0000E6r 1  A9 00                lda #$00
+0000E8r 1  8D rr rr             sta setup_negative
+0000EBr 1  4C rr rr             jmp load_recip_abs
+0000EEr 1               
+0000EEr 1               load_recip_negative:
+0000EEr 1  A9 01                lda #$01
+0000F0r 1  8D rr rr             sta setup_negative
+0000F3r 1  38                   sec
+0000F4r 1  A9 00                lda #$00
+0000F6r 1  ED rr rr             sbc setup_value
+0000F9r 1  8D rr rr             sta setup_value
+0000FCr 1  A9 00                lda #$00
+0000FEr 1  ED rr rr             sbc setup_value+1
+000101r 1  8D rr rr             sta setup_value+1
+000104r 1               
+000104r 1               load_recip_abs:
+000104r 1  0E rr rr             asl setup_value
+000107r 1  2E rr rr             rol setup_value+1
+00010Ar 1  18                   clc
+00010Br 1  A9 rr                lda #<_recip3d
+00010Dr 1  6D rr rr             adc setup_value
+000110r 1  85 rr                sta setup_ptr
+000112r 1  A9 rr                lda #>_recip3d
+000114r 1  6D rr rr             adc setup_value+1
+000117r 1  85 rr                sta setup_ptr+1
+000119r 1  A0 00                ldy #$00
+00011Br 1  B1 rr                lda (setup_ptr),y
+00011Dr 1  8D rr rr             sta setup_recip
+000120r 1  C8                   iny
+000121r 1  B1 rr                lda (setup_ptr),y
+000123r 1  8D rr rr             sta setup_recip+1
+000126r 1  60                   rts
+000127r 1               
+000127r 1               ; A is an 8-bit fraction. Computes (fraction * setup_recip) >> 8 using
+000127r 1               ; two 8x8 products, matching view3d.c's former scale_frac implementation.
+000127r 1               scale_recip:
+000127r 1  8D rr rr             sta setup_value
+00012Ar 1  AC rr rr             ldy setup_recip+1
+00012Dr 1  20 rr rr             jsr multiply_8x8
+000130r 1  AD rr rr             lda mul_product
+000133r 1  8D rr rr             sta setup_scaled
+000136r 1  AD rr rr             lda mul_product+1
+000139r 1  8D rr rr             sta setup_scaled+1
+00013Cr 1  AD rr rr             lda setup_value
+00013Fr 1  AC rr rr             ldy setup_recip
+000142r 1  20 rr rr             jsr multiply_8x8
+000145r 1  18                   clc
+000146r 1  AD rr rr             lda setup_scaled
+000149r 1  6D rr rr             adc mul_product+1
+00014Cr 1  8D rr rr             sta setup_scaled
+00014Fr 1  90 03                bcc scale_recip_done
+000151r 1  EE rr rr             inc setup_scaled+1
+000154r 1               scale_recip_done:
+000154r 1  60                   rts
+000155r 1               
+000155r 1               ; A * Y -> mul_product, unsigned.
+000155r 1               multiply_8x8:
+000155r 1  8D rr rr             sta mul_left
+000158r 1  A9 00                lda #$00
+00015Ar 1  8D rr rr             sta mul_left+1
+00015Dr 1  8C rr rr             sty mul_right
+000160r 1  8D rr rr             sta mul_product
+000163r 1  8D rr rr             sta mul_product+1
+000166r 1  4E rr rr 90          .repeat 8
+00016Ar 1  13 18 AD rr  
+00016Er 1  rr 6D rr rr  
+000256r 1                               lsr mul_right
+000256r 1                               bcc :+
+000256r 1                               clc
+000256r 1                               lda mul_product
+000256r 1                               adc mul_left
+000256r 1                               sta mul_product
+000256r 1                               lda mul_product+1
+000256r 1                               adc mul_left+1
+000256r 1                               sta mul_product+1
+000256r 1               :               asl mul_left
+000256r 1                               rol mul_left+1
+000256r 1                       .endrepeat
+000256r 1  60                   rts
+000257r 1               
+000257r 1               ; Walks the grid until a wall tile (1 or 2) is hit, the ray leaves the map, or
+000257r 1               ; _dda_steps iterations elapse. On a hit _dda_side_x / _dda_side_y hold the
+000257r 1               ; accumulated ray length, which the caller turns into a wall distance.
+000257r 1               _dda_cast:
+000257r 1  A9 00                lda #$00
+000259r 1  8D rr rr             sta _dda_hit
+00025Cr 1  AE rr rr             ldx _dda_steps
+00025Fr 1  D0 03                bne dda_start
+000261r 1  4C rr rr             jmp dda_done
+000264r 1               
+000264r 1               dda_start:
+000264r 1               dda_loop:
+000264r 1  AD rr rr             lda _dda_side_x
+000267r 1  CD rr rr             cmp _dda_side_y
+00026Ar 1  AD rr rr             lda _dda_side_x+1
+00026Dr 1  ED rr rr             sbc _dda_side_y+1
+000270r 1  B0 2C                bcs dda_step_y
+000272r 1               
+000272r 1  AD rr rr             lda _dda_map_x
+000275r 1  18                   clc
+000276r 1  6D rr rr             adc _dda_step_x
+000279r 1  8D rr rr             sta _dda_map_x
+00027Cr 1  C9 14                cmp #MAZE_W                ; unsigned test also catches the $FF underflow
+00027Er 1  90 03                bcc dda_x_ok
+000280r 1  4C rr rr             jmp dda_done
+000283r 1               dda_x_ok:
+000283r 1  18                   clc
+000284r 1  AD rr rr             lda _dda_side_x
+000287r 1  6D rr rr             adc _dda_delta_x
+00028Ar 1  8D rr rr             sta _dda_side_x
+00028Dr 1  AD rr rr             lda _dda_side_x+1
+000290r 1  6D rr rr             adc _dda_delta_x+1
+000293r 1  8D rr rr             sta _dda_side_x+1
+000296r 1  A9 00                lda #$00
+000298r 1  8D rr rr             sta _dda_side
+00029Br 1  4C rr rr             jmp dda_tile
+00029Er 1               
+00029Er 1               dda_step_y:
+00029Er 1  AD rr rr             lda _dda_map_y
+0002A1r 1  18                   clc
+0002A2r 1  6D rr rr             adc _dda_step_y
+0002A5r 1  8D rr rr             sta _dda_map_y
+0002A8r 1  C9 3B                cmp #MAZE_H
+0002AAr 1  90 03                bcc dda_y_ok
+0002ACr 1  4C rr rr             jmp dda_done
+0002AFr 1               dda_y_ok:
+0002AFr 1  18                   clc
+0002B0r 1  AD rr rr             lda _dda_side_y
+0002B3r 1  6D rr rr             adc _dda_delta_y
+0002B6r 1  8D rr rr             sta _dda_side_y
+0002B9r 1  AD rr rr             lda _dda_side_y+1
+0002BCr 1  6D rr rr             adc _dda_delta_y+1
+0002BFr 1  8D rr rr             sta _dda_side_y+1
+0002C2r 1  A9 01                lda #$01
+0002C4r 1  8D rr rr             sta _dda_side
+0002C7r 1               
+0002C7r 1               dda_tile:
+0002C7r 1  AC rr rr             ldy _dda_map_y
+0002CAr 1  B9 rr rr             lda _maze_row_lo,y
+0002CDr 1  85 rr                sta dda_ptr
+0002CFr 1  B9 rr rr             lda _maze_row_hi,y
+0002D2r 1  85 rr                sta dda_ptr+1
+0002D4r 1  AC rr rr             ldy _dda_map_x
+0002D7r 1  B1 rr                lda (dda_ptr),y
+0002D9r 1  C9 01                cmp #$01
+0002DBr 1  F0 14                beq dda_wall_near
+0002DDr 1  C9 02                cmp #$02
+0002DFr 1  F0 10                beq dda_wall_near
+0002E1r 1  C9 05                cmp #$05                   ; exit gate: solid only while closed
+0002E3r 1  D0 05                bne dda_continue
+0002E5r 1  AD rr rr             lda _maze_exit_open
+0002E8r 1  F0 07                beq dda_wall_near
+0002EAr 1               dda_continue:
+0002EAr 1  CA                   dex
+0002EBr 1  F0 03                beq dda_done
+0002EDr 1  4C rr rr             jmp dda_loop
+0002F0r 1               
+0002F0r 1               dda_done:
+0002F0r 1  60                   rts
+0002F1r 1               
+0002F1r 1               dda_wall_near:
+0002F1r 1  4C rr rr             jmp dda_wall
+0002F4r 1               
+0002F4r 1               dda_wall:
+0002F4r 1  A9 01                lda #$01
+0002F6r 1  8D rr rr             sta _dda_hit
+0002F9r 1  60                   rts
+0002F9r 1               

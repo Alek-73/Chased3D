@@ -1,0 +1,250 @@
+ca65 V2.19 - Git 547d923
+Main file   : C:\Users\Alex\Chased3D\MELODY.ASM
+Current file: C:\Users\Alex\Chased3D\MELODY.ASM
+
+000000r 1                       .setcpu "6502"
+000000r 1               
+000000r 1               ; Melody playback driven from the deferred vertical blank vector.
+000000r 1               ;
+000000r 1               ; The tick has to run on an interrupt: the render loop takes several frames per
+000000r 1               ; pass, so advancing notes from the main loop would tie tempo to the frame rate.
+000000r 1               ; It also has to be assembly rather than C, because cc65 uses a software stack
+000000r 1               ; and shared temporaries that an interrupt would corrupt mid-call.
+000000r 1               
+000000r 1                       .export _melody_install
+000000r 1                       .export _melody_laser_buzz
+000000r 1                       .export _melody_active
+000000r 1                       .export _melody_timer
+000000r 1                       .export _melody_index
+000000r 1                       .export _melody_length
+000000r 1                       .export _melody_freq0
+000000r 1                       .export _melody_freq1
+000000r 1                       .export _melody_dur
+000000r 1                       .export _melody_threat_level
+000000r 1                       .export _melody_threat_freq
+000000r 1                       .export _melody_threat_dur
+000000r 1                       .export _melody_threat_length
+000000r 1               
+000000r 1               SETVBV  = $E45C
+000000r 1               VVBLKD  = $0224
+000000r 1               AUDF1   = $D200
+000000r 1               AUDC1   = $D201
+000000r 1               AUDF2   = $D202
+000000r 1               AUDC2   = $D203
+000000r 1               AUDF3   = $D204
+000000r 1               AUDC3   = $D205
+000000r 1               AUDF4   = $D206
+000000r 1               AUDC4   = $D207
+000000r 1               AUDCTL  = $D208
+000000r 1               SKCTL   = $D20F
+000000r 1               
+000000r 1               MELODY_MAX = 32
+000000r 1               PEAK_VOLUME = $0A
+000000r 1               
+000000r 1                       .segment "BSS"
+000000r 1               _melody_active:
+000000r 1  xx                   .res 1
+000001r 1               _melody_timer:
+000001r 1  xx                   .res 1
+000002r 1               _melody_index:
+000002r 1  xx                   .res 1
+000003r 1               _melody_length:
+000003r 1  xx                   .res 1
+000004r 1               _melody_freq0:
+000004r 1  xx xx xx xx          .res MELODY_MAX
+000008r 1  xx xx xx xx  
+00000Cr 1  xx xx xx xx  
+000024r 1               _melody_freq1:
+000024r 1  xx xx xx xx          .res MELODY_MAX
+000028r 1  xx xx xx xx  
+00002Cr 1  xx xx xx xx  
+000044r 1               _melody_dur:
+000044r 1  xx xx xx xx          .res MELODY_MAX
+000048r 1  xx xx xx xx  
+00004Cr 1  xx xx xx xx  
+000064r 1               _melody_threat_level:
+000064r 1  xx                   .res 1
+000065r 1               _melody_threat_freq:
+000065r 1  xx xx xx xx          .res 16
+000069r 1  xx xx xx xx  
+00006Dr 1  xx xx xx xx  
+000075r 1               _melody_threat_dur:
+000075r 1  xx xx xx xx          .res 16
+000079r 1  xx xx xx xx  
+00007Dr 1  xx xx xx xx  
+000085r 1               _melody_threat_length:
+000085r 1  xx                   .res 1
+000086r 1               threat_index:
+000086r 1  xx                   .res 1
+000087r 1               threat_timer:
+000087r 1  xx                   .res 1
+000088r 1               threat_frequency:
+000088r 1  xx                   .res 1
+000089r 1               melody_volume:
+000089r 1  xx                   .res 1
+00008Ar 1               laser_buzz_timer:
+00008Ar 1  xx                   .res 1
+00008Br 1               saved_vbi:
+00008Br 1  xx xx                .res 2
+00008Dr 1               
+00008Dr 1                       .segment "CODE"
+000000r 1               
+000000r 1               _melody_install:
+000000r 1  A9 00                lda #$00
+000002r 1  8D 08 D2             sta AUDCTL
+000005r 1  8D 01 D2             sta AUDC1
+000008r 1  8D 03 D2             sta AUDC2
+00000Br 1  8D 05 D2             sta AUDC3
+00000Er 1  8D 07 D2             sta AUDC4
+000011r 1  8D rr rr             sta _melody_threat_level
+000014r 1  8D rr rr             sta threat_index
+000017r 1  8D rr rr             sta threat_timer
+00001Ar 1  8D rr rr             sta laser_buzz_timer
+00001Dr 1  8D rr rr             sta _melody_active
+000020r 1  A9 03                lda #$03
+000022r 1  8D 0F D2             sta SKCTL
+000025r 1               
+000025r 1  AD 24 02             lda VVBLKD
+000028r 1  8D rr rr             sta saved_vbi
+00002Br 1  AD 25 02             lda VVBLKD+1
+00002Er 1  8D rr rr             sta saved_vbi+1
+000031r 1               
+000031r 1                       ; SETVBV avoids the race of writing the vector bytes non-atomically.
+000031r 1                       ; Vector 7 is the deferred VBI; 6 is the immediate one, which would
+000031r 1                       ; bypass the OS stage 1 work that updates RTCLOK.
+000031r 1  A0 rr                ldy #<melody_vbi
+000033r 1  A2 rr                ldx #>melody_vbi
+000035r 1  A9 07                lda #$07
+000037r 1  20 5C E4             jsr SETVBV
+00003Ar 1  60                   rts
+00003Br 1               
+00003Br 1               melody_vbi:
+00003Br 1  48                   pha
+00003Cr 1  8A                   txa
+00003Dr 1  48                   pha
+00003Er 1  98                   tya
+00003Fr 1  48                   pha
+000040r 1  20 rr rr             jsr melody_tick
+000043r 1  20 rr rr             jsr threat_tick
+000046r 1  20 rr rr             jsr laser_buzz_tick
+000049r 1  68                   pla
+00004Ar 1  A8                   tay
+00004Br 1  68                   pla
+00004Cr 1  AA                   tax
+00004Dr 1  68                   pla
+00004Er 1  6C rr rr             jmp (saved_vbi)
+000051r 1               
+000051r 1               ; Two voices with the volume swelling into each note rather than decaying.
+000051r 1               melody_tick:
+000051r 1  AD rr rr             lda _melody_active
+000054r 1  F0 67                beq melody_done
+000056r 1  AD rr rr             lda _melody_timer
+000059r 1  F0 18                beq load_note
+00005Br 1  CE rr rr             dec _melody_timer
+00005Er 1  AD rr rr             lda melody_volume
+000061r 1  C9 0A                cmp #PEAK_VOLUME
+000063r 1  B0 58                bcs melody_done
+000065r 1  69 02                adc #$02                   ; carry is clear here, from the cmp above
+000067r 1  8D rr rr             sta melody_volume
+00006Ar 1  09 A0                ora #$A0                   ; pure tone, distortion off
+00006Cr 1  8D 01 D2             sta AUDC1
+00006Fr 1  8D 03 D2             sta AUDC2
+000072r 1  60                   rts
+000073r 1               
+000073r 1               load_note:
+000073r 1  AE rr rr             ldx _melody_index
+000076r 1  EC rr rr             cpx _melody_length
+000079r 1  90 0C                bcc have_note
+00007Br 1  A9 00                lda #$00
+00007Dr 1  8D rr rr             sta _melody_active
+000080r 1  8D 01 D2             sta AUDC1
+000083r 1  8D 03 D2             sta AUDC2
+000086r 1  60                   rts
+000087r 1               
+000087r 1               have_note:
+000087r 1  BD rr rr             lda _melody_freq0,x
+00008Ar 1  8D 00 D2             sta AUDF1
+00008Dr 1  BD rr rr             lda _melody_freq1,x
+000090r 1  8D 02 D2             sta AUDF2
+000093r 1  1D rr rr             ora _melody_freq0,x
+000096r 1  F0 10                beq silence_note
+000098r 1  A9 00                lda #$00
+00009Ar 1  8D rr rr             sta melody_volume
+00009Dr 1  A9 A0                lda #$A0
+00009Fr 1  8D 01 D2             sta AUDC1
+0000A2r 1  8D 03 D2             sta AUDC2
+0000A5r 1  4C rr rr             jmp save_note
+0000A8r 1               
+0000A8r 1               silence_note:
+0000A8r 1  A9 00                lda #$00
+0000AAr 1  8D rr rr             sta melody_volume
+0000ADr 1  8D 01 D2             sta AUDC1
+0000B0r 1  8D 03 D2             sta AUDC2
+0000B3r 1               
+0000B3r 1               save_note:
+0000B3r 1  BD rr rr             lda _melody_dur,x
+0000B6r 1  8D rr rr             sta _melody_timer
+0000B9r 1  E8                   inx
+0000BAr 1  8E rr rr             stx _melody_index
+0000BDr 1               melody_done:
+0000BDr 1  60                   rts
+0000BEr 1               
+0000BEr 1               _melody_laser_buzz:
+0000BEr 1  A9 20                lda #$20
+0000C0r 1  8D 06 D2             sta AUDF4
+0000C3r 1  A9 88                lda #$88                   ; poly noise, volume 8
+0000C5r 1  8D 07 D2             sta AUDC4
+0000C8r 1  A9 18                lda #$18                   ; short burst, independent of frame rate
+0000CAr 1  8D rr rr             sta laser_buzz_timer
+0000CDr 1  60                   rts
+0000CEr 1               
+0000CEr 1               laser_buzz_tick:
+0000CEr 1  AD rr rr             lda laser_buzz_timer
+0000D1r 1  F0 05                beq laser_buzz_silence
+0000D3r 1  CE rr rr             dec laser_buzz_timer
+0000D6r 1  D0 05                bne laser_buzz_done
+0000D8r 1               laser_buzz_silence:
+0000D8r 1  A9 00                lda #$00
+0000DAr 1  8D 07 D2             sta AUDC4
+0000DDr 1               laser_buzz_done:
+0000DDr 1  60                   rts
+0000DEr 1               
+0000DEr 1               threat_tick:
+0000DEr 1  AD rr rr             lda _melody_threat_level
+0000E1r 1  F0 46                beq threat_silence
+0000E3r 1  AD rr rr             lda threat_timer
+0000E6r 1  F0 14                beq threat_load_note
+0000E8r 1  CE rr rr             dec threat_timer
+0000EBr 1  AD rr rr             lda threat_frequency
+0000EEr 1  F0 39                beq threat_silence
+0000F0r 1  8D 04 D2             sta AUDF3
+0000F3r 1  AD rr rr             lda _melody_threat_level
+0000F6r 1  09 A0                ora #$A0
+0000F8r 1  8D 05 D2             sta AUDC3
+0000FBr 1  60                   rts
+0000FCr 1               
+0000FCr 1               threat_load_note:
+0000FCr 1  AE rr rr             ldx threat_index
+0000FFr 1  EC rr rr             cpx _melody_threat_length
+000102r 1  90 05                bcc threat_have_note
+000104r 1  A2 00                ldx #$00
+000106r 1  8E rr rr             stx threat_index
+000109r 1               threat_have_note:
+000109r 1  BD rr rr             lda _melody_threat_freq,x
+00010Cr 1  8D rr rr             sta threat_frequency
+00010Fr 1  BD rr rr             lda _melody_threat_dur,x
+000112r 1  8D rr rr             sta threat_timer
+000115r 1  EE rr rr             inc threat_index
+000118r 1  AD rr rr             lda threat_frequency
+00011Br 1  F0 0C                beq threat_silence
+00011Dr 1  8D 04 D2             sta AUDF3
+000120r 1  AD rr rr             lda _melody_threat_level
+000123r 1  09 A0                ora #$A0
+000125r 1  8D 05 D2             sta AUDC3
+000128r 1  60                   rts
+000129r 1               
+000129r 1               threat_silence:
+000129r 1  A9 00                lda #$00
+00012Br 1  8D 05 D2             sta AUDC3
+00012Er 1  60                   rts
+00012Er 1               

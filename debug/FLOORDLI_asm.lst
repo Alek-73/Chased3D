@@ -1,0 +1,107 @@
+ca65 V2.19 - Git 547d923
+Main file   : C:\Users\Alex\Chased3D\FLOORDLI.ASM
+Current file: C:\Users\Alex\Chased3D\FLOORDLI.ASM
+
+000000r 1                       .setcpu "6502"
+000000r 1               
+000000r 1               ; Six horizontal floor luminance bands plus a final HUD boundary. Each DLI is
+000000r 1               ; attached to the mode line before a boundary; WSYNC makes the new color start
+000000r 1               ; cleanly on the following scanline.
+000000r 1               
+000000r 1                       .export _floor_dli_install
+000000r 1                       .export _floor_dli_set_rotation
+000000r 1               
+000000r 1               VDSLST = $0200
+000000r 1               WSYNC  = $D40A
+000000r 1               VCOUNT = $D40B
+000000r 1               NMIEN  = $D40E
+000000r 1               COLPF0 = $D016
+000000r 1               COLPF1 = $D017
+000000r 1               COLPF2 = $D018
+000000r 1               COLBK  = $D01A
+000000r 1               
+000000r 1               HUD_GREEN = $C8
+000000r 1               HUD_WHITE = $0E
+000000r 1               
+000000r 1               HUD_VCOUNT = 104
+000000r 1               
+000000r 1                       .segment "PAGE6CODE"
+000000r 1               
+000000r 1               _floor_dli_install:
+000000r 1  A9 40                lda #$40                   ; keep VBI on, disable DLI while vector changes
+000002r 1  8D 0E D4             sta NMIEN
+000005r 1  A9 rr                lda #<floor_dli
+000007r 1  8D 00 02             sta VDSLST
+00000Ar 1  A9 rr                lda #>floor_dli
+00000Cr 1  8D 01 02             sta VDSLST+1
+00000Fr 1  A9 00                lda #$00
+000011r 1  8D rr rr             sta floor_dli_stage
+000014r 1  8D rr rr             sta floor_dli_rotation
+000017r 1  A9 C0                lda #$C0                   ; enable VBI and DLI NMIs
+000019r 1  8D 0E D4             sta NMIEN
+00001Cr 1  60                   rts
+00001Dr 1               
+00001Dr 1               _floor_dli_set_rotation:
+00001Dr 1  8D rr rr             sta floor_dli_rotation
+000020r 1  60                   rts
+000021r 1               
+000021r 1               floor_dli:
+000021r 1  48                   pha
+000022r 1  8A                   txa
+000023r 1  48                   pha
+000024r 1  98                   tya
+000025r 1  48                   pha
+000026r 1               
+000026r 1  AD 0B D4             lda VCOUNT
+000029r 1  C9 68                cmp #HUD_VCOUNT
+00002Br 1  B0 27                bcs floor_dli_hud
+00002Dr 1  AE rr rr             ldx floor_dli_stage
+000030r 1  E0 06                cpx #$06
+000032r 1  90 05                bcc floor_dli_band
+000034r 1  A2 00                ldx #$00
+000036r 1  8E rr rr             stx floor_dli_stage
+000039r 1               floor_dli_band:
+000039r 1  8A                   txa
+00003Ar 1  18                   clc
+00003Br 1  6D rr rr             adc floor_dli_rotation
+00003Er 1  C9 06                cmp #$06
+000040r 1  90 02                bcc floor_dli_color
+000042r 1  E9 06                sbc #$06
+000044r 1               floor_dli_color:
+000044r 1  AA                   tax
+000045r 1  BD rr rr             lda floor_colors,x
+000048r 1  8D 0A D4             sta WSYNC
+00004Br 1  8D 16 D0             sta COLPF0
+00004Er 1               
+00004Er 1  EE rr rr             inc floor_dli_stage
+000051r 1  4C rr rr             jmp floor_dli_restore
+000054r 1               
+000054r 1               floor_dli_hud:
+000054r 1  A9 00                lda #$00
+000056r 1  8D 0A D4             sta WSYNC
+000059r 1  8D 1A D0             sta COLBK
+00005Cr 1  A9 C8                lda #HUD_GREEN
+00005Er 1  8D 17 D0             sta COLPF1
+000061r 1  A9 0E                lda #HUD_WHITE
+000063r 1  8D 18 D0             sta COLPF2
+000066r 1  A9 00                lda #$00
+000068r 1  8D rr rr             sta floor_dli_stage
+00006Br 1               floor_dli_restore:
+00006Br 1  68                   pla
+00006Cr 1  A8                   tay
+00006Dr 1  68                   pla
+00006Er 1  AA                   tax
+00006Fr 1  68                   pla
+000070r 1  40                   rti
+000071r 1               
+000071r 1                       .segment "PAGE6BSS"
+000000r 1               floor_dli_stage:
+000000r 1  xx                   .res 1
+000001r 1               floor_dli_rotation:
+000001r 1  xx                   .res 1
+000002r 1               
+000002r 1                       .segment "PAGE6DATA"
+000000r 1               floor_colors:
+000000r 1  22 24 26 28          .byte $22, $24, $26, $28, $26, $24
+000004r 1  26 24        
+000005r 1               

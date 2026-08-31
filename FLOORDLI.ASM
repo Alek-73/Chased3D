@@ -12,7 +12,12 @@ WSYNC  = $D40A
 VCOUNT = $D40B
 NMIEN  = $D40E
 COLPF0 = $D016
+COLPF1 = $D017
+COLPF2 = $D018
 COLBK  = $D01A
+
+HUD_GREEN = $C8
+HUD_WHITE = $0E
 
 HUD_VCOUNT = 104
 
@@ -71,6 +76,11 @@ floor_dli_hud:
         lda #$00
         sta WSYNC
         sta COLBK
+        lda #HUD_GREEN
+        sta COLPF1
+        lda #HUD_WHITE
+        sta COLPF2
+        lda #$00
         sta floor_dli_stage
 floor_dli_restore:
         pla

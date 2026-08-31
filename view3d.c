@@ -2,11 +2,12 @@
 #include "maze.h"
 #include "trig3d.h"
 #include "view3d.h"
+#ifdef DEBUG_HUD
 #include "build_number.h"
+#endif
 
 /* ANTIC mode D: 160x96, 4 colours, 2 bits per pixel, 40 bytes per row.
  * One ray column == one byte == 4 pixels, so no bit masking is ever needed. */
-#define VIEW_STRIDE 40
 #define HORIZON (VIEW_ROWS / 2)
 #define WALL_SCALE ((unsigned int)VIEW_ROWS * 256u)   /* a wall one cell away fills the view */
 #define MAX_STEPS 24
@@ -314,28 +315,79 @@ void minimap_update(unsigned int px, unsigned int py, unsigned int angle,
     minimap_plot((unsigned char)(pursuer_x >> 8), pursuer_row, 0x01);
 }
 
-/* ANTIC mode 6 uses internal character codes, not ATASCII; bits 6-7 pick the
- * colour register, and COLPF2 is the only one bright enough over COLBK. */
-#define HUD_COLOR 0x80
+/* ANTIC mode 6 uses internal character codes, not ATASCII; bits 6-7 select
+ * the playfield colour register used by each character. */
+#define HUD_LABEL_COLOR 0x40
+#define HUD_NUMBER_COLOR 0x80
+#define HUD_CHAR(character) ((unsigned char)(((character) - 32) | HUD_LABEL_COLOR))
+#define HUD_DIGIT(digit) ((unsigned char)((16 + (digit)) | HUD_NUMBER_COLOR))
 
 void hud_set_fps(unsigned char fps)
 {
+#ifdef DEBUG_HUD
     if (fps > 99) fps = 99;
-    hud_line[0] = (unsigned char)(38 | HUD_COLOR);   /* F */
-    hud_line[1] = (unsigned char)(48 | HUD_COLOR);   /* P */
-    hud_line[2] = (unsigned char)(51 | HUD_COLOR);   /* S */
-    hud_line[4] = (unsigned char)((16 + (fps / 10)) | HUD_COLOR);
-    hud_line[5] = (unsigned char)((16 + (fps % 10)) | HUD_COLOR);
+    hud_line[0] = HUD_CHAR('F');
+    hud_line[1] = HUD_CHAR('P');
+    hud_line[2] = HUD_CHAR('S');
+    hud_line[4] = HUD_DIGIT(fps / 10);
+    hud_line[5] = HUD_DIGIT(fps % 10);
+#else
+    (void)fps;
+#endif
 }
 
 void hud_set_targets(unsigned char remaining)
 {
+#ifdef DEBUG_HUD
     if (remaining > 99) remaining = 99;
-    hud_line[10] = (unsigned char)(52 | HUD_COLOR);   /* T */
-    hud_line[11] = (unsigned char)(39 | HUD_COLOR);   /* G */
-    hud_line[12] = (unsigned char)(52 | HUD_COLOR);   /* T */
-    hud_line[14] = (unsigned char)((16 + (remaining / 10)) | HUD_COLOR);
-    hud_line[15] = (unsigned char)((16 + (remaining % 10)) | HUD_COLOR);
+    hud_line[10] = HUD_CHAR('T');
+    hud_line[11] = HUD_CHAR('G');
+    hud_line[12] = HUD_CHAR('T');
+    hud_line[14] = HUD_DIGIT(remaining / 10);
+    hud_line[15] = HUD_DIGIT(remaining % 10);
+#else
+    (void)remaining;
+#endif
+}
+
+#ifndef DEBUG_HUD
+static void hud_set_number5(unsigned char offset, unsigned int value)
+{
+    hud_line[offset++] = HUD_DIGIT(value / 10000u);
+    value %= 10000u;
+    hud_line[offset++] = HUD_DIGIT(value / 1000u);
+    value %= 1000u;
+    hud_line[offset++] = HUD_DIGIT(value / 100u);
+    value %= 100u;
+    hud_line[offset++] = HUD_DIGIT(value / 10u);
+    hud_line[offset] = HUD_DIGIT(value % 10u);
+}
+#endif
+
+void hud_set_game(unsigned char lives, unsigned char level,
+                  unsigned int score, unsigned int high_score)
+{
+#ifdef DEBUG_HUD
+    (void)lives;
+    (void)level;
+    (void)score;
+    (void)high_score;
+#else
+    if (lives > 9) lives = 9;
+    if (level > 9) level = 9;
+    hud_line[0] = HUD_CHAR('L');
+    hud_line[1] = HUD_DIGIT(lives);
+    hud_line[2] = 0;
+    hud_line[3] = HUD_CHAR('L');
+    hud_line[4] = HUD_CHAR('V');
+    hud_line[5] = HUD_DIGIT(level);
+    hud_line[6] = 0;
+    hud_line[7] = HUD_CHAR('S');
+    hud_set_number5(8, score);
+    hud_line[13] = 0;
+    hud_line[14] = HUD_CHAR('H');
+    hud_set_number5(15, high_score);
+#endif
 }
 
 void hud_set_decoy(unsigned char progress, unsigned char maximum)
@@ -378,10 +430,13 @@ void view3d_init(void)
     unsigned char i;
     unsigned char n;
 
-    hud_line[16] = 34 | HUD_COLOR;   /* B */
-    hud_line[17] = (16 + BUILD_DIGIT_100) | HUD_COLOR;
-    hud_line[18] = (16 + BUILD_DIGIT_10) | HUD_COLOR;
-    hud_line[19] = (16 + BUILD_DIGIT_1) | HUD_COLOR;
+    for (i = 0; i < sizeof(hud_line); ++i) hud_line[i] = 0;
+#ifdef DEBUG_HUD
+    hud_line[16] = HUD_CHAR('B');
+    hud_line[17] = HUD_DIGIT(BUILD_DIGIT_100);
+    hud_line[18] = HUD_DIGIT(BUILD_DIGIT_10);
+    hud_line[19] = HUD_DIGIT(BUILD_DIGIT_1);
+#endif
 
     for (addr = 0; addr < HEIGHT_STEPS; ++addr) {
         n = (addr <= (DIST_MIN >> 4))
@@ -410,10 +465,10 @@ void view3d_init(void)
     view_dlist[n++] = (unsigned char)addr;
     view_dlist[n++] = (unsigned char)(addr >> 8);
 
-    *(volatile unsigned char *)708 = COLOR_FLOOR;
-    *(volatile unsigned char *)709 = COLOR_WALL_Y;
-    *(volatile unsigned char *)710 = COLOR_WALL_X;
-    *(volatile unsigned char *)712 = COLOR_CEILING;
+    COLOR0 = COLOR_FLOOR;
+    COLOR1 = COLOR_WALL_Y;
+    COLOR2 = COLOR_WALL_X;
+    COLOR4 = COLOR_CEILING;
 
     OS.sdlst = view_dlist;
     OS.sdmctl = 0x22;

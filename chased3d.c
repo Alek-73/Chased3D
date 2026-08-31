@@ -5,6 +5,7 @@
 #include "view3d.h"
 #include "sprite3d.h"
 #include "melody.h"
+#include "textplot.h"
 
 #define KBD_SKSTAT 0xD20F
 #define KBD_KBCODE 0xD209
@@ -27,6 +28,7 @@
 #define DECOY_RECHARGE_TICKS 200
 #define LASER_SECONDS 5
 #define FLOOR_SCROLL_DISTANCE 256
+#define SCORE_PER_TARGET 100u
 
 extern unsigned char startup_portb;
 extern unsigned char startup_memtop[2];
@@ -53,6 +55,8 @@ extern unsigned char startup_memtop[2];
 static unsigned char frame_ticks = 1;
 static unsigned char lives = STARTING_LIVES;
 static unsigned char level = 1;
+static unsigned int score;
+static unsigned int high_score;
 static unsigned int player_x;
 static unsigned int player_y;
 static unsigned int player_angle;
@@ -358,16 +362,44 @@ static void reset_positions(void)
     sprite3d_clear_all();
 }
 
+static void update_game_hud(void)
+{
+    hud_set_game(lives, level, score, high_score);
+}
+
+static void score_target(void)
+{
+    if (score > 65535u - SCORE_PER_TARGET)
+        score = 65535u;
+    else
+        score += SCORE_PER_TARGET;
+    if (score > high_score) high_score = score;
+    update_game_hud();
+}
+
 static void handle_catch(void)
 {
+    unsigned char i;
+
     melody_set_threat_level(0);
     melody_play(CAUGHT_MELODY);
     while (melody_playing()) waitvsync();
 
-    if (--lives == 0) lives = STARTING_LIVES;
+    if (--lives == 0) {
+        lives = STARTING_LIVES;
+        score = 0;
+    }
+    update_game_hud();
 
     reset_positions();
+    //debug
+    textplot_print(TEXTPLOT_ALIGN_CENTER, "Caught!", 10, 1, 2);
+    for (i = 0;; ++i) waitvsync();
+    
 }
+
+static unsigned char threat_old_color;
+static unsigned char threat_color_active;
 
 static void update_threat_sound(void)
 {
@@ -383,6 +415,16 @@ static void update_threat_sound(void)
         if (level_signal == 0) level_signal = 1;
         if (level_signal > 15) level_signal = 15;
     }
+    if (level_signal > 10) {
+        if (!threat_color_active) {
+            threat_old_color = COLOR4;
+            threat_color_active = 1;
+        }
+        COLOR4 = COLOR_ORANGE;
+    } else if (threat_color_active) {
+        COLOR4 = threat_old_color;
+        threat_color_active = 0;
+    }
     melody_set_threat_level(level_signal);
 }
 
@@ -395,6 +437,7 @@ static void handle_level_clear(void)
     while (melody_playing()) waitvsync();
 
     level = (level >= LEVEL_MAX) ? 1 : (unsigned char)(level + 1);
+    update_game_hud();
     maze_load_level(level);
     minimap_build();
     minimap_show();
@@ -450,6 +493,7 @@ int main(void)
     *(volatile unsigned char *)NOCLIK = 1;
     hud_set_targets(sprite3d_targets_left());
     hud_set_decoy(decoy_recharge_ticks, DECOY_RECHARGE_TICKS);
+    update_game_hud();
 
     ticks_per_second = (get_tv() == AT_PAL) ? 50 : 60;
     laser_period_ticks = (unsigned int)ticks_per_second * LASER_SECONDS;
@@ -483,6 +527,7 @@ int main(void)
             handle_catch();
         if (sprite3d_collect(player_x, player_y)) {
             hud_set_targets(sprite3d_targets_left());
+            score_target();
             melody_pickup();
         }
         if (sprite3d_targets_left() == 0) maze_set_exit_open(1);

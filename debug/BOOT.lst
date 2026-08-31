@@ -1,0 +1,44 @@
+ca65 V2.19 - Git 547d923
+Main file   : C:\Users\Alex\Chased3D\BOOT.ASM
+Current file: C:\Users\Alex\Chased3D\BOOT.ASM
+
+000000r 1                       .setcpu "6502"
+000000r 1               
+000000r 1               ; Runs before the generic cc65 Atari startup. With BASIC enabled, OS MEMTOP is
+000000r 1               ; low enough that crt0 would place the C software stack inside the program.
+000000r 1               
+000000r 1                       .export basic_off_start
+000000r 1                       .export _startup_portb, _startup_memtop
+000000r 1                       .import start
+000000r 1               
+000000r 1               PORTB  = $D301
+000000r 1               PBCTL  = $D303
+000000r 1               MEMTOP = $02E5
+000000r 1               
+000000r 1                       .segment "PAGE6CODE"
+000000r 1               
+000000r 1               basic_off_start:
+000000r 1  AD 03 D3             lda PBCTL
+000003r 1  09 04                ora #$04
+000005r 1  8D 03 D3             sta PBCTL
+000008r 1  AD 01 D3             lda PORTB
+00000Br 1  8D rr rr             sta _startup_portb
+00000Er 1  09 02                ora #$02
+000010r 1  8D 01 D3             sta PORTB
+000013r 1               
+000013r 1  AD E5 02             lda MEMTOP
+000016r 1  8D rr rr             sta _startup_memtop
+000019r 1  AD E6 02             lda MEMTOP+1
+00001Cr 1  8D rr rr             sta _startup_memtop+1
+00001Fr 1  A9 20                lda #<$BC20
+000021r 1  8D E5 02             sta MEMTOP
+000024r 1  A9 BC                lda #>$BC20
+000026r 1  8D E6 02             sta MEMTOP+1
+000029r 1  4C rr rr             jmp start
+00002Cr 1               
+00002Cr 1                       .segment "PAGE6BSS"
+000000r 1               _startup_portb:
+000000r 1  xx                   .res 1
+000001r 1               _startup_memtop:
+000001r 1  xx xx                .res 2
+000001r 1               

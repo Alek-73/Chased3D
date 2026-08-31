@@ -1,0 +1,145 @@
+ca65 V2.19 - Git 547d923
+Main file   : C:\Users\Alex\Chased3D\COLUMN3D.ASM
+Current file: C:\Users\Alex\Chased3D\COLUMN3D.ASM
+
+000000r 1                       .setcpu "6502"
+000000r 1               
+000000r 1               ; Unrolled vertical column blitter for the Chased3D raycaster.
+000000r 1               ;
+000000r 1               ; The view is ANTIC mode D (160x96, 4 colours, 40 bytes per row). Each of the
+000000r 1               ; 40 ray columns is exactly one byte wide, so a column fill is one "sta abs,x"
+000000r 1               ; per row with X holding the column index. Every store is a 3-byte absolute
+000000r 1               ; instruction, which lets the entry tables be computed as base + 3 * row.
+000000r 1               
+000000r 1                       .export _col3d_x
+000000r 1                       .export _col3d_row
+000000r 1                       .export _col3d_end
+000000r 1                       .export _col3d_color
+000000r 1                       .export _col3d_fill_down
+000000r 1                       .export _col3d_fill_up
+000000r 1                       .export _col3d_fill_span
+000000r 1               
+000000r 1                       .import _view_buffer
+000000r 1               
+000000r 1               VIEW_ROWS  = 92
+000000r 1               VIEW_STRIDE = 40
+000000r 1               
+000000r 1                       .segment "BSS"
+000000r 1                       .align 2
+000000r 1               col3d_vec:
+000000r 1  xx xx                .res 2
+000002r 1               _col3d_x:
+000002r 1  xx                   .res 1
+000003r 1               _col3d_row:
+000003r 1  xx                   .res 1
+000004r 1               _col3d_end:
+000004r 1  xx                   .res 1
+000005r 1               _col3d_color:
+000005r 1  xx                   .res 1
+000006r 1               saved_op:
+000006r 1  xx                   .res 1
+000007r 1               
+000007r 1                       .segment "CODE"
+000000r 1               
+000000r 1               ; Fill rows _col3d_row .. 95 of column _col3d_x with _col3d_color.
+000000r 1               _col3d_fill_down:
+000000r 1  AE rr rr             ldx _col3d_row
+000003r 1  BD rr rr             lda asc_lo,x
+000006r 1  8D rr rr             sta col3d_vec
+000009r 1  BD rr rr             lda asc_hi,x
+00000Cr 1  8D rr rr             sta col3d_vec+1
+00000Fr 1  AE rr rr             ldx _col3d_x
+000012r 1  AD rr rr             lda _col3d_color
+000015r 1  6C rr rr             jmp (col3d_vec)
+000018r 1               
+000018r 1               ; Fill rows _col3d_row .. 0 of column _col3d_x with _col3d_color.
+000018r 1               _col3d_fill_up:
+000018r 1  AE rr rr             ldx _col3d_row
+00001Br 1  BD rr rr             lda desc_lo,x
+00001Er 1  8D rr rr             sta col3d_vec
+000021r 1  BD rr rr             lda desc_hi,x
+000024r 1  8D rr rr             sta col3d_vec+1
+000027r 1  AE rr rr             ldx _col3d_x
+00002Ar 1  AD rr rr             lda _col3d_color
+00002Dr 1  6C rr rr             jmp (col3d_vec)
+000030r 1               
+000030r 1               ; Fill rows _col3d_row .. _col3d_end-1 only, by temporarily planting an RTS at
+000030r 1               ; the row after the span. Writing each pixel once avoids the visible overdraw
+000030r 1               ; of filling to the screen bottom and painting the floor back over it.
+000030r 1               _col3d_fill_span:
+000030r 1  AE rr rr             ldx _col3d_end
+000033r 1  BD rr rr             lda asc_lo,x
+000036r 1  8D rr rr             sta span_load+1
+000039r 1  8D rr rr             sta span_store+1
+00003Cr 1  8D rr rr             sta span_restore+1
+00003Fr 1  BD rr rr             lda asc_hi,x
+000042r 1  8D rr rr             sta span_load+2
+000045r 1  8D rr rr             sta span_store+2
+000048r 1  8D rr rr             sta span_restore+2
+00004Br 1               span_load:
+00004Br 1  AD FF FF             lda $FFFF
+00004Er 1  8D rr rr             sta saved_op
+000051r 1  A9 60                lda #$60
+000053r 1               span_store:
+000053r 1  8D FF FF             sta $FFFF
+000056r 1               
+000056r 1  AE rr rr             ldx _col3d_row
+000059r 1  BD rr rr             lda asc_lo,x
+00005Cr 1  8D rr rr             sta col3d_vec
+00005Fr 1  BD rr rr             lda asc_hi,x
+000062r 1  8D rr rr             sta col3d_vec+1
+000065r 1  AE rr rr             ldx _col3d_x
+000068r 1  AD rr rr             lda _col3d_color
+00006Br 1  20 rr rr             jsr span_call
+00006Er 1               
+00006Er 1  AD rr rr             lda saved_op
+000071r 1               span_restore:
+000071r 1  8D FF FF             sta $FFFF
+000074r 1  60                   rts
+000075r 1               
+000075r 1               span_call:
+000075r 1  6C rr rr             jmp (col3d_vec)
+000078r 1               
+000078r 1               asc_block:
+000078r 1  9D rr rr 9D          .repeat VIEW_ROWS, I
+00007Cr 1  rr rr 9D rr  
+000080r 1  rr 9D rr rr  
+00018Cr 1                       sta _view_buffer + I * VIEW_STRIDE,x
+00018Cr 1                       .endrepeat
+00018Cr 1  60                   rts
+00018Dr 1               
+00018Dr 1               desc_block:
+00018Dr 1  9D rr rr 9D          .repeat VIEW_ROWS, I
+000191r 1  rr rr 9D rr  
+000195r 1  rr 9D rr rr  
+0002A1r 1                       sta _view_buffer + (VIEW_ROWS - 1 - I) * VIEW_STRIDE,x
+0002A1r 1                       .endrepeat
+0002A1r 1  60                   rts
+0002A2r 1               
+0002A2r 1                       .segment "RODATA"
+000000r 1               ; One extra entry so a span ending at the last row lands on the trailing rts.
+000000r 1               asc_lo:
+000000r 1  rr rr rr rr          .repeat VIEW_ROWS + 1, I
+000004r 1  rr rr rr rr  
+000008r 1  rr rr rr rr  
+00005Dr 1                       .byte <(asc_block + 3 * I)
+00005Dr 1                       .endrepeat
+00005Dr 1               asc_hi:
+00005Dr 1  rr rr rr rr          .repeat VIEW_ROWS + 1, I
+000061r 1  rr rr rr rr  
+000065r 1  rr rr rr rr  
+0000BAr 1                       .byte >(asc_block + 3 * I)
+0000BAr 1                       .endrepeat
+0000BAr 1               desc_lo:
+0000BAr 1  rr rr rr rr          .repeat VIEW_ROWS, I
+0000BEr 1  rr rr rr rr  
+0000C2r 1  rr rr rr rr  
+000116r 1                       .byte <(desc_block + 3 * (VIEW_ROWS - 1 - I))
+000116r 1                       .endrepeat
+000116r 1               desc_hi:
+000116r 1  rr rr rr rr          .repeat VIEW_ROWS, I
+00011Ar 1  rr rr rr rr  
+00011Er 1  rr rr rr rr  
+000116r 1                       .byte >(desc_block + 3 * (VIEW_ROWS - 1 - I))
+000116r 1                       .endrepeat
+000116r 1               
