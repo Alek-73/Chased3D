@@ -54,8 +54,10 @@ static void draw_character(unsigned char x, unsigned char character)
     }
 }
 
-void textplot_print(unsigned char alignment, const char *text,
-                    unsigned char y, unsigned char color, unsigned char size)
+static void textplot_print_area(unsigned char alignment, const char *text,
+                               unsigned char y, unsigned char color,
+                               unsigned char size, unsigned char area_x,
+                               unsigned char area_width)
 {
     unsigned char length;
     unsigned char x;
@@ -71,7 +73,7 @@ void textplot_print(unsigned char alignment, const char *text,
     plot_size = size;
     char_width = GLYPH_WIDTH * plot_size;
     height = GLYPH_HEIGHT * plot_size;
-    max_chars = VIEW3D_WIDTH_PIXELS / char_width;
+    max_chars = area_width / char_width;
     plot_y = y > VIEW_ROWS - height ? VIEW_ROWS - height : y;
     plot_color = color & 3;
 
@@ -80,15 +82,30 @@ void textplot_print(unsigned char alignment, const char *text,
     width = (unsigned char)(length * char_width);
 
     if (alignment == TEXTPLOT_ALIGN_RIGHT) {
-        x = VIEW3D_X_PIXELS + VIEW3D_WIDTH_PIXELS - width;
+        x = area_x + area_width - width;
     } else if (alignment == TEXTPLOT_ALIGN_CENTER) {
-        x = VIEW3D_X_PIXELS + (VIEW3D_WIDTH_PIXELS - width) / 2;
+        x = area_x + (area_width - width) / 2;
     } else {
-        x = VIEW3D_X_PIXELS;
+        x = area_x;
     }
 
     for (index = 0; index < length; ++index) {
         draw_character(x, (unsigned char)text[index]);
         x += char_width;
     }
+}
+
+void textplot_print(unsigned char alignment, const char *text,
+                    unsigned char y, unsigned char color, unsigned char size)
+{
+    textplot_print_area(alignment, text, y, color, size,
+                        VIEW3D_X_PIXELS, VIEW3D_WIDTH_PIXELS);
+}
+
+void textplot_print_fullscreen(unsigned char alignment, const char *text,
+                               unsigned char y, unsigned char color,
+                               unsigned char size)
+{
+    textplot_print_area(alignment, text, y, color, size,
+                        0, VIEW_STRIDE * 4);
 }

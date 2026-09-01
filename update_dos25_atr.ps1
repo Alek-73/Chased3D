@@ -40,6 +40,22 @@ function Find-DosEntry([byte[]]$image, [string]$dosFileName) {
     return -1
 }
 
+function New-DosEntry([byte[]]$image, [string]$dosFileName) {
+    $directoryName = Get-DosName $dosFileName
+    for ($sector = 361; $sector -le 368; ++$sector) {
+        $directoryOffset = Get-SectorOffset $sector
+        for ($entry = 0; $entry -lt 8; ++$entry) {
+            $candidate = $directoryOffset + ($entry * 16)
+            if (($image[$candidate] -band 0x40) -ne 0) { continue }
+            [Array]::Clear($image, $candidate, 16)
+            $image[$candidate] = 0x42
+            [System.Text.Encoding]::ASCII.GetBytes($directoryName).CopyTo($image, $candidate + 5)
+            return $candidate
+        }
+    }
+    throw "The DOS directory has no free entry for '$dosFileName'."
+}
+
 function Test-SectorFree([byte[]]$image, [int]$sector) {
     $vtocOffset = Get-SectorOffset 360
     $bitmapOffset = $vtocOffset + 10 + [Math]::Floor($sector / 8)
@@ -92,7 +108,7 @@ foreach ($dosFileName in $Files.Keys) {
     $entryOffset = Find-DosEntry $image $dosFileName
 
     if ($entryOffset -lt 0) {
-        throw "DOS file '$dosFileName' is not present in '$AtrPath'."
+        $entryOffset = New-DosEntry $image $dosFileName
     }
 
     $allocatedSectors = $image[$entryOffset + 1] + (256 * $image[$entryOffset + 2])
@@ -141,7 +157,8 @@ foreach ($dosFileName in $Files.Keys) {
         }
     }
 
-    $fileNumber = $image[(Get-SectorOffset $chain[0]) + 125] -band 0xFC
+    $firstDirectoryOffset = Get-SectorOffset 361
+    $fileNumber = ([int](($entryOffset - $firstDirectoryOffset) / 16)) -shl 2
     $sourceOffset = 0
     for ($index = 0; $index -lt $requiredSectors; ++$index) {
         $sector = $chain[$index]
@@ -160,6 +177,8 @@ foreach ($dosFileName in $Files.Keys) {
 
     $image[$entryOffset + 1] = $requiredSectors -band 0xFF
     $image[$entryOffset + 2] = ($requiredSectors -shr 8) -band 0xFF
+    $image[$entryOffset + 3] = $chain[0] -band 0xFF
+    $image[$entryOffset + 4] = ($chain[0] -shr 8) -band 0xFF
 }
 
 $temporaryPath = "$resolvedAtr.tmp"

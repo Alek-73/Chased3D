@@ -53,11 +53,20 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw "ca65 failed with exit code $LASTEXITCODE."
     }
+    & $ca65 -g SPLASHRAINBOW.ASM -o SPLASHRAINBOW.o
+    if ($LASTEXITCODE -ne 0) {
+        throw "ca65 failed with exit code $LASTEXITCODE."
+    }
+    & .\convert_splash_mono.ps1
+    if ($LASTEXITCODE -ne 0) {
+        throw "Splash artwork conversion failed with exit code $LASTEXITCODE."
+    }
     & $cl65 -t atari -C chased3d.cfg --start-addr 0x4000 -O -g `
-        -m Chased3D.map -Ln Chased3D.lbl -o Chased3D.XEX chased3d.c view3d.c textplot.c maze.c trig3d.c sprite3d.c melody.c BOOT.o COLUMN3D.o RAYCAST.o MELODY.o FLOORDLI.o
+        -m Chased3D.map -Ln Chased3D.lbl -o Chased3D.XEX chased3d.c view3d.c textplot.c maze.c trig3d.c sprite3d.c melody.c splash_screen.c BOOT.o COLUMN3D.o RAYCAST.o MELODY.o FLOORDLI.o SPLASHRAINBOW.o
     if ($LASTEXITCODE -ne 0) {
         throw "cl65 failed with exit code $LASTEXITCODE."
     }
+    & .\report_free_ram.ps1 -MapPath .\Chased3D.map
 
     & .\update_dos25_atr.ps1 -AtrPath .\Chased3D.atr -RenameFiles @{
         "CHASED3D.XEX" = "AUTORUN.SYS"
@@ -67,6 +76,7 @@ try {
         "L3.CSV" = ".\L3.csv"
         "L4.CSV" = ".\L4.csv"
         "L5.CSV" = ".\L5.csv"
+        "SPLASH.BMP" = ".\SPLASH.BMP"
     }
     [System.IO.File]::WriteAllText($buildNumberPath, "$nextBuild`r`n")
     Write-Host "Successful build number: $nextBuild"

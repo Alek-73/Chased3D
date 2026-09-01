@@ -21,7 +21,7 @@
 	.dbg		file, "C:\tools\cc65\include/stdlib.h", 6948, 1786840065
 	.dbg		file, "C:\Users\Alex\Chased3D/maze.h", 550, 1787868964
 	.dbg		file, "C:\Users\Alex\Chased3D/trig3d.h", 333, 1787781160
-	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1299, 1788211140
+	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1299, 1788211929
 	.dbg		file, "C:\Users\Alex\Chased3D/sprite3d.h", 910, 1787954059
 	.dbg		sym, "maze_map", "00", extern, "_maze_map"
 	.dbg		sym, "maze_exit_col", "00", extern, "_maze_exit_col"

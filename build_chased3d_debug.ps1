@@ -19,6 +19,11 @@ if (-not (Test-Path (Join-Path $root "build_number.h"))) {
 
 New-Item -ItemType Directory -Force $debugDir | Out-Null
 
+& (Join-Path $root "convert_splash_mono.ps1")
+if ($LASTEXITCODE -ne 0) {
+    throw "Splash artwork conversion failed with exit code $LASTEXITCODE."
+}
+
 function Invoke-Tool([string]$tool, [string[]]$arguments) {
     & $tool @arguments
     if ($LASTEXITCODE -ne 0) {
@@ -26,8 +31,8 @@ function Invoke-Tool([string]$tool, [string[]]$arguments) {
     }
 }
 
-$cSources = @("chased3d.c", "view3d.c", "textplot.c", "maze.c", "trig3d.c", "sprite3d.c", "melody.c")
-$asmSources = @("BOOT.ASM", "COLUMN3D.ASM", "RAYCAST.ASM", "MELODY.ASM", "FLOORDLI.ASM")
+$cSources = @("chased3d.c", "view3d.c", "textplot.c", "maze.c", "trig3d.c", "sprite3d.c", "melody.c", "splash_screen.c")
+$asmSources = @("BOOT.ASM", "COLUMN3D.ASM", "RAYCAST.ASM", "MELODY.ASM", "FLOORDLI.ASM", "SPLASHRAINBOW.ASM")
 $objects = [System.Collections.Generic.List[string]]::new()
 
 foreach ($sourceName in $cSources) {
@@ -85,6 +90,7 @@ $linkArguments = @(
     "-o", $xexPath
 ) + $objects.ToArray()
 Invoke-Tool $cl65 $linkArguments
+& (Join-Path $root "report_free_ram.ps1") -MapPath $mapPath
 
 Copy-Item -Force (Join-Path $root "Chased3D.atr") $debugAtr
 & (Join-Path $root "update_dos25_atr.ps1") -AtrPath $debugAtr -RenameFiles @{
@@ -95,6 +101,7 @@ Copy-Item -Force (Join-Path $root "Chased3D.atr") $debugAtr
     "L3.CSV" = (Join-Path $root "L3.csv")
     "L4.CSV" = (Join-Path $root "L4.csv")
     "L5.CSV" = (Join-Path $root "L5.csv")
+    "SPLASH.BMP" = (Join-Path $root "SPLASH.BMP")
 }
 if ($LASTEXITCODE -ne 0) {
     throw "DOS 2.5 ATR update failed with exit code $LASTEXITCODE."

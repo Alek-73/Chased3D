@@ -6,6 +6,7 @@
 #include "sprite3d.h"
 #include "melody.h"
 #include "textplot.h"
+#include "splash_screen.h"
 
 #define KBD_SKSTAT 0xD20F
 #define KBD_KBCODE 0xD209
@@ -471,12 +472,17 @@ int main(void)
 
     srand(((unsigned int)*(volatile unsigned char *)POKEY_RANDOM << 8)
           | *(volatile unsigned char *)RTCLOK_LOW);
+
+    splash_screen_show();
+
     maze_load_level(1);
     //maze_load_level(6);
     minimap_build();
     sprite3d_build_targets();
     sprite3d_build_laser(PLAYER_START_X, PLAYER_START_Y);
     sprite3d_locate_exit();
+
+    splash_screen_rainbow();
 
     /* Start on row 1, column 6, facing +X. */
     player_x = PLAYER_START_X;

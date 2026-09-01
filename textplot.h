@@ -7,5 +7,7 @@
 
 void textplot_print(unsigned char alignment, const char *text,
 					unsigned char y, unsigned char color, unsigned char size);
+void textplot_print_fullscreen(unsigned char alignment, const char *text,
+						   unsigned char y, unsigned char color, unsigned char size);
 
 #endif

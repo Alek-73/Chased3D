@@ -430,6 +430,9 @@ void view3d_init(void)
     unsigned char i;
     unsigned char n;
 
+    for (addr = 0; addr < VIEW_STRIDE * VIEW_ROWS; ++addr)
+        view_buffer[addr] = 0;
+
     for (i = 0; i < sizeof(hud_line); ++i) hud_line[i] = 0;
 #ifdef DEBUG_HUD
     hud_line[16] = HUD_CHAR('B');
