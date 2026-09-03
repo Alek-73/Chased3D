@@ -11,10 +11,12 @@
 #define KBD_SKSTAT 0xD20F
 #define KBD_KBCODE 0xD209
 #define POKEY_RANDOM 0xD20A
+#define JOYSTICK_FIRE0 0xD010
 #define PORTB 0xD301
 #define PBCTL 0xD303
 #define NOCLIK 0x02DB   /* non-zero silences the OS key click */
 #define RTCLOK_LOW 20   /* OS jiffy counter, bumped every vertical blank */
+#define OS_ATTRACT 77
 
 /* Movement is scaled by elapsed jiffies so speed does not change with the
  * render rate. The cap keeps a single step below one cell, which is what stops
@@ -22,14 +24,16 @@
 #define MOVE_PER_TICK 20
 #define TURN_PER_TICK 400u
 #define MAX_TICKS 6
-#define PURSUER_PER_TICK 8
+#define PURSUER_PER_TICK 12
 #define PURSUER_STUCK_TICKS 200
 #define THREAT_DISTANCE 4096
 #define DECOY_CAPTURE_TICKS 40
 #define DECOY_RECHARGE_TICKS 200
+#define DECOY_ACTIVE_TICKS 500
 #define LASER_SECONDS 5
 #define FLOOR_SCROLL_DISTANCE 256
 #define SCORE_PER_TARGET 100u
+#define SCORE_PER_DECOY 50u
 
 extern unsigned char startup_portb;
 extern unsigned char startup_memtop[2];
@@ -42,16 +46,21 @@ extern unsigned char startup_memtop[2];
 #define PLAYER_START_X ((6u << 8) | 0x80u)
 #define PLAYER_START_Y ((1u << 8) | 0x80u)
 #define PLAYER_START_ANGLE 0
-#define LEVEL_MAX 5
+#define LEVEL_MAX 6
 
 /* Same melodies as chased1V3.BAS lines 460 and 464: a level-clear jingle
  * followed by the loading tune while the next level is prepared. */
 #define LEVEL_CLEAR_MELODY "C12C14E18B08C14A14G18F14E18D18E14D14C14P01"
 #define LEVEL_LOAD_MELODY "C14C14E14C18F18C18E18C14D14P04"
+#define GAME_OVER_MELODY LEVEL_LOAD_MELODY
+#define VICTORY_MELODY "C14C14C14C24C24C24B18A18G18F18E18D18C12"
 #define DECOY_DEPLOY_MELODY "C21G21C22"
 #define DECOY_TRAPPED_MELODY "G11D11G02"
 #define DECOY_READY_MELODY "C21E21G21C22"
 #define PURSUER_RESPAWN_MELODY "C21E21G21E21C22"
+#define LAST_TARGET_MELODY "C21E21G21C22E22G22C24"
+
+static char loading_level_message[] = "LOADING LEVEL 0";
 
 static unsigned char frame_ticks = 1;
 static unsigned char lives = STARTING_LIVES;
@@ -69,15 +78,26 @@ static unsigned char decoy_active;
 static unsigned char decoy_available = 1;
 static unsigned char decoy_capture_ticks;
 static unsigned char decoy_recharge_ticks = DECOY_RECHARGE_TICKS;
+static unsigned int decoy_active_ticks;
 static unsigned int laser_elapsed_ticks;
 static unsigned int laser_period_ticks;
 static int floor_motion_units;
+static unsigned char threat_old_color;
+static unsigned char threat_color_active;
+
+static void add_score(unsigned char points);
 
 /* SKSTAT bit 2 clears while a key is held, which gives continuous movement. */
 static unsigned char read_key(void)
 {
     if ((*(volatile unsigned char *)KBD_SKSTAT & 0x04) != 0) return 0xFF;
     return *(volatile unsigned char *)KBD_KBCODE & 0x3F;
+}
+
+static void wait_frame(void)
+{
+    *(volatile unsigned char *)OS_ATTRACT = 0;
+    waitvsync();
 }
 
 static void try_move(int delta_x, int delta_y)
@@ -245,6 +265,7 @@ static void move_pursuer(void)
         decoy_capture_ticks = 0;
         decoy_recharge_ticks = 0;
         pursuer_retarget_timer = RETARGET_STALE_TICKS + 1;
+        add_score(SCORE_PER_DECOY);
     }
 
     pursuer_retarget_timer += frame_ticks;
@@ -315,6 +336,7 @@ static void deploy_decoy(void)
     decoy_available = 0;
     decoy_capture_ticks = 0;
     decoy_recharge_ticks = 0;
+    decoy_active_ticks = 0;
     pursuer_retarget_timer = RETARGET_STALE_TICKS + 1;
     melody_play(DECOY_DEPLOY_MELODY);
 }
@@ -323,6 +345,17 @@ static void update_decoy_recharge(void)
 {
     unsigned int next;
 
+    if (decoy_active) {
+        next = decoy_active_ticks + frame_ticks;
+        if (next >= DECOY_ACTIVE_TICKS) {
+            decoy_active = 0;
+            decoy_capture_ticks = 0;
+            decoy_recharge_ticks = 0;
+            pursuer_retarget_timer = RETARGET_STALE_TICKS + 1;
+        } else {
+            decoy_active_ticks = next;
+        }
+    }
     if (!decoy_active && decoy_recharge_ticks < DECOY_RECHARGE_TICKS) {
         next = (unsigned int)decoy_recharge_ticks + frame_ticks;
         decoy_recharge_ticks = next >= DECOY_RECHARGE_TICKS
@@ -344,10 +377,10 @@ static void update_laser(void)
     melody_laser_buzz();
 }
 
-/* Repositions player and pursuer to their starting spots, used both after a
- * catch and after finishing a level. */
-static void reset_positions(void)
+static void start_life(void)
 {
+    if (threat_color_active) COLOR4 = threat_old_color;
+    threat_color_active = 0;
     player_x = PLAYER_START_X;
     player_y = PLAYER_START_Y;
     player_angle = PLAYER_START_ANGLE;
@@ -359,8 +392,13 @@ static void reset_positions(void)
     decoy_available = 1;
     decoy_capture_ticks = 0;
     decoy_recharge_ticks = DECOY_RECHARGE_TICKS;
+    decoy_active_ticks = 0;
     floor_motion_units = 0;
     sprite3d_clear_all();
+    sprite3d_build_laser(PLAYER_START_X, PLAYER_START_Y);
+    laser_elapsed_ticks = 0;
+    hud_set_decoy(decoy_recharge_ticks, DECOY_RECHARGE_TICKS);
+    melody_laser_buzz();
 }
 
 static void update_game_hud(void)
@@ -368,39 +406,81 @@ static void update_game_hud(void)
     hud_set_game(lives, level, score, high_score);
 }
 
-static void score_target(void)
+static void start_new_game(void)
 {
-    if (score > 65535u - SCORE_PER_TARGET)
+    lives = STARTING_LIVES;
+    level = 1;
+    score = 0;
+    maze_load_level(level);
+    minimap_build();
+    minimap_show();
+    sprite3d_build_targets();
+    sprite3d_locate_exit();
+#ifdef DEBUG_HUD
+    hud_set_targets(sprite3d_targets_left());
+#endif
+    start_life();
+    update_game_hud();
+}
+
+static unsigned char restart_pressed(void)
+{
+    return read_key() == KEY_SPACE
+        || *(volatile unsigned char *)JOYSTICK_FIRE0 == 0;
+}
+
+static void show_end_screen(const char *message, unsigned char size,
+                            const char *melody)
+{
+    if (threat_color_active) COLOR4 = threat_old_color;
+    threat_color_active = 0;
+    sprite3d_clear_all();
+    view3d_render(player_x, player_y, player_angle);
+    textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER, message, 2, 1, size);
+    textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER, "Press Space or Fire",
+                              20, 1, TEXTPLOT_SIZE_HALF);
+    melody_play(melody);
+
+    while (restart_pressed()) wait_frame();
+    while (!restart_pressed()) wait_frame();
+    while (restart_pressed()) wait_frame();
+}
+
+static void game_over(void)
+{
+    show_end_screen("Game Over", TEXTPLOT_SIZE_DOUBLE, GAME_OVER_MELODY);
+    start_new_game();
+}
+
+static void victory(void)
+{
+    show_end_screen("YOU DID IT !!!", TEXTPLOT_SIZE_NORMAL, VICTORY_MELODY);
+    start_new_game();
+}
+
+static void add_score(unsigned char points)
+{
+    if (score > 65535u - points)
         score = 65535u;
     else
-        score += SCORE_PER_TARGET;
+        score += points;
     if (score > high_score) high_score = score;
     update_game_hud();
 }
 
 static void handle_catch(void)
 {
-    unsigned char i;
-
     melody_set_threat_level(0);
     melody_play(CAUGHT_MELODY);
-    while (melody_playing()) waitvsync();
+    while (melody_playing()) wait_frame();
 
-    if (--lives == 0) {
-        lives = STARTING_LIVES;
-        score = 0;
-    }
+    --lives;
     update_game_hud();
-
-    reset_positions();
-    //debug
-    textplot_print(TEXTPLOT_ALIGN_CENTER, "Caught!", 10, 1, 2);
-    for (i = 0;; ++i) waitvsync();
-    
+    if (lives == 0)
+        game_over();
+    else
+        start_life();
 }
-
-static unsigned char threat_old_color;
-static unsigned char threat_color_active;
 
 static void update_threat_sound(void)
 {
@@ -435,35 +515,43 @@ static void handle_level_clear(void)
 {
     melody_set_threat_level(0);
     melody_play(LEVEL_CLEAR_MELODY);
-    while (melody_playing()) waitvsync();
+    while (melody_playing()) wait_frame();
 
-    level = (level >= LEVEL_MAX) ? 1 : (unsigned char)(level + 1);
+    if (level >= LEVEL_MAX) {
+        victory();
+        return;
+    }
+    ++level;
     update_game_hud();
+    loading_level_message[14] = (char)('0' + level);
+    textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER, loading_level_message,
+                              2, 1, TEXTPLOT_SIZE_NORMAL);
     maze_load_level(level);
     minimap_build();
     minimap_show();
     sprite3d_build_targets();
-    sprite3d_build_laser(player_x, player_y);
     sprite3d_locate_exit();
+#ifdef DEBUG_HUD
     hud_set_targets(sprite3d_targets_left());
+#endif
 
     melody_play(LEVEL_LOAD_MELODY);
-    while (melody_playing()) waitvsync();
+    while (melody_playing()) wait_frame();
 
-    reset_positions();
-    laser_elapsed_ticks = 0;
-    melody_laser_buzz();
+    start_life();
 }
 
 int main(void)
 {
     unsigned char key;
     unsigned char ticks_per_second;
-    unsigned char last_tick;
     unsigned char prev_tick;
     unsigned char now;
-    unsigned char frames;
     unsigned char previous_key;
+#ifdef DEBUG_HUD
+    unsigned char last_tick;
+    unsigned char frames;
+#endif
 
     *(volatile unsigned char *)PBCTL |= 0x04;
     *(volatile unsigned char *)PORTB |= 0x02;
@@ -479,34 +567,34 @@ int main(void)
     //maze_load_level(6);
     minimap_build();
     sprite3d_build_targets();
-    sprite3d_build_laser(PLAYER_START_X, PLAYER_START_Y);
     sprite3d_locate_exit();
 
     splash_screen_rainbow();
-
-    /* Start on row 1, column 6, facing +X. */
-    player_x = PLAYER_START_X;
-    player_y = PLAYER_START_Y;
-    player_angle = PLAYER_START_ANGLE;
-    place_pursuer_at_start();
 
     view3d_init();
     minimap_show();
     sprite3d_init();
     melody_install();
     melody_threat_play("A02A02E12A02A02E12");
-    melody_laser_buzz();
+    start_life();
     *(volatile unsigned char *)NOCLIK = 1;
+#ifdef DEBUG_HUD
     hud_set_targets(sprite3d_targets_left());
-    hud_set_decoy(decoy_recharge_ticks, DECOY_RECHARGE_TICKS);
+#endif
+    textplot_print_fullscreen(TEXTPLOT_ALIGN_LEFT, "DECOY",
+                              DECOY_BAR_TOP + DECOY_BAR_HEIGHT, 3,
+                              TEXTPLOT_SIZE_HALF);
     update_game_hud();
+    melody_play(LEVEL_LOAD_MELODY);
 
     ticks_per_second = (get_tv() == AT_PAL) ? 50 : 60;
     laser_period_ticks = (unsigned int)ticks_per_second * LASER_SECONDS;
     laser_elapsed_ticks = 0;
-    last_tick = *(volatile unsigned char *)RTCLOK_LOW;
-    prev_tick = last_tick;
+    prev_tick = *(volatile unsigned char *)RTCLOK_LOW;
+#ifdef DEBUG_HUD
+    last_tick = prev_tick;
     frames = 0;
+#endif
     previous_key = 0xFF;
 
     for (;;) {
@@ -532,11 +620,17 @@ int main(void)
         if (pursuer_caught_player() || sprite3d_hit_laser(player_x, player_y))
             handle_catch();
         if (sprite3d_collect(player_x, player_y)) {
+#ifdef DEBUG_HUD
             hud_set_targets(sprite3d_targets_left());
-            score_target();
-            melody_pickup();
+#endif
+            add_score(SCORE_PER_TARGET);
+            if (sprite3d_targets_left() == 0) {
+                maze_set_exit_open(1);
+                melody_play(LAST_TARGET_MELODY);
+            } else {
+                melody_pickup();
+            }
         }
-        if (sprite3d_targets_left() == 0) maze_set_exit_open(1);
         if (sprite3d_reached_exit(player_x, player_y)) handle_level_clear();
 
         view3d_render(player_x, player_y, player_angle);
@@ -545,9 +639,9 @@ int main(void)
                       pursuer_x, pursuer_y);
         sprite3d_draw_decoy(decoy_active, player_x, player_y, player_angle,
                     decoy_x, decoy_y);
-        minimap_update(player_x, player_y, player_angle,
-                   pursuer_x, pursuer_y);
+        minimap_update(player_x, player_y, player_angle);
 
+#ifdef DEBUG_HUD
         ++frames;
         now = *(volatile unsigned char *)RTCLOK_LOW;
         if ((unsigned char)(now - last_tick) >= ticks_per_second) {
@@ -555,7 +649,8 @@ int main(void)
             frames = 0;
             last_tick = now;
         }
-        waitvsync();
+#endif
+        wait_frame();
     }
     *(volatile unsigned char *)0x02E5 = startup_memtop[0];
     *(volatile unsigned char *)0x02E6 = startup_memtop[1];

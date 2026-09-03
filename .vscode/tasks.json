@@ -39,7 +39,7 @@
             "type": "shell",
             "command": "C:\\A8\\Altirra-4.40\\Altirra64.exe",
             "args": [
-                "${workspaceFolder}\\Chased3D.XEX"
+                "${workspaceFolder}\\Chased3D.atr"
             ],
             "isBackground": true,
             "problemMatcher": []

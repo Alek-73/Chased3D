@@ -10,7 +10,7 @@
 	.importzp	c_sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
-	.dbg		file, "C:\Users\Alex\Chased3D\chased3d.c", 18780, 1788293991
+	.dbg		file, "C:\Users\Alex\Chased3D\chased3d.c", 20937, 1788473348
 	.dbg		file, "C:\tools\cc65\include/atari.h", 22152, 1786840064
 	.dbg		file, "C:\tools\cc65\include/_atarios.h", 40084, 1786840064
 	.dbg		file, "C:\tools\cc65\include/_gtia.h", 13839, 1786840064
@@ -21,11 +21,11 @@
 	.dbg		file, "C:\tools\cc65\include/stdlib.h", 6948, 1786840065
 	.dbg		file, "C:\Users\Alex\Chased3D/maze.h", 550, 1787868964
 	.dbg		file, "C:\Users\Alex\Chased3D/trig3d.h", 333, 1787781160
-	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1299, 1788211929
+	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1410, 1788473348
 	.dbg		file, "C:\Users\Alex\Chased3D/sprite3d.h", 910, 1787954059
 	.dbg		file, "C:\Users\Alex\Chased3D/melody.h", 326, 1787954059
-	.dbg		file, "C:\Users\Alex\Chased3D/textplot.h", 424, 1788300845
-	.dbg		file, "C:\Users\Alex\Chased3D/splash_screen.h", 127, 1788293991
+	.dbg		file, "C:\Users\Alex\Chased3D/textplot.h", 440, 1788473040
+	.dbg		file, "C:\Users\Alex\Chased3D/splash_screen.h", 127, 1788301734
 	.forceimport	__STARTUP__
 	.dbg		sym, "maze_map", "00", extern, "_maze_map"
 	.dbg		sym, "sin3d", "00", extern, "_sin3d"
@@ -70,7 +70,7 @@
 	.import		_melody_threat_play
 	.import		_melody_set_threat_level
 	.import		_melody_laser_buzz
-	.import		_textplot_print
+	.import		_textplot_print_fullscreen
 	.import		_splash_screen_show
 	.import		_splash_screen_rainbow
 	.import		_startup_portb
@@ -98,21 +98,32 @@ _pursuer_retarget_timer:
 
 .segment	"RODATA"
 
-S0007:
+S000B:
 	.byte	$43,$31,$32,$43,$31,$34,$45,$31,$38,$42,$30,$38,$43,$31,$34,$41
 	.byte	$31,$34,$47,$31,$38,$46,$31,$34,$45,$31,$38,$44,$31,$38,$45,$31
 	.byte	$34,$44,$31,$34,$43,$31,$34,$50,$30,$31,$00
-S0008:
+S0009:
+	.byte	$43,$31,$34,$43,$31,$34,$43,$31,$34,$43,$32,$34,$43,$32,$34,$43
+	.byte	$32,$34,$42,$31,$38,$41,$31,$38,$47,$31,$38,$46,$31,$38,$45,$31
+	.byte	$38,$44,$31,$38,$43,$31,$32,$00
+S000C:
 	.byte	$43,$31,$34,$43,$31,$34,$45,$31,$34,$43,$31,$38,$46,$31,$38,$43
 	.byte	$31,$38,$45,$31,$38,$43,$31,$34,$44,$31,$34,$50,$30,$34,$00
-S0009:
-	.byte	$41,$30,$32,$41,$30,$32,$45,$31,$32,$41,$30,$32,$41,$30,$32,$45
-	.byte	$31,$32,$00
+S000F	:=	S000C+0
+S0007	:=	S000C+0
 S0005:
+	.byte	$50,$72,$65,$73,$73,$20,$53,$70,$61,$63,$65,$20,$6F,$72,$20,$46
+	.byte	$69,$72,$65,$00
+S000A:
 	.byte	$41,$31,$34,$43,$32,$38,$42,$31,$38,$41,$31,$34,$47,$31,$34,$41
 	.byte	$31,$31,$00
+S000D:
+	.byte	$41,$30,$32,$41,$30,$32,$45,$31,$32,$41,$30,$32,$41,$30,$32,$45
+	.byte	$31,$32,$00
 S0001:
 	.byte	$43,$32,$31,$45,$32,$31,$47,$32,$31,$45,$32,$31,$43,$32,$32,$00
+S0008:
+	.byte	$59,$4F,$55,$20,$44,$49,$44,$20,$49,$54,$20,$21,$21,$21,$00
 S0004:
 	.byte	$43,$32,$31,$45,$32,$31,$47,$32,$31,$43,$32,$32,$00
 S0003:
@@ -120,7 +131,9 @@ S0003:
 S0002:
 	.byte	$47,$31,$31,$44,$31,$31,$47,$30,$32,$00
 S0006:
-	.byte	$43,$61,$75,$67,$68,$74,$21,$00
+	.byte	$47,$61,$6D,$65,$20,$4F,$76,$65,$72,$00
+S000E:
+	.byte	$44,$45,$43,$4F,$59,$00
 
 .segment	"BSS"
 
@@ -146,12 +159,18 @@ _decoy_active:
 	.res	1,$00
 _decoy_capture_ticks:
 	.res	1,$00
+_decoy_active_ticks:
+	.res	2,$00
 _laser_elapsed_ticks:
 	.res	2,$00
 _laser_period_ticks:
 	.res	2,$00
 _floor_motion_units:
 	.res	2,$00
+_threat_old_color:
+	.res	1,$00
+_threat_color_active:
+	.res	1,$00
 _pursuer_target_col:
 	.res	1,$00
 _pursuer_target_row:
@@ -162,10 +181,6 @@ _pursuer_stuck_row:
 	.res	1,$00
 _pursuer_stuck_ticks:
 	.res	2,$00
-_threat_old_color:
-	.res	1,$00
-_threat_color_active:
-	.res	1,$00
 
 ; ---------------------------------------------------------------
 ; unsigned char __near__ read_key (void)
@@ -182,7 +197,7 @@ _threat_color_active:
 ;
 ; if ((*(volatile unsigned char *)KBD_SKSTAT & 0x04) != 0) return 0xFF;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 79
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 87
 	lda     $D20F
 	and     #$04
 	beq     L0004
@@ -192,15 +207,42 @@ _threat_color_active:
 ;
 ; return *(volatile unsigned char *)KBD_KBCODE & 0x3F;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 80
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 88
 L0004:	lda     $D209
 	and     #$3F
 	ldx     #$00
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 81
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 89
 	rts
+
+	.dbg	line
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ wait_frame (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_wait_frame: near
+
+	.dbg	func, "wait_frame", "00", static, "_wait_frame"
+
+.segment	"CODE"
+
+;
+; *(volatile unsigned char *)OS_ATTRACT = 0;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 93
+	lda     #$00
+	sta     $004D
+;
+; waitvsync();
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 94
+	jmp     _waitvsync
 
 	.dbg	line
 .endproc
@@ -224,12 +266,12 @@ L0004:	lda     $D209
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 84
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 98
 	jsr     pushax
 ;
 ; next_x = (unsigned int)((int)player_x + delta_x);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 88
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 102
 	jsr     decsp4
 	ldy     #$07
 	jsr     ldaxysp
@@ -245,7 +287,7 @@ L0004:	lda     $D209
 ;
 ; next_y = (unsigned int)((int)player_y + delta_y);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 89
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 103
 	ldy     #$05
 	jsr     ldaxysp
 	clc
@@ -259,7 +301,7 @@ L0004:	lda     $D209
 ;
 ; if (!maze_solid((unsigned char)(next_x >> 8), (unsigned char)(player_y >> 8)))
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 91
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 105
 	ldy     #$03
 	lda     (c_sp),y
 	jsr     pusha
@@ -270,7 +312,7 @@ L0004:	lda     $D209
 ;
 ; player_x = next_x;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 92
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 106
 	ldy     #$03
 	jsr     ldaxysp
 	sta     _player_x
@@ -278,7 +320,7 @@ L0004:	lda     $D209
 ;
 ; if (!maze_solid((unsigned char)(player_x >> 8), (unsigned char)(next_y >> 8)))
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 93
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 107
 L0002:	lda     _player_x+1
 	jsr     pusha
 	ldy     #$02
@@ -289,14 +331,14 @@ L0002:	lda     _player_x+1
 ;
 ; player_y = next_y;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 94
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 108
 	jsr     ldax0sp
 	sta     _player_y
 	stx     _player_y+1
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 95
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 109
 L0003:	jmp     incsp8
 
 	.dbg	line
@@ -327,12 +369,12 @@ L0003:	jmp     incsp8
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 98
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 112
 	jsr     pusha
 ;
 ; step = (int)MOVE_PER_TICK * (int)frame_ticks;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 109
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 123
 	ldy     #$11
 	jsr     subysp
 	lda     _frame_ticks
@@ -344,14 +386,14 @@ L0003:	jmp     incsp8
 ;
 ; idx = (unsigned char)(player_angle >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 110
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 124
 	lda     _player_angle+1
 	ldy     #$10
 	sta     (c_sp),y
 ;
 ; dir_x = sin3d[(unsigned char)(idx + 64)];
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 111
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 125
 	ldx     #$00
 	lda     (c_sp),y
 	ldy     #$40
@@ -373,7 +415,7 @@ L0018:	adc     #<(_sin3d)
 ;
 ; dir_y = sin3d[idx];
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 112
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 126
 	ldy     #$10
 	ldx     #$00
 	lda     (c_sp),y
@@ -393,7 +435,7 @@ L0019:	adc     #<(_sin3d)
 ;
 ; if (direction < 0) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 113
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 127
 	ldy     #$11
 	lda     (c_sp),y
 	asl     a
@@ -401,7 +443,7 @@ L0019:	adc     #<(_sin3d)
 ;
 ; dir_x = -dir_x;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 114
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 128
 	ldy     #$0F
 	jsr     ldaxysp
 	jsr     negax
@@ -410,7 +452,7 @@ L0019:	adc     #<(_sin3d)
 ;
 ; dir_y = -dir_y;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 115
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 129
 	ldy     #$0D
 	jsr     ldaxysp
 	jsr     negax
@@ -419,7 +461,7 @@ L0019:	adc     #<(_sin3d)
 ;
 ; old_x = player_x;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 117
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 131
 L0002:	lda     _player_x
 	ldx     _player_x+1
 	ldy     #$02
@@ -427,14 +469,14 @@ L0002:	lda     _player_x
 ;
 ; old_y = player_y;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 118
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 132
 	lda     _player_y
 	ldx     _player_y+1
 	jsr     stax0sp
 ;
 ; try_move((dir_x * step) >> 8, (dir_y * step) >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 119
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 133
 	ldy     #$11
 	jsr     pushwysp
 	ldy     #$0D
@@ -460,7 +502,7 @@ L0005:	jsr     _try_move
 ;
 ; moved_x = abs((int)player_x - (int)old_x);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 120
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 134
 	lda     _player_x
 	sec
 	ldy     #$02
@@ -477,7 +519,7 @@ L0005:	jsr     _try_move
 ;
 ; moved_y = abs((int)player_y - (int)old_y);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 121
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 135
 	lda     _player_y
 	sec
 	ldy     #$00
@@ -494,13 +536,13 @@ L0005:	jsr     _try_move
 ;
 ; moved = moved_x > moved_y
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 122
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 136
 	ldy     #$0B
 	jsr     pushwysp
 ;
 ; ? moved_x + (moved_y >> 1) : moved_y + (moved_x >> 1);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 123
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 137
 	ldy     #$09
 	jsr     ldaxysp
 	jsr     tosicmp
@@ -529,7 +571,7 @@ L0021:	adc     (c_sp),y
 ;
 ; floor_motion_units += direction > 0 ? moved : -moved;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 124
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 138
 	ldy     #$11
 	lda     (c_sp),y
 	sec
@@ -551,18 +593,18 @@ L000B:	clc
 ;
 ; while (floor_motion_units >= FLOOR_SCROLL_DISTANCE) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 125
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 139
 	jmp     L001C
 ;
 ; view3d_floor_motion(1);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 126
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 140
 L001A:	lda     #$01
 	jsr     _view3d_floor_motion
 ;
 ; floor_motion_units -= FLOOR_SCROLL_DISTANCE;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 127
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 141
 	lda     _floor_motion_units
 	sec
 	sta     _floor_motion_units
@@ -572,7 +614,7 @@ L001C:	sta     _floor_motion_units+1
 ;
 ; while (floor_motion_units >= FLOOR_SCROLL_DISTANCE) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 125
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 139
 	lda     _floor_motion_units
 	cmp     #$00
 	lda     _floor_motion_units+1
@@ -583,18 +625,18 @@ L000F:	bmi     L001A
 ;
 ; while (floor_motion_units <= -FLOOR_SCROLL_DISTANCE) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 129
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 143
 	jmp     L0012
 ;
 ; view3d_floor_motion(-1);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 130
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 144
 L0010:	lda     #$FF
 	jsr     _view3d_floor_motion
 ;
 ; floor_motion_units += FLOOR_SCROLL_DISTANCE;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 131
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 145
 	clc
 	lda     #$01
 	adc     _floor_motion_units+1
@@ -602,7 +644,7 @@ L0010:	lda     #$FF
 ;
 ; while (floor_motion_units <= -FLOOR_SCROLL_DISTANCE) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 129
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 143
 L0012:	lda     _floor_motion_units
 	cmp     #$01
 	lda     _floor_motion_units+1
@@ -613,7 +655,7 @@ L0013:	bmi     L0010
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 133
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 147
 	ldy     #$12
 	jmp     addysp
 
@@ -637,7 +679,7 @@ L0013:	bmi     L0010
 ;
 ; for (row = MAZE_H - 2; row > 0; --row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 153
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 167
 	jsr     decsp2
 	lda     #$39
 	ldy     #$00
@@ -647,7 +689,7 @@ L000C:	sta     (c_sp),y
 ;
 ; for (col = MAZE_W - 2; col > 0; --col) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 154
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 168
 	lda     #$12
 	iny
 L000B:	sta     (c_sp),y
@@ -656,7 +698,7 @@ L000B:	sta     (c_sp),y
 ;
 ; if (maze_map[row][col] != 0) continue;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 155
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 169
 	ldx     #$00
 	lda     (c_sp,x)
 	jsr     pusha0
@@ -676,7 +718,7 @@ L000B:	sta     (c_sp),y
 ;
 ; pursuer_x = ((unsigned int)col << 8) | 0x80u;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 156
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 170
 	ldy     #$01
 	lda     (c_sp),y
 	sta     _pursuer_x+1
@@ -685,7 +727,7 @@ L000B:	sta     (c_sp),y
 ;
 ; pursuer_y = ((unsigned int)row << 8) | 0x80u;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 157
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 171
 	dey
 	lda     (c_sp),y
 	sta     _pursuer_y+1
@@ -694,33 +736,33 @@ L000B:	sta     (c_sp),y
 ;
 ; pursuer_stuck_col = col;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 158
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 172
 	iny
 	lda     (c_sp),y
 	sta     _pursuer_stuck_col
 ;
 ; pursuer_stuck_row = row;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 159
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 173
 	dey
 	lda     (c_sp),y
 	sta     _pursuer_stuck_row
 ;
 ; pursuer_stuck_ticks = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 160
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 174
 	tya
 	sta     _pursuer_stuck_ticks
 	sta     _pursuer_stuck_ticks+1
 ;
 ; return;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 161
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 175
 	jmp     incsp2
 ;
 ; for (col = MAZE_W - 2; col > 0; --col) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 154
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 168
 L0008:	ldy     #$01
 	lda     (c_sp),y
 	sec
@@ -729,7 +771,7 @@ L0008:	ldy     #$01
 ;
 ; for (row = MAZE_H - 2; row > 0; --row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 153
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 167
 L0004:	dey
 	lda     (c_sp),y
 	sec
@@ -738,7 +780,7 @@ L0004:	dey
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 164
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 178
 L0003:	jmp     incsp2
 
 	.dbg	line
@@ -768,7 +810,7 @@ L0003:	jmp     incsp2
 ;
 ; player_col = (unsigned char)(player_x >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 178
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 192
 	ldy     #$0A
 	jsr     subysp
 	lda     _player_x+1
@@ -777,35 +819,35 @@ L0003:	jmp     incsp2
 ;
 ; player_row = (unsigned char)(player_y >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 179
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 193
 	lda     _player_y+1
 	dey
 	sta     (c_sp),y
 ;
 ; current_col = (unsigned char)(pursuer_x >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 180
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 194
 	lda     _pursuer_x+1
 	dey
 	sta     (c_sp),y
 ;
 ; current_row = (unsigned char)(pursuer_y >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 181
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 195
 	lda     _pursuer_y+1
 	dey
 	sta     (c_sp),y
 ;
 ; choices = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 182
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 196
 	ldx     #$00
 	txa
 	jsr     stax0sp
 ;
 ; for (row = 0; row < MAZE_H; ++row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 183
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 197
 	ldy     #$08
 L001C:	sta     (c_sp),y
 	cmp     #$3B
@@ -813,7 +855,7 @@ L001C:	sta     (c_sp),y
 ;
 ; for (col = 0; col < MAZE_W; ++col) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 184
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 198
 	lda     #$00
 	iny
 L001B:	sta     (c_sp),y
@@ -822,7 +864,7 @@ L001B:	sta     (c_sp),y
 ;
 ; if (maze_solid(col, row)) continue;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 185
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 199
 	lda     (c_sp),y
 	jsr     pusha
 	ldy     #$09
@@ -833,7 +875,7 @@ L001B:	sta     (c_sp),y
 ;
 ; if (col == player_col && row == player_row) continue;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 186
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 200
 	ldy     #$09
 	lda     (c_sp),y
 	ldy     #$05
@@ -847,7 +889,7 @@ L001B:	sta     (c_sp),y
 ;
 ; if (col == current_col && row == current_row) continue;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 187
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 201
 L000B:	ldy     #$09
 	lda     (c_sp),y
 	ldy     #$03
@@ -861,14 +903,14 @@ L000B:	ldy     #$09
 ;
 ; && col == (unsigned char)(decoy_x >> 8)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 189
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 203
 L000F:	lda     _decoy_active
 	beq     L0013
 	lda     _decoy_x+1
 ;
 ; && row == (unsigned char)(decoy_y >> 8)) continue;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 190
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 204
 	ldy     #$09
 	cmp     (c_sp),y
 	bne     L0013
@@ -879,13 +921,13 @@ L000F:	lda     _decoy_active
 ;
 ; ++choices;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 191
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 205
 L0013:	lda     #$01
 	jsr     addeq0sp
 ;
 ; if ((unsigned int)rand() % choices != 0) continue;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 192
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 206
 	jsr     _rand
 	jsr     pushax
 	ldy     #$03
@@ -898,7 +940,7 @@ L0013:	lda     #$01
 ;
 ; chosen_col = col;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 193
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 207
 	ldy     #$09
 	lda     (c_sp),y
 	ldy     #$07
@@ -906,7 +948,7 @@ L0013:	lda     #$01
 ;
 ; chosen_row = row;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 194
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 208
 	iny
 	lda     (c_sp),y
 	ldy     #$06
@@ -914,7 +956,7 @@ L0013:	lda     #$01
 ;
 ; for (col = 0; col < MAZE_W; ++col) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 184
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 198
 L0008:	ldy     #$09
 	clc
 	lda     #$01
@@ -923,7 +965,7 @@ L0008:	ldy     #$09
 ;
 ; for (row = 0; row < MAZE_H; ++row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 183
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 197
 L0004:	dey
 	clc
 	lda     #$01
@@ -932,7 +974,7 @@ L0004:	dey
 ;
 ; if (choices == 0) return;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 197
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 211
 L0003:	ldy     #$00
 	lda     (c_sp),y
 	iny
@@ -941,7 +983,7 @@ L0003:	ldy     #$00
 ;
 ; pursuer_x = ((unsigned int)chosen_col << 8) | 0x80u;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 199
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 213
 	ldy     #$07
 	lda     (c_sp),y
 	sta     _pursuer_x+1
@@ -950,7 +992,7 @@ L0003:	ldy     #$00
 ;
 ; pursuer_y = ((unsigned int)chosen_row << 8) | 0x80u;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 200
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 214
 	dey
 	lda     (c_sp),y
 	sta     _pursuer_y+1
@@ -959,52 +1001,52 @@ L0003:	ldy     #$00
 ;
 ; pursuer_dir_x = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 201
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 215
 	lda     #$00
 	sta     _pursuer_dir_x
 ;
 ; pursuer_dir_y = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 202
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 216
 	sta     _pursuer_dir_y
 ;
 ; pursuer_retarget_timer = RETARGET_STALE_TICKS + 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 203
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 217
 	lda     #$33
 	sta     _pursuer_retarget_timer
 ;
 ; pursuer_stuck_col = chosen_col;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 204
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 218
 	iny
 	lda     (c_sp),y
 	sta     _pursuer_stuck_col
 ;
 ; pursuer_stuck_row = chosen_row;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 205
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 219
 	dey
 	lda     (c_sp),y
 	sta     _pursuer_stuck_row
 ;
 ; pursuer_stuck_ticks = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 206
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 220
 	lda     #$00
 	sta     _pursuer_stuck_ticks
 	sta     _pursuer_stuck_ticks+1
 ;
 ; melody_play(PURSUER_RESPAWN_MELODY);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 207
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 221
 	lda     #<(S0001)
 	ldx     #>(S0001)
 	jsr     _melody_play
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 208
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 222
 L0001:	ldy     #$0A
 	jmp     addysp
 
@@ -1037,7 +1079,7 @@ L0001:	ldy     #$0A
 ;
 ; col = (unsigned char)(pursuer_x >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 229
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 243
 	ldy     #$0F
 	jsr     subysp
 	lda     _pursuer_x+1
@@ -1046,21 +1088,21 @@ L0001:	ldy     #$0A
 ;
 ; row = (unsigned char)(pursuer_y >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 230
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 244
 	lda     _pursuer_y+1
 	dey
 	sta     (c_sp),y
 ;
 ; && col == (unsigned char)(decoy_x >> 8)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 233
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 247
 	lda     _decoy_active
 	beq     L0042
 	lda     _decoy_x+1
 ;
 ; && row == (unsigned char)(decoy_y >> 8)) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 234
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 248
 	iny
 	cmp     (c_sp),y
 	bne     L0042
@@ -1071,7 +1113,7 @@ L0001:	ldy     #$0A
 ;
 ; if (decoy_capture_ticks == 0) melody_play(DECOY_TRAPPED_MELODY);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 235
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 249
 	lda     _decoy_capture_ticks
 	bne     L0040
 	lda     #<(S0002)
@@ -1080,7 +1122,7 @@ L0001:	ldy     #$0A
 ;
 ; decoy_capture_ticks += frame_ticks;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 236
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 250
 L0040:	lda     _frame_ticks
 	clc
 	adc     _decoy_capture_ticks
@@ -1088,66 +1130,66 @@ L0040:	lda     _frame_ticks
 ;
 ; if (decoy_capture_ticks < DECOY_CAPTURE_TICKS) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 237
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 251
 	cmp     #$28
 	bcs     L0041
 ;
 ; pursuer_stuck_col = col;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 238
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 252
 	ldy     #$0E
 	lda     (c_sp),y
 	sta     _pursuer_stuck_col
 ;
 ; pursuer_stuck_row = row;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 239
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 253
 	dey
 	lda     (c_sp),y
 	sta     _pursuer_stuck_row
 ;
 ; pursuer_stuck_ticks = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 240
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 254
 	lda     #$00
 	sta     _pursuer_stuck_ticks
 	sta     _pursuer_stuck_ticks+1
 ;
 ; return;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 241
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 255
 	jmp     L0034
 ;
 ; decoy_active = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 243
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 257
 L0041:	lda     #$00
 	sta     _decoy_active
 ;
 ; decoy_available = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 244
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 258
 	sta     _decoy_available
 ;
 ; decoy_capture_ticks = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 245
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 259
 	sta     _decoy_capture_ticks
 ;
 ; decoy_recharge_ticks = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 246
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 260
 	sta     _decoy_recharge_ticks
 ;
 ; pursuer_retarget_timer = RETARGET_STALE_TICKS + 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 247
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 261
 	lda     #$33
 	sta     _pursuer_retarget_timer
 ;
 ; pursuer_retarget_timer += frame_ticks;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 250
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 264
 L0042:	lda     _frame_ticks
 	clc
 	adc     _pursuer_retarget_timer
@@ -1155,7 +1197,7 @@ L0042:	lda     _frame_ticks
 ;
 ; need_retarget = pursuer_retarget_timer > RETARGET_STALE_TICKS;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 251
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 265
 	cmp     #$33
 	lda     #$00
 	rol     a
@@ -1164,7 +1206,7 @@ L0042:	lda     _frame_ticks
 ;
 ; if (col == pursuer_target_col && row == pursuer_target_row) need_retarget = 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 252
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 266
 	ldy     #$0E
 	lda     (c_sp),y
 	cmp     _pursuer_target_col
@@ -1179,7 +1221,7 @@ L0042:	lda     _frame_ticks
 ;
 ; if (!need_retarget && (pursuer_dir_x != 0 || pursuer_dir_y != 0)) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 253
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 267
 L0008:	ldy     #$0A
 	lda     (c_sp),y
 	bne     L0049
@@ -1190,7 +1232,7 @@ L0008:	ldy     #$0A
 ;
 ; next_col = (unsigned char)(col + pursuer_dir_x);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 254
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 268
 L0048:	lda     _pursuer_dir_x
 	clc
 	ldy     #$0E
@@ -1200,7 +1242,7 @@ L0048:	lda     _pursuer_dir_x
 ;
 ; next_row = (unsigned char)(row + pursuer_dir_y);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 255
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 269
 	lda     _pursuer_dir_y
 	clc
 	iny
@@ -1210,7 +1252,7 @@ L0048:	lda     _pursuer_dir_x
 ;
 ; if (maze_solid(next_col, row) || maze_solid(col, next_row)) need_retarget = 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 256
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 270
 	iny
 	lda     (c_sp),y
 	jsr     pusha
@@ -1233,14 +1275,14 @@ L0017:	lda     #$01
 ;
 ; if (need_retarget) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 259
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 273
 L0016:	ldy     #$0A
 L0049:	lda     (c_sp),y
 	jeq     L0019
 ;
 ; (decoy_active ? decoy_x : player_x) >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 261
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 275
 	lda     _decoy_active
 	beq     L001A
 	ldx     _decoy_x+1
@@ -1250,7 +1292,7 @@ L001B:	stx     _pursuer_target_col
 ;
 ; (decoy_active ? decoy_y : player_y) >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 263
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 277
 	lda     _decoy_active
 	beq     L001C
 	ldx     _decoy_y+1
@@ -1260,19 +1302,19 @@ L001D:	stx     _pursuer_target_row
 ;
 ; pursuer_retarget_timer = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 264
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 278
 	lda     #$00
 	sta     _pursuer_retarget_timer
 ;
 ; best = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 266
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 280
 	ldy     #$08
 	sta     (c_sp),y
 ;
 ; best_distance = 32767;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 267
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 281
 	ldx     #$7F
 	lda     #$FF
 	ldy     #$06
@@ -1280,7 +1322,7 @@ L001D:	stx     _pursuer_target_row
 ;
 ; for (i = 0; i < 8; ++i) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 268
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 282
 	lda     #$00
 	ldy     #$09
 L003C:	sta     (c_sp),y
@@ -1289,7 +1331,7 @@ L003C:	sta     (c_sp),y
 ;
 ; next_col = (unsigned char)(col + dir_x[i]);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 269
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 283
 	lda     #<(M0001)
 	ldx     #>(M0001)
 	clc
@@ -1306,7 +1348,7 @@ L0022:	ldy     #$00
 ;
 ; next_row = (unsigned char)(row + dir_y[i]);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 270
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 284
 	lda     #<(M0002)
 	ldx     #>(M0002)
 	clc
@@ -1324,7 +1366,7 @@ L0023:	ldy     #$00
 ;
 ; if (maze_solid(next_col, row) || maze_solid(col, next_row)) continue;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 271
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 285
 	iny
 	lda     (c_sp),y
 	jsr     pusha
@@ -1344,7 +1386,7 @@ L0023:	ldy     #$00
 ;
 ; distance = abs((int)next_col - (int)pursuer_target_col)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 272
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 286
 	ldy     #$0C
 	lda     (c_sp),y
 	sec
@@ -1354,7 +1396,7 @@ L0023:	ldy     #$00
 ;
 ; + abs((int)next_row - (int)pursuer_target_row);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 273
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 287
 L0035:	jsr     _abs
 	jsr     pushax
 	ldy     #$0D
@@ -1371,7 +1413,7 @@ L0036:	jsr     _abs
 ;
 ; if (distance < best_distance) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 274
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 288
 	ldy     #$06
 	cmp     (c_sp),y
 	txa
@@ -1383,7 +1425,7 @@ L003B:	bpl     L0020
 ;
 ; best_distance = distance;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 275
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 289
 	ldy     #$05
 	jsr     ldaxysp
 	ldy     #$06
@@ -1391,7 +1433,7 @@ L003B:	bpl     L0020
 ;
 ; best = i;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 276
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 290
 	ldy     #$09
 	lda     (c_sp),y
 	dey
@@ -1399,7 +1441,7 @@ L003B:	bpl     L0020
 ;
 ; for (i = 0; i < 8; ++i) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 268
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 282
 L0020:	ldy     #$09
 	clc
 	lda     #$01
@@ -1408,7 +1450,7 @@ L0020:	ldy     #$09
 ;
 ; pursuer_dir_x = dir_x[best];
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 279
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 293
 L001F:	lda     #<(M0001)
 	ldx     #>(M0001)
 	dey
@@ -1422,7 +1464,7 @@ L0028:	ldy     #$00
 ;
 ; pursuer_dir_y = dir_y[best];
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 280
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 294
 	lda     #<(M0002)
 	ldx     #>(M0002)
 	ldy     #$08
@@ -1436,7 +1478,7 @@ L0029:	ldy     #$00
 ;
 ; candidate_x = (int)pursuer_x + pursuer_dir_x * PURSUER_PER_TICK * frame_ticks;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 283
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 297
 L0019:	lda     _pursuer_x
 	ldx     _pursuer_x+1
 	jsr     pushax
@@ -1454,7 +1496,7 @@ L002A:	jsr     aslax3
 ;
 ; candidate_y = (int)pursuer_y + pursuer_dir_y * PURSUER_PER_TICK * frame_ticks;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 284
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 298
 	lda     _pursuer_y
 	ldx     _pursuer_y+1
 	jsr     pushax
@@ -1471,7 +1513,7 @@ L002B:	jsr     aslax3
 ;
 ; if (!maze_solid((unsigned char)(candidate_x >> 8), row))
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 285
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 299
 	ldy     #$03
 	lda     (c_sp),y
 	jsr     pusha
@@ -1483,7 +1525,7 @@ L002B:	jsr     aslax3
 ;
 ; pursuer_x = (unsigned int)candidate_x;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 286
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 300
 	ldy     #$03
 	jsr     ldaxysp
 	sta     _pursuer_x
@@ -1491,7 +1533,7 @@ L002B:	jsr     aslax3
 ;
 ; if (!maze_solid((unsigned char)(pursuer_x >> 8), (unsigned char)(candidate_y >> 8)))
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 287
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 301
 L002C:	lda     _pursuer_x+1
 	jsr     pusha
 	ldy     #$02
@@ -1502,28 +1544,28 @@ L002C:	lda     _pursuer_x+1
 ;
 ; pursuer_y = (unsigned int)candidate_y;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 288
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 302
 	jsr     ldax0sp
 	sta     _pursuer_y
 	stx     _pursuer_y+1
 ;
 ; col = (unsigned char)(pursuer_x >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 290
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 304
 L002E:	lda     _pursuer_x+1
 	ldy     #$0E
 	sta     (c_sp),y
 ;
 ; row = (unsigned char)(pursuer_y >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 291
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 305
 	lda     _pursuer_y+1
 	dey
 	sta     (c_sp),y
 ;
 ; if (col != pursuer_stuck_col || row != pursuer_stuck_row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 292
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 306
 	iny
 	lda     (c_sp),y
 	cmp     _pursuer_stuck_col
@@ -1535,33 +1577,33 @@ L002E:	lda     _pursuer_x+1
 ;
 ; pursuer_stuck_col = col;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 293
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 307
 	iny
 L004E:	lda     (c_sp),y
 	sta     _pursuer_stuck_col
 ;
 ; pursuer_stuck_row = row;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 294
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 308
 	dey
 	lda     (c_sp),y
 	sta     _pursuer_stuck_row
 ;
 ; pursuer_stuck_ticks = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 295
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 309
 	lda     #$00
 	sta     _pursuer_stuck_ticks
 	sta     _pursuer_stuck_ticks+1
 ;
 ; } else {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 296
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 310
 	jmp     L0034
 ;
 ; pursuer_stuck_ticks += frame_ticks;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 297
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 311
 L004D:	lda     _frame_ticks
 	clc
 	adc     _pursuer_stuck_ticks
@@ -1572,7 +1614,7 @@ L004D:	lda     _frame_ticks
 ;
 ; if (pursuer_stuck_ticks >= PURSUER_STUCK_TICKS) respawn_pursuer();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 298
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 312
 	lda     _pursuer_stuck_ticks
 	cmp     #$C8
 	lda     _pursuer_stuck_ticks+1
@@ -1582,7 +1624,7 @@ L004D:	lda     _frame_ticks
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 300
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 314
 L0034:	ldy     #$0F
 	jmp     addysp
 
@@ -1625,13 +1667,13 @@ M0002:
 ;
 ; return (player_x >> 8) == (pursuer_x >> 8)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 305
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 319
 	ldx     #$00
 	lda     _player_x+1
 ;
 ; && (player_y >> 8) == (pursuer_y >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 306
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 320
 	cmp     _pursuer_x+1
 	bne     L0005
 	lda     _player_y+1
@@ -1643,7 +1685,7 @@ L0006:	lda     #$01
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 307
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 321
 	rts
 
 	.dbg	line
@@ -1664,13 +1706,13 @@ L0006:	lda     #$01
 ;
 ; if (!decoy_available) return;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 311
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 325
 	lda     _decoy_available
 	beq     L0001
 ;
 ; decoy_x = player_x;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 312
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 326
 	lda     _player_x+1
 	sta     _decoy_x+1
 	lda     _player_x
@@ -1678,7 +1720,7 @@ L0006:	lda     #$01
 ;
 ; decoy_y = player_y;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 313
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 327
 	lda     _player_y+1
 	sta     _decoy_y+1
 	lda     _player_y
@@ -1686,42 +1728,48 @@ L0006:	lda     #$01
 ;
 ; decoy_active = 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 314
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 328
 	lda     #$01
 	sta     _decoy_active
 ;
 ; decoy_available = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 315
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 329
 	lda     #$00
 	sta     _decoy_available
 ;
 ; decoy_capture_ticks = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 316
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 330
 	sta     _decoy_capture_ticks
 ;
 ; decoy_recharge_ticks = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 317
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 331
 	sta     _decoy_recharge_ticks
+;
+; decoy_active_ticks = 0;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 332
+	sta     _decoy_active_ticks
+	sta     _decoy_active_ticks+1
 ;
 ; pursuer_retarget_timer = RETARGET_STALE_TICKS + 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 318
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 333
 	lda     #$33
 	sta     _pursuer_retarget_timer
 ;
 ; melody_play(DECOY_DEPLOY_MELODY);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 319
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 334
 	lda     #<(S0003)
 	ldx     #>(S0003)
 	jmp     _melody_play
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 320
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 335
 L0001:	rts
 
 	.dbg	line
@@ -1741,79 +1789,138 @@ L0001:	rts
 .segment	"CODE"
 
 ;
-; if (!decoy_active && decoy_recharge_ticks < DECOY_RECHARGE_TICKS) {
+; if (decoy_active) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 326
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 341
 	jsr     decsp2
 	lda     _decoy_active
-	bne     L0008
+	beq     L0004
+;
+; next = decoy_active_ticks + frame_ticks;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 342
+	lda     _decoy_active_ticks
+	ldx     _decoy_active_ticks+1
+	clc
+	adc     _frame_ticks
+	bcc     L0010
+	inx
+L0010:	jsr     stax0sp
+;
+; if (next >= DECOY_ACTIVE_TICKS) {
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 343
+	cmp     #$F4
+	txa
+	sbc     #$01
+	bcc     L0003
+;
+; decoy_active = 0;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 344
+	lda     #$00
+	sta     _decoy_active
+;
+; decoy_capture_ticks = 0;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 345
+	sta     _decoy_capture_ticks
+;
+; decoy_recharge_ticks = 0;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 346
+	sta     _decoy_recharge_ticks
+;
+; pursuer_retarget_timer = RETARGET_STALE_TICKS + 1;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 347
+	lda     #$33
+	sta     _pursuer_retarget_timer
+;
+; } else {
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 348
+	jmp     L0004
+;
+; decoy_active_ticks = next;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 349
+L0003:	jsr     ldax0sp
+	sta     _decoy_active_ticks
+	stx     _decoy_active_ticks+1
+;
+; if (!decoy_active && decoy_recharge_ticks < DECOY_RECHARGE_TICKS) {
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 352
+L0004:	lda     _decoy_active
+	bne     L000B
 	lda     _decoy_recharge_ticks
 	cmp     #$C8
-	bcs     L0008
+	bcs     L000B
 ;
 ; next = (unsigned int)decoy_recharge_ticks + frame_ticks;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 327
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 353
 	ldx     #$00
 	lda     _decoy_recharge_ticks
 	clc
 	adc     _frame_ticks
-	bcc     L000D
+	bcc     L0011
 	inx
-L000D:	jsr     stax0sp
+L0011:	jsr     stax0sp
 ;
 ; ? DECOY_RECHARGE_TICKS : (unsigned char)next;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 329
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 355
 	cmp     #$C8
 	txa
 	sbc     #$00
-	bcc     L0006
+	bcc     L0009
 	lda     #$C8
-	jmp     L000F
-L0006:	ldy     #$00
+	jmp     L0013
+L0009:	ldy     #$00
 	lda     (c_sp),y
-L000F:	sta     _decoy_recharge_ticks
+L0013:	sta     _decoy_recharge_ticks
 ;
 ; if (decoy_recharge_ticks >= DECOY_RECHARGE_TICKS)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 330
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 356
 	cmp     #$C8
-	bcc     L0008
+	bcc     L000B
 ;
 ; melody_play(DECOY_READY_MELODY);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 331
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 357
 	lda     #<(S0004)
 	ldx     #>(S0004)
 	jsr     _melody_play
 ;
 ; if (!decoy_active && decoy_recharge_ticks >= DECOY_RECHARGE_TICKS)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 333
-L0008:	lda     _decoy_active
-	bne     L0011
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 359
+L000B:	lda     _decoy_active
+	bne     L0015
 	lda     _decoy_recharge_ticks
 	cmp     #$C8
-	bcc     L0011
+	bcc     L0015
 ;
 ; decoy_available = 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 334
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 360
 	lda     #$01
 	sta     _decoy_available
 ;
 ; hud_set_decoy(decoy_recharge_ticks, DECOY_RECHARGE_TICKS);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 335
-L0011:	lda     _decoy_recharge_ticks
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 361
+L0015:	lda     _decoy_recharge_ticks
 	jsr     pusha
 	lda     #$C8
 	jsr     _hud_set_decoy
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 336
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 362
 	jmp     incsp2
 
 	.dbg	line
@@ -1834,7 +1941,7 @@ L0011:	lda     _decoy_recharge_ticks
 ;
 ; laser_elapsed_ticks += frame_ticks;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 340
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 366
 	lda     _frame_ticks
 	clc
 	adc     _laser_elapsed_ticks
@@ -1845,7 +1952,7 @@ L0011:	lda     _decoy_recharge_ticks
 ;
 ; if (laser_elapsed_ticks < laser_period_ticks) return;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 341
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 367
 	lda     _laser_elapsed_ticks
 	cmp     _laser_period_ticks
 	lda     _laser_elapsed_ticks+1
@@ -1854,14 +1961,14 @@ L0011:	lda     _decoy_recharge_ticks
 ;
 ; laser_elapsed_ticks = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 342
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 368
 	lda     #$00
 	sta     _laser_elapsed_ticks
 	sta     _laser_elapsed_ticks+1
 ;
 ; sprite3d_build_laser(player_x, player_y);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 343
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 369
 	lda     _player_x
 	ldx     _player_x+1
 	jsr     pushax
@@ -1871,33 +1978,47 @@ L0011:	lda     _decoy_recharge_ticks
 ;
 ; melody_laser_buzz();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 344
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 370
 	jmp     _melody_laser_buzz
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 345
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 371
 L0001:	rts
 
 	.dbg	line
 .endproc
 
 ; ---------------------------------------------------------------
-; void __near__ reset_positions (void)
+; void __near__ start_life (void)
 ; ---------------------------------------------------------------
 
 .segment	"CODE"
 
-.proc	_reset_positions: near
+.proc	_start_life: near
 
-	.dbg	func, "reset_positions", "00", static, "_reset_positions"
+	.dbg	func, "start_life", "00", static, "_start_life"
 
 .segment	"CODE"
 
 ;
+; if (threat_color_active) COLOR4 = threat_old_color;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 375
+	lda     _threat_color_active
+	beq     L0003
+	lda     _threat_old_color
+	sta     $02C8
+;
+; threat_color_active = 0;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 376
+	lda     #$00
+L0003:	sta     _threat_color_active
+;
 ; player_x = PLAYER_START_X;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 351
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 377
 	ldx     #$06
 	lda     #$80
 	sta     _player_x
@@ -1905,75 +2026,110 @@ L0001:	rts
 ;
 ; player_y = PLAYER_START_Y;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 352
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 378
 	ldx     #$01
 	sta     _player_y
 	stx     _player_y+1
 ;
 ; player_angle = PLAYER_START_ANGLE;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 353
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 379
 	lda     #$00
 	sta     _player_angle
 	sta     _player_angle+1
 ;
 ; place_pursuer_at_start();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 354
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 380
 	jsr     _place_pursuer_at_start
 ;
 ; pursuer_dir_x = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 355
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 381
 	lda     #$00
 	sta     _pursuer_dir_x
 ;
 ; pursuer_dir_y = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 356
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 382
 	sta     _pursuer_dir_y
 ;
 ; pursuer_retarget_timer = RETARGET_STALE_TICKS + 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 357
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 383
 	lda     #$33
 	sta     _pursuer_retarget_timer
 ;
 ; decoy_active = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 358
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 384
 	lda     #$00
 	sta     _decoy_active
 ;
 ; decoy_available = 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 359
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 385
 	lda     #$01
 	sta     _decoy_available
 ;
 ; decoy_capture_ticks = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 360
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 386
 	lda     #$00
 	sta     _decoy_capture_ticks
 ;
 ; decoy_recharge_ticks = DECOY_RECHARGE_TICKS;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 361
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 387
 	lda     #$C8
 	sta     _decoy_recharge_ticks
 ;
+; decoy_active_ticks = 0;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 388
+	lda     #$00
+	sta     _decoy_active_ticks
+	sta     _decoy_active_ticks+1
+;
 ; floor_motion_units = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 362
-	lda     #$00
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 389
 	sta     _floor_motion_units
 	sta     _floor_motion_units+1
 ;
 ; sprite3d_clear_all();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 363
-	jmp     _sprite3d_clear_all
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 390
+	jsr     _sprite3d_clear_all
+;
+; sprite3d_build_laser(PLAYER_START_X, PLAYER_START_Y);
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 391
+	ldx     #$06
+	lda     #$80
+	jsr     pushax
+	ldx     #$01
+	jsr     _sprite3d_build_laser
+;
+; laser_elapsed_ticks = 0;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 392
+	lda     #$00
+	sta     _laser_elapsed_ticks
+	sta     _laser_elapsed_ticks+1
+;
+; hud_set_decoy(decoy_recharge_ticks, DECOY_RECHARGE_TICKS);
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 393
+	lda     _decoy_recharge_ticks
+	jsr     pusha
+	lda     #$C8
+	jsr     _hud_set_decoy
+;
+; melody_laser_buzz();
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 394
+	jmp     _melody_laser_buzz
 
 	.dbg	line
 .endproc
@@ -1993,7 +2149,7 @@ L0001:	rts
 ;
 ; hud_set_game(lives, level, score, high_score);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 368
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 399
 	lda     _lives
 	jsr     pusha
 	lda     _level
@@ -2004,6 +2160,316 @@ L0001:	rts
 	lda     _high_score
 	ldx     _high_score+1
 	jmp     _hud_set_game
+
+	.dbg	line
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ start_new_game (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_start_new_game: near
+
+	.dbg	func, "start_new_game", "00", static, "_start_new_game"
+
+.segment	"CODE"
+
+;
+; lives = STARTING_LIVES;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 404
+	lda     #$03
+	sta     _lives
+;
+; level = 1;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 405
+	lda     #$01
+	sta     _level
+;
+; score = 0;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 406
+	lda     #$00
+	sta     _score
+	sta     _score+1
+;
+; maze_load_level(level);
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 407
+	lda     _level
+	jsr     _maze_load_level
+;
+; minimap_build();
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 408
+	jsr     _minimap_build
+;
+; minimap_show();
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 409
+	jsr     _minimap_show
+;
+; sprite3d_build_targets();
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 410
+	jsr     _sprite3d_build_targets
+;
+; sprite3d_locate_exit();
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 411
+	jsr     _sprite3d_locate_exit
+;
+; hud_set_targets(sprite3d_targets_left());
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 413
+	jsr     _sprite3d_targets_left
+	jsr     _hud_set_targets
+;
+; start_life();
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 415
+	jsr     _start_life
+;
+; update_game_hud();
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 416
+	jmp     _update_game_hud
+
+	.dbg	line
+.endproc
+
+; ---------------------------------------------------------------
+; unsigned char __near__ restart_pressed (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_restart_pressed: near
+
+	.dbg	func, "restart_pressed", "00", static, "_restart_pressed"
+
+.segment	"CODE"
+
+;
+; return read_key() == KEY_SPACE
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 421
+	jsr     _read_key
+;
+; || *(volatile unsigned char *)JOYSTICK_FIRE0 == 0;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 422
+	cmp     #$21
+	beq     L0004
+	lda     $D010
+	beq     L0004
+	ldx     #$00
+	txa
+	rts
+L0004:	lda     #$01
+	ldx     #$00
+;
+; }
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 423
+	rts
+
+	.dbg	line
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ show_end_screen (const char *message, unsigned char size, const char *melody)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_show_end_screen: near
+
+	.dbg	func, "show_end_screen", "00", static, "_show_end_screen"
+	.dbg	sym, "message", "00", auto, 3
+	.dbg	sym, "size", "00", auto, 2
+	.dbg	sym, "melody", "00", auto, 0
+
+.segment	"CODE"
+
+;
+; {
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 427
+	jsr     pushax
+;
+; if (threat_color_active) COLOR4 = threat_old_color;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 428
+	lda     _threat_color_active
+	beq     L000C
+	lda     _threat_old_color
+	sta     $02C8
+;
+; threat_color_active = 0;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 429
+	lda     #$00
+L000C:	sta     _threat_color_active
+;
+; sprite3d_clear_all();
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 430
+	jsr     _sprite3d_clear_all
+;
+; view3d_render(player_x, player_y, player_angle);
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 431
+	lda     _player_x
+	ldx     _player_x+1
+	jsr     pushax
+	lda     _player_y
+	ldx     _player_y+1
+	jsr     pushax
+	lda     _player_angle
+	ldx     _player_angle+1
+	jsr     _view3d_render
+;
+; textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER, message, 30, 1, size);
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 432
+	lda     #$01
+	jsr     pusha
+	ldy     #$07
+	jsr     pushwysp
+	lda     #$1E
+	jsr     pusha
+	lda     #$01
+	jsr     pusha
+	ldy     #$07
+	lda     (c_sp),y
+	jsr     _textplot_print_fullscreen
+;
+; textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER, "Press Space or Fire",
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 433
+	lda     #$01
+	jsr     pusha
+	lda     #<(S0005)
+	ldx     #>(S0005)
+	jsr     pushax
+;
+; 50, 3, TEXTPLOT_SIZE_HALF);
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 434
+	lda     #$32
+	jsr     pusha
+	lda     #$03
+	jsr     pusha
+	lda     #$80
+	jsr     _textplot_print_fullscreen
+;
+; melody_play(melody);
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 435
+	jsr     ldax0sp
+	jsr     _melody_play
+;
+; while (restart_pressed()) wait_frame();
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 437
+	jmp     L0005
+L0003:	jsr     _wait_frame
+L0005:	jsr     _restart_pressed
+	tax
+	bne     L0003
+;
+; while (!restart_pressed()) wait_frame();
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 438
+	jmp     L0008
+L0006:	jsr     _wait_frame
+L0008:	jsr     _restart_pressed
+	tax
+	beq     L0006
+;
+; while (restart_pressed()) wait_frame();
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 439
+	jmp     L000B
+L0009:	jsr     _wait_frame
+L000B:	jsr     _restart_pressed
+	tax
+	bne     L0009
+;
+; }
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 440
+	jmp     incsp5
+
+	.dbg	line
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ game_over (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_game_over: near
+
+	.dbg	func, "game_over", "00", static, "_game_over"
+
+.segment	"CODE"
+
+;
+; show_end_screen("Game Over", TEXTPLOT_SIZE_DOUBLE, GAME_OVER_MELODY);
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 444
+	lda     #<(S0006)
+	ldx     #>(S0006)
+	jsr     pushax
+	lda     #$02
+	jsr     pusha
+	lda     #<(S0007)
+	ldx     #>(S0007)
+	jsr     _show_end_screen
+;
+; start_new_game();
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 445
+	jmp     _start_new_game
+
+	.dbg	line
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ victory (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_victory: near
+
+	.dbg	func, "victory", "00", static, "_victory"
+
+.segment	"CODE"
+
+;
+; show_end_screen("YOU DID IT !!!", TEXTPLOT_SIZE_NORMAL, VICTORY_MELODY);
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 450
+	lda     #<(S0008)
+	ldx     #>(S0008)
+	jsr     pushax
+	lda     #$01
+	jsr     pusha
+	lda     #<(S0009)
+	ldx     #>(S0009)
+	jsr     _show_end_screen
+;
+; start_new_game();
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 451
+	jmp     _start_new_game
 
 	.dbg	line
 .endproc
@@ -2023,7 +2489,7 @@ L0001:	rts
 ;
 ; if (score > 65535u - SCORE_PER_TARGET)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 373
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 456
 	lda     _score
 	cmp     #$9C
 	lda     _score+1
@@ -2032,19 +2498,19 @@ L0001:	rts
 ;
 ; score = 65535u;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 374
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 457
 	lda     #$FF
 	sta     _score
 	sta     _score+1
 ;
 ; else
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 375
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 458
 	jmp     L0003
 ;
 ; score += SCORE_PER_TARGET;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 376
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 459
 L0002:	lda     #$64
 	clc
 	adc     _score
@@ -2054,7 +2520,7 @@ L0002:	lda     #$64
 ;
 ; if (score > high_score) high_score = score;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 377
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 460
 L0003:	lda     _score
 	sec
 	sbc     _high_score
@@ -2071,7 +2537,7 @@ L0003:	lda     _score
 ;
 ; update_game_hud();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 378
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 461
 L0005:	jmp     _update_game_hud
 
 	.dbg	line
@@ -2086,90 +2552,57 @@ L0005:	jmp     _update_game_hud
 .proc	_handle_catch: near
 
 	.dbg	func, "handle_catch", "00", static, "_handle_catch"
-	.dbg	sym, "i", "00", auto, -1
 
 .segment	"CODE"
 
 ;
 ; melody_set_threat_level(0);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 385
-	jsr     decsp1
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 466
 	lda     #$00
 	jsr     _melody_set_threat_level
 ;
 ; melody_play(CAUGHT_MELODY);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 386
-	lda     #<(S0005)
-	ldx     #>(S0005)
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 467
+	lda     #<(S000A)
+	ldx     #>(S000A)
 	jsr     _melody_play
 ;
-; while (melody_playing()) waitvsync();
+; while (melody_playing()) wait_frame();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 387
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 468
 	jmp     L0004
-L0002:	jsr     _waitvsync
+L0002:	jsr     _wait_frame
 L0004:	jsr     _melody_playing
 	tax
 	bne     L0002
 ;
-; if (--lives == 0) {
+; --lives;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 389
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 470
 	dec     _lives
-	bne     L0005
-;
-; lives = STARTING_LIVES;
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 390
-	lda     #$03
-	sta     _lives
-;
-; score = 0;
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 391
-	txa
-	sta     _score
-	sta     _score+1
 ;
 ; update_game_hud();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 393
-L0005:	jsr     _update_game_hud
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 471
+	jsr     _update_game_hud
 ;
-; reset_positions();
+; if (lives == 0)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 395
-	jsr     _reset_positions
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 472
+	lda     _lives
+	bne     L0005
 ;
-; textplot_print(TEXTPLOT_ALIGN_CENTER, "Caught!", 10, 1, 2);
+; game_over();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 397
-	lda     #$01
-	jsr     pusha
-	lda     #<(S0006)
-	ldx     #>(S0006)
-	jsr     pushax
-	lda     #$0A
-	jsr     pusha
-	lda     #$01
-	jsr     pusha
-	lda     #$02
-	jsr     _textplot_print
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 473
+	jmp     _game_over
 ;
-; for (i = 0;; ++i) waitvsync();
+; start_life();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 398
-	lda     #$00
-	tay
-L000A:	sta     (c_sp),y
-	jsr     _waitvsync
-	ldy     #$00
-	clc
-	lda     #$01
-	adc     (c_sp),y
-	jmp     L000A
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 475
+L0005:	jmp     _start_life
 
 	.dbg	line
 .endproc
@@ -2191,7 +2624,7 @@ L000A:	sta     (c_sp),y
 ;
 ; distance = abs((int)player_x - (int)pursuer_x)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 410
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 483
 	jsr     decsp3
 	lda     _player_x
 	sec
@@ -2204,7 +2637,7 @@ L000A:	sta     (c_sp),y
 ;
 ; + abs((int)player_y - (int)pursuer_y);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 411
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 484
 	jsr     _abs
 	jsr     pushax
 	lda     _player_y
@@ -2222,7 +2655,7 @@ L000A:	sta     (c_sp),y
 ;
 ; if (distance >= THREAT_DISTANCE) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 412
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 485
 	cmp     #$00
 	txa
 	sbc     #$10
@@ -2232,18 +2665,18 @@ L0003:	bpl     L0002
 ;
 ; level_signal = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 413
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 486
 	lda     #$00
 	tay
 ;
 ; } else {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 414
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 487
 	jmp     L000C
 ;
 ; level_signal = (unsigned char)((THREAT_DISTANCE - distance) >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 415
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 488
 L0002:	lda     #$00
 	sec
 	ldy     #$01
@@ -2259,7 +2692,7 @@ L0002:	lda     #$00
 ;
 ; if (level_signal == 0) level_signal = 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 416
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 489
 	lda     (c_sp),y
 	bne     L000F
 	lda     #$01
@@ -2267,7 +2700,7 @@ L0002:	lda     #$00
 ;
 ; if (level_signal > 15) level_signal = 15;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 417
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 490
 L000F:	lda     (c_sp),y
 	cmp     #$10
 	bcc     L0011
@@ -2276,62 +2709,62 @@ L000C:	sta     (c_sp),y
 ;
 ; if (level_signal > 10) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 419
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 492
 L0011:	lda     (c_sp),y
 	cmp     #$0B
 	bcc     L0008
 ;
 ; if (!threat_color_active) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 420
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 493
 	lda     _threat_color_active
 	bne     L0012
 ;
 ; threat_old_color = COLOR4;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 421
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 494
 	lda     $02C8
 	sta     _threat_old_color
 ;
 ; threat_color_active = 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 422
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 495
 	lda     #$01
 	sta     _threat_color_active
 ;
 ; COLOR4 = COLOR_ORANGE;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 424
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 497
 L0012:	lda     #$4A
 	sta     $02C8
 ;
 ; } else if (threat_color_active) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 425
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 498
 	jmp     L0014
 L0008:	lda     _threat_color_active
 	beq     L0014
 ;
 ; COLOR4 = threat_old_color;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 426
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 499
 	lda     _threat_old_color
 	sta     $02C8
 ;
 ; threat_color_active = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 427
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 500
 	sty     _threat_color_active
 ;
 ; melody_set_threat_level(level_signal);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 429
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 502
 L0014:	lda     (c_sp),y
 	jsr     _melody_set_threat_level
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 430
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 503
 	jmp     incsp3
 
 	.dbg	line
@@ -2352,118 +2785,100 @@ L0014:	lda     (c_sp),y
 ;
 ; melody_set_threat_level(0);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 436
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 509
 	lda     #$00
 	jsr     _melody_set_threat_level
 ;
 ; melody_play(LEVEL_CLEAR_MELODY);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 437
-	lda     #<(S0007)
-	ldx     #>(S0007)
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 510
+	lda     #<(S000B)
+	ldx     #>(S000B)
 	jsr     _melody_play
 ;
-; while (melody_playing()) waitvsync();
+; while (melody_playing()) wait_frame();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 438
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 511
 	jmp     L0004
-L0002:	jsr     _waitvsync
+L0002:	jsr     _wait_frame
 L0004:	jsr     _melody_playing
 	tax
 	bne     L0002
 ;
-; level = (level >= LEVEL_MAX) ? 1 : (unsigned char)(level + 1);
+; if (level >= LEVEL_MAX) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 440
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 513
 	lda     _level
-	cmp     #$05
-	bcc     L000A
-	lda     #$01
-	jmp     L000B
-L000A:	lda     _level
-	clc
-	adc     #$01
-L000B:	sta     _level
+	cmp     #$06
+	bcc     L0009
+;
+; victory();
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 514
+	jmp     _victory
+;
+; ++level;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 517
+L0009:	inc     _level
 ;
 ; update_game_hud();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 441
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 518
 	jsr     _update_game_hud
 ;
 ; maze_load_level(level);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 442
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 519
 	lda     _level
 	jsr     _maze_load_level
 ;
 ; minimap_build();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 443
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 520
 	jsr     _minimap_build
 ;
 ; minimap_show();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 444
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 521
 	jsr     _minimap_show
 ;
 ; sprite3d_build_targets();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 445
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 522
 	jsr     _sprite3d_build_targets
-;
-; sprite3d_build_laser(player_x, player_y);
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 446
-	lda     _player_x
-	ldx     _player_x+1
-	jsr     pushax
-	lda     _player_y
-	ldx     _player_y+1
-	jsr     _sprite3d_build_laser
 ;
 ; sprite3d_locate_exit();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 447
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 523
 	jsr     _sprite3d_locate_exit
 ;
 ; hud_set_targets(sprite3d_targets_left());
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 448
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 525
 	jsr     _sprite3d_targets_left
 	jsr     _hud_set_targets
 ;
 ; melody_play(LEVEL_LOAD_MELODY);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 450
-	lda     #<(S0008)
-	ldx     #>(S0008)
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 528
+	lda     #<(S000C)
+	ldx     #>(S000C)
 	jsr     _melody_play
 ;
-; while (melody_playing()) waitvsync();
+; while (melody_playing()) wait_frame();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 451
-	jmp     L0009
-L0007:	jsr     _waitvsync
-L0009:	jsr     _melody_playing
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 529
+	jmp     L0008
+L0006:	jsr     _wait_frame
+L0008:	jsr     _melody_playing
 	tax
-	bne     L0007
+	bne     L0006
 ;
-; reset_positions();
+; start_life();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 453
-	jsr     _reset_positions
-;
-; laser_elapsed_ticks = 0;
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 454
-	lda     #$00
-	sta     _laser_elapsed_ticks
-	sta     _laser_elapsed_ticks+1
-;
-; melody_laser_buzz();
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 455
-	jmp     _melody_laser_buzz
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 531
+	jmp     _start_life
 
 	.dbg	line
 .endproc
@@ -2479,18 +2894,18 @@ L0009:	jsr     _melody_playing
 	.dbg	func, "main", "00", static, "_main"
 	.dbg	sym, "key", "00", auto, -1
 	.dbg	sym, "ticks_per_second", "00", auto, -2
-	.dbg	sym, "last_tick", "00", auto, -3
-	.dbg	sym, "prev_tick", "00", auto, -4
-	.dbg	sym, "now", "00", auto, -5
-	.dbg	sym, "frames", "00", auto, -6
-	.dbg	sym, "previous_key", "00", auto, -7
+	.dbg	sym, "prev_tick", "00", auto, -3
+	.dbg	sym, "now", "00", auto, -4
+	.dbg	sym, "previous_key", "00", auto, -5
+	.dbg	sym, "last_tick", "00", auto, -6
+	.dbg	sym, "frames", "00", auto, -7
 
 .segment	"CODE"
 
 ;
 ; *(volatile unsigned char *)PBCTL |= 0x04;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 468
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 546
 	jsr     decsp7
 	lda     $D303
 	ora     #$04
@@ -2498,156 +2913,142 @@ L0009:	jsr     _melody_playing
 ;
 ; *(volatile unsigned char *)PORTB |= 0x02;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 469
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 547
 	lda     $D301
 	ora     #$02
 	sta     $D301
 ;
 ; OS.sdmctl = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 470
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 548
 	lda     #$00
 	sta     $022F
 ;
 ; ANTIC.dmactl = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 471
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 549
 	sta     $D400
 ;
 ; | *(volatile unsigned char *)RTCLOK_LOW);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 474
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 552
 	lda     $0014
 	ldx     $D20A
 	jsr     _srand
 ;
 ; splash_screen_show();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 476
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 554
 	jsr     _splash_screen_show
 ;
 ; maze_load_level(1);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 478
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 556
 	lda     #$01
 	jsr     _maze_load_level
 ;
 ; minimap_build();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 480
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 558
 	jsr     _minimap_build
 ;
 ; sprite3d_build_targets();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 481
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 559
 	jsr     _sprite3d_build_targets
-;
-; sprite3d_build_laser(PLAYER_START_X, PLAYER_START_Y);
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 482
-	ldx     #$06
-	lda     #$80
-	jsr     pushax
-	ldx     #$01
-	jsr     _sprite3d_build_laser
 ;
 ; sprite3d_locate_exit();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 483
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 560
 	jsr     _sprite3d_locate_exit
 ;
 ; splash_screen_rainbow();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 485
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 562
 	jsr     _splash_screen_rainbow
-;
-; player_x = PLAYER_START_X;
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 488
-	ldx     #$06
-	lda     #$80
-	sta     _player_x
-	stx     _player_x+1
-;
-; player_y = PLAYER_START_Y;
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 489
-	ldx     #$01
-	sta     _player_y
-	stx     _player_y+1
-;
-; player_angle = PLAYER_START_ANGLE;
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 490
-	lda     #$00
-	sta     _player_angle
-	sta     _player_angle+1
-;
-; place_pursuer_at_start();
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 491
-	jsr     _place_pursuer_at_start
 ;
 ; view3d_init();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 493
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 564
 	jsr     _view3d_init
 ;
 ; minimap_show();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 494
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 565
 	jsr     _minimap_show
 ;
 ; sprite3d_init();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 495
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 566
 	jsr     _sprite3d_init
 ;
 ; melody_install();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 496
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 567
 	jsr     _melody_install
 ;
 ; melody_threat_play("A02A02E12A02A02E12");
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 497
-	lda     #<(S0009)
-	ldx     #>(S0009)
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 568
+	lda     #<(S000D)
+	ldx     #>(S000D)
 	jsr     _melody_threat_play
 ;
-; melody_laser_buzz();
+; start_life();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 498
-	jsr     _melody_laser_buzz
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 569
+	jsr     _start_life
 ;
 ; *(volatile unsigned char *)NOCLIK = 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 499
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 570
 	lda     #$01
 	sta     $02DB
 ;
 ; hud_set_targets(sprite3d_targets_left());
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 500
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 572
 	jsr     _sprite3d_targets_left
 	jsr     _hud_set_targets
 ;
-; hud_set_decoy(decoy_recharge_ticks, DECOY_RECHARGE_TICKS);
+; textplot_print_fullscreen(TEXTPLOT_ALIGN_LEFT, "DECOY",
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 501
-	lda     _decoy_recharge_ticks
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 574
+	lda     #$00
 	jsr     pusha
-	lda     #$C8
-	jsr     _hud_set_decoy
+	lda     #<(S000E)
+	ldx     #>(S000E)
+	jsr     pushax
+;
+; DECOY_BAR_TOP + DECOY_BAR_HEIGHT, 3,
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 575
+	lda     #$43
+	jsr     pusha
+	lda     #$03
+	jsr     pusha
+;
+; TEXTPLOT_SIZE_HALF);
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 576
+	lda     #$80
+	jsr     _textplot_print_fullscreen
 ;
 ; update_game_hud();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 502
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 577
 	jsr     _update_game_hud
+;
+; melody_play(LEVEL_LOAD_MELODY);
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 578
+	lda     #<(S000F)
+	ldx     #>(S000F)
+	jsr     _melody_play
 ;
 ; ticks_per_second = (get_tv() == AT_PAL) ? 50 : 60;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 504
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 580
 	jsr     _get_tv
 	cmp     #$01
 	bne     L0002
@@ -2659,7 +3060,7 @@ L0020:	ldy     #$05
 ;
 ; laser_period_ticks = (unsigned int)ticks_per_second * LASER_SECONDS;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 505
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 581
 	ldx     #$00
 	lda     (c_sp),y
 	jsr     mulax5
@@ -2668,48 +3069,48 @@ L0020:	ldy     #$05
 ;
 ; laser_elapsed_ticks = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 506
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 582
 	lda     #$00
 	sta     _laser_elapsed_ticks
 	sta     _laser_elapsed_ticks+1
 ;
-; last_tick = *(volatile unsigned char *)RTCLOK_LOW;
+; prev_tick = *(volatile unsigned char *)RTCLOK_LOW;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 507
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 583
 	lda     $0014
 	dey
 	sta     (c_sp),y
 ;
-; prev_tick = last_tick;
+; last_tick = prev_tick;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 508
-	dey
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 585
+	ldy     #$01
 	sta     (c_sp),y
 ;
 ; frames = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 509
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 586
 	lda     #$00
-	ldy     #$01
+	dey
 	sta     (c_sp),y
 ;
 ; previous_key = 0xFF;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 510
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 588
 	lda     #$FF
-	dey
+	ldy     #$02
 	sta     (c_sp),y
 ;
 ; now = *(volatile unsigned char *)RTCLOK_LOW;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 513
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 591
 L0021:	lda     $0014
-	ldy     #$02
+	ldy     #$03
 	sta     (c_sp),y
 ;
 ; frame_ticks = (unsigned char)(now - prev_tick);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 514
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 592
 	sec
 	iny
 	sbc     (c_sp),y
@@ -2717,14 +3118,14 @@ L0021:	lda     $0014
 ;
 ; if (frame_ticks == 0) frame_ticks = 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 515
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 593
 	lda     _frame_ticks
 	bne     L0022
 	lda     #$01
 ;
 ; else if (frame_ticks > MAX_TICKS) frame_ticks = MAX_TICKS;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 516
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 594
 	jmp     L001F
 L0022:	lda     _frame_ticks
 	cmp     #$07
@@ -2734,7 +3135,7 @@ L001F:	sta     _frame_ticks
 ;
 ; prev_tick = now;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 517
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 595
 L000A:	dey
 	lda     (c_sp),y
 	iny
@@ -2742,20 +3143,20 @@ L000A:	dey
 ;
 ; key = read_key();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 519
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 597
 	jsr     _read_key
 	ldy     #$06
 	sta     (c_sp),y
 ;
 ; if (key == KEY_ESC) break;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 520
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 598
 	cmp     #$1C
 	jeq     L002D
 ;
 ; if (key == KEY_W) step_forward(1);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 521
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 599
 	lda     (c_sp),y
 	cmp     #$2E
 	bne     L0024
@@ -2764,7 +3165,7 @@ L000A:	dey
 ;
 ; else if (key == KEY_S) step_forward(-1);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 522
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 600
 	jmp     L0014
 L0024:	lda     (c_sp),y
 	cmp     #$3E
@@ -2774,7 +3175,7 @@ L0024:	lda     (c_sp),y
 ;
 ; else if (key == KEY_A) player_angle -= TURN_PER_TICK * frame_ticks;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 523
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 601
 	jmp     L0014
 L0026:	lda     (c_sp),y
 	cmp     #$3F
@@ -2795,7 +3196,7 @@ L0026:	lda     (c_sp),y
 ;
 ; else if (key == KEY_D) player_angle += TURN_PER_TICK * frame_ticks;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 524
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 602
 	jmp     L0014
 L0028:	lda     (c_sp),y
 	cmp     #$3A
@@ -2814,12 +3215,12 @@ L0028:	lda     (c_sp),y
 ;
 ; else if (key == KEY_SPACE && previous_key != KEY_SPACE) deploy_decoy();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 525
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 603
 	jmp     L0014
 L002A:	lda     (c_sp),y
 	cmp     #$21
 	bne     L002E
-	ldy     #$00
+	ldy     #$02
 	lda     (c_sp),y
 	cmp     #$21
 	beq     L0014
@@ -2827,35 +3228,35 @@ L002A:	lda     (c_sp),y
 ;
 ; previous_key = key;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 526
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 604
 L0014:	ldy     #$06
 L002E:	lda     (c_sp),y
-	ldy     #$00
+	ldy     #$02
 	sta     (c_sp),y
 ;
 ; update_decoy_recharge();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 528
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 606
 	jsr     _update_decoy_recharge
 ;
 ; update_laser();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 529
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 607
 	jsr     _update_laser
 ;
 ; move_pursuer();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 530
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 608
 	jsr     _move_pursuer
 ;
 ; update_threat_sound();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 531
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 609
 	jsr     _update_threat_sound
 ;
 ; if (pursuer_caught_player() || sprite3d_hit_laser(player_x, player_y))
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 532
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 610
 	jsr     _pursuer_caught_player
 	tax
 	bne     L0019
@@ -2870,12 +3271,12 @@ L002E:	lda     (c_sp),y
 ;
 ; handle_catch();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 533
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 611
 L0019:	jsr     _handle_catch
 ;
 ; if (sprite3d_collect(player_x, player_y)) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 534
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 612
 L0018:	lda     _player_x
 	ldx     _player_x+1
 	jsr     pushax
@@ -2887,23 +3288,23 @@ L0018:	lda     _player_x
 ;
 ; hud_set_targets(sprite3d_targets_left());
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 535
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 614
 	jsr     _sprite3d_targets_left
 	jsr     _hud_set_targets
 ;
 ; score_target();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 536
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 616
 	jsr     _score_target
 ;
 ; melody_pickup();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 537
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 617
 	jsr     _melody_pickup
 ;
 ; if (sprite3d_targets_left() == 0) maze_set_exit_open(1);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 539
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 619
 L001B:	jsr     _sprite3d_targets_left
 	cmp     #$00
 	bne     L001C
@@ -2912,7 +3313,7 @@ L001B:	jsr     _sprite3d_targets_left
 ;
 ; if (sprite3d_reached_exit(player_x, player_y)) handle_level_clear();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 540
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 620
 L001C:	lda     _player_x
 	ldx     _player_x+1
 	jsr     pushax
@@ -2925,7 +3326,7 @@ L001C:	lda     _player_x
 ;
 ; view3d_render(player_x, player_y, player_angle);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 542
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 622
 L001D:	lda     _player_x
 	ldx     _player_x+1
 	jsr     pushax
@@ -2938,7 +3339,7 @@ L001D:	lda     _player_x
 ;
 ; sprite3d_draw_targets(player_x, player_y, player_angle);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 543
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 623
 	lda     _player_x
 	ldx     _player_x+1
 	jsr     pushax
@@ -2951,7 +3352,7 @@ L001D:	lda     _player_x
 ;
 ; sprite3d_draw_pursuer(player_x, player_y, player_angle,
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 544
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 624
 	lda     _player_x
 	ldx     _player_x+1
 	jsr     pushax
@@ -2964,7 +3365,7 @@ L001D:	lda     _player_x
 ;
 ; pursuer_x, pursuer_y);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 545
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 625
 	lda     _pursuer_x
 	ldx     _pursuer_x+1
 	jsr     pushax
@@ -2974,7 +3375,7 @@ L001D:	lda     _player_x
 ;
 ; sprite3d_draw_decoy(decoy_active, player_x, player_y, player_angle,
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 546
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 626
 	lda     _decoy_active
 	jsr     pusha
 	lda     _player_x
@@ -2989,7 +3390,7 @@ L001D:	lda     _player_x
 ;
 ; decoy_x, decoy_y);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 547
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 627
 	lda     _decoy_x
 	ldx     _decoy_x+1
 	jsr     pushax
@@ -2999,7 +3400,7 @@ L001D:	lda     _player_x
 ;
 ; minimap_update(player_x, player_y, player_angle,
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 548
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 628
 	lda     _player_x
 	ldx     _player_x+1
 	jsr     pushax
@@ -3012,7 +3413,7 @@ L001D:	lda     _player_x
 ;
 ; pursuer_x, pursuer_y);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 549
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 629
 	lda     _pursuer_x
 	ldx     _pursuer_x+1
 	jsr     pushax
@@ -3022,89 +3423,89 @@ L001D:	lda     _player_x
 ;
 ; ++frames;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 551
-	ldy     #$01
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 632
+	ldy     #$00
 	clc
-	tya
+	lda     #$01
 	adc     (c_sp),y
 	sta     (c_sp),y
 ;
 ; now = *(volatile unsigned char *)RTCLOK_LOW;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 552
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 633
 	lda     $0014
-	iny
+	ldy     #$03
 	sta     (c_sp),y
 ;
 ; if ((unsigned char)(now - last_tick) >= ticks_per_second) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 553
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 634
 	sec
-	ldy     #$04
+	ldy     #$01
 	sbc     (c_sp),y
-	iny
+	ldy     #$05
 	cmp     (c_sp),y
 	bcc     L001E
 ;
 ; hud_set_fps(frames);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 554
-	ldy     #$01
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 635
+	ldy     #$00
 	lda     (c_sp),y
 	jsr     _hud_set_fps
 ;
 ; frames = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 555
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 636
 	lda     #$00
-	ldy     #$01
+	tay
 	sta     (c_sp),y
 ;
 ; last_tick = now;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 556
-	iny
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 637
+	ldy     #$03
 	lda     (c_sp),y
-	ldy     #$04
+	ldy     #$01
 	sta     (c_sp),y
 ;
-; waitvsync();
+; wait_frame();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 558
-L001E:	jsr     _waitvsync
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 640
+L001E:	jsr     _wait_frame
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 559
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 641
 	jmp     L0021
 ;
 ; *(volatile unsigned char *)0x02E5 = startup_memtop[0];
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 560
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 642
 L002D:	lda     _startup_memtop
 	sta     $02E5
 ;
 ; *(volatile unsigned char *)0x02E6 = startup_memtop[1];
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 561
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 643
 	lda     _startup_memtop+1
 	sta     $02E6
 ;
 ; *(volatile unsigned char *)PORTB = startup_portb;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 562
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 644
 	lda     _startup_portb
 	sta     $D301
 ;
 ; return 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 563
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 645
 	ldx     #$00
 	txa
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 564
+	.dbg	line, "C:\Users\Alex\Chased3D\chased3d.c", 646
 	rts
 
 	.dbg	line

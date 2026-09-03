@@ -10,7 +10,7 @@
 	.importzp	c_sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
-	.dbg		file, "C:\Users\Alex\Chased3D\splash_screen.c", 3300, 1788301247
+	.dbg		file, "C:\Users\Alex\Chased3D\splash_screen.c", 3417, 1788469805
 	.dbg		file, "C:\tools\cc65\include/atari.h", 22152, 1786840064
 	.dbg		file, "C:\tools\cc65\include/_atarios.h", 40084, 1786840064
 	.dbg		file, "C:\tools\cc65\include/_gtia.h", 13839, 1786840064
@@ -19,10 +19,11 @@
 	.dbg		file, "C:\tools\cc65\include/_pia.h", 3044, 1786840064
 	.dbg		file, "C:\tools\cc65\include/_antic.h", 11827, 1786840064
 	.dbg		file, "C:\tools\cc65\include/stdio.h", 6999, 1786840065
-	.dbg		file, "C:\Users\Alex\Chased3D/splash_screen.h", 127, 1788293991
-	.dbg		file, "C:\Users\Alex\Chased3D/textplot.h", 424, 1788300845
-	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1299, 1788211929
-	.dbg		file, "C:\Users\Alex\Chased3D/build_number.h", 136, 1788301656
+	.dbg		file, "C:\Users\Alex\Chased3D/splash_screen.h", 127, 1788301734
+	.dbg		file, "C:\Users\Alex\Chased3D/textplot.h", 440, 1788473040
+	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1410, 1788473348
+	.dbg		file, "C:\Users\Alex\Chased3D/maze.h", 550, 1787868964
+	.dbg		file, "C:\Users\Alex\Chased3D/build_number.h", 136, 1788473352
 	.dbg		sym, "view_buffer", "00", extern, "_view_buffer"
 	.import		_fclose
 	.import		_fgetc
@@ -37,7 +38,7 @@ S0006:
 	.byte	$62,$79,$20,$41,$6C,$65,$78,$20,$56,$69,$72,$6F,$6C,$69,$2C,$20
 	.byte	$32,$30,$32,$36,$00
 S0007:
-	.byte	$52,$65,$76,$31,$2E,$30,$35,$34,$20,$70,$72,$65,$73,$73,$20,$46
+	.byte	$52,$65,$76,$31,$2E,$30,$37,$39,$20,$70,$72,$65,$73,$73,$20,$46
 	.byte	$69,$72,$65,$00
 S0003:
 	.byte	$44,$3A,$53,$50,$4C,$41,$53,$48,$2E,$42,$4D,$50,$00
@@ -121,7 +122,7 @@ L0006:	bcs     L0003
 	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 93
 L0003:	jsr     _splash_load_bitmap
 ;
-; textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER, "Chased3D", 7, 3, 2);
+; textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER, "Chased3D", 7, 3,
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 94
 	lda     #$01
@@ -133,18 +134,22 @@ L0003:	jsr     _splash_load_bitmap
 	jsr     pusha
 	lda     #$03
 	jsr     pusha
+;
+; TEXTPLOT_SIZE_DOUBLE);
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 95
 	lda     #$02
 	jsr     _textplot_print_fullscreen
 ;
 ; textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER,
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 95
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 96
 	lda     #$01
 	jsr     pusha
 ;
-; "by Alex Viroli, 2026", 18, 2, 1);
+; "by Alex Viroli, 2026", 18, 2,
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 96
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 97
 	lda     #<(S0006)
 	ldx     #>(S0006)
 	jsr     pushax
@@ -152,18 +157,22 @@ L0003:	jsr     _splash_load_bitmap
 	jsr     pusha
 	lda     #$02
 	jsr     pusha
+;
+; TEXTPLOT_SIZE_NORMAL);
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 98
 	lda     #$01
 	jsr     _textplot_print_fullscreen
 ;
 ; textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER,
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 97
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 99
 	lda     #$01
 	jsr     pusha
 ;
-; SPLASH_REVISION, 35, 3, 1);
+; SPLASH_REVISION, 35, 3, TEXTPLOT_SIZE_HALF);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 98
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 100
 	lda     #<(S0007)
 	ldx     #>(S0007)
 	jsr     pushax
@@ -171,47 +180,47 @@ L0003:	jsr     _splash_load_bitmap
 	jsr     pusha
 	lda     #$03
 	jsr     pusha
-	lda     #$01
+	lda     #$80
 	jsr     _textplot_print_fullscreen
 ;
 ; splash_build_dlist();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 99
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 101
 	jsr     _splash_build_dlist
 ;
 ; COLOR0 = 0x3A;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 101
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 103
 	lda     #$3A
 	sta     $02C4
 ;
 ; COLOR1 = 0xCA;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 102
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 104
 	lda     #$CA
 	sta     $02C5
 ;
 ; COLOR2 = 0x1E;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 103
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 105
 	lda     #$1E
 	sta     $02C6
 ;
 ; COLOR3 = 0x00;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 104
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 106
 	lda     #$00
 	sta     $02C7
 ;
 ; COLOR4 = 0x02;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 105
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 107
 	lda     #$02
 	sta     $02C8
 ;
 ; OS.sdlst = splash_dlist;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 106
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 108
 	lda     #>(_splash_dlist)
 	sta     $0230+1
 	lda     #<(_splash_dlist)
@@ -219,18 +228,18 @@ L0003:	jsr     _splash_load_bitmap
 ;
 ; OS.sdmctl = 0x22;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 107
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 109
 	lda     #$22
 	sta     $022F
 ;
 ; ANTIC.dmactl = 0x22;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 108
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 110
 	sta     $D400
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 109
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 111
 	jmp     incsp2
 
 	.dbg	line

@@ -1,5 +1,15 @@
-#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include "maze.h"
+
+#define LEVEL_BUFFER_SIZE 64
+
+#pragma bss-name (push, "AUXBSS")
+static unsigned char level_buffer[LEVEL_BUFFER_SIZE];
+static int level_file;
+static unsigned char level_buffer_pos;
+static unsigned char level_buffer_len;
+#pragma bss-name (pop)
 
 #pragma bss-name (push, "HIGHBSS")
 unsigned char maze_map[MAZE_H][MAZE_W];
@@ -97,9 +107,21 @@ static void clear_map(void)
     }
 }
 
+static int read_level_byte(void)
+{
+    int count;
+
+    if (level_buffer_pos >= level_buffer_len) {
+        count = read(level_file, level_buffer, LEVEL_BUFFER_SIZE);
+        if (count <= 0) return -1;
+        level_buffer_pos = 0;
+        level_buffer_len = (unsigned char)count;
+    }
+    return level_buffer[level_buffer_pos++];
+}
+
 void maze_load_level(unsigned char requested_level)
 {
-    FILE *file;
     const char *level_name;
     unsigned char row;
     unsigned char col;
@@ -130,20 +152,22 @@ void maze_load_level(unsigned char requested_level)
         else if (requested_level == 4) level_name = "D:L3.CSV";
         else if (requested_level == 5) level_name = "D:L4.CSV";
         else level_name = "D:L5.CSV";
-        file = fopen(level_name, "r");
-        if (file == 0) return;
-        do { ch = fgetc(file); } while (ch != EOF && ch != '\n' && ch != '\r');
-        if (ch == '\r') ch = fgetc(file);
+        level_file = open(level_name, O_RDONLY);
+        if (level_file < 0) return;
+        level_buffer_pos = 0;
+        level_buffer_len = 0;
+        do { ch = read_level_byte(); } while (ch >= 0 && ch != '\n' && ch != '\r');
+        if (ch == '\r') ch = read_level_byte();
         for (row = 0; row < MAZE_H; ++row) {
-            do { ch = fgetc(file); } while (ch != EOF && ch != ';');
-            if (ch == EOF) { fclose(file); return; }
+            do { ch = read_level_byte(); } while (ch >= 0 && ch != ';');
+            if (ch < 0) { close(level_file); return; }
             for (col = 0; col < MAZE_W; ++col) {
-                do { ch = fgetc(file); } while (ch != EOF && (ch < '0' || ch > '6'));
-                if (ch == EOF) { fclose(file); return; }
+                do { ch = read_level_byte(); } while (ch >= 0 && (ch < '0' || ch > '6'));
+                if (ch < 0) { close(level_file); return; }
                 maze_map[row][col] = (unsigned char)(ch - '0');
             }
         }
-        fclose(file);
+        close(level_file);
     }
 
     for (row = 0; row < MAZE_H && !maze_exit_found; ++row) {

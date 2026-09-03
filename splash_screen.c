@@ -1,5 +1,6 @@
 #include <atari.h>
-#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include "splash_screen.h"
 #include "textplot.h"
 #include "view3d.h"
@@ -42,43 +43,35 @@ static void splash_build_dlist(void)
 
 static void splash_load_bitmap(void)
 {
-    FILE *file;
+    int file;
+    unsigned char *source;
     unsigned char *dest;
     unsigned char source_row;
     unsigned char byte;
-    int first;
-    int second;
 
-    file = fopen("D:SPLASH.BMP", "rb");
-    if (file == 0) return;
-    if (fgetc(file) != 'B' || fgetc(file) != 'M') {
-        fclose(file);
-        return;
-    }
-    for (byte = 2; byte < SPLASH_BMP_DATA_OFFSET; ++byte) {
-        if (fgetc(file) == EOF) {
-            fclose(file);
-            return;
-        }
-    }
+    source = view_buffer;
+    file = open("D:SPLASH.BMP", O_RDONLY);
+    if (file < 0) return;
+    if (read(file, source, SPLASH_BMP_DATA_OFFSET) != SPLASH_BMP_DATA_OFFSET
+        || source[0] != 'B' || source[1] != 'M') goto done;
 
     for (source_row = 0; source_row < SPLASH_BITMAP_ROWS; ++source_row) {
+        if (read(file, source, VIEW_STRIDE * 2) != VIEW_STRIDE * 2) goto done;
         dest = view_buffer
              + (unsigned int)(SPLASH_BITMAP_TOP + SPLASH_BITMAP_ROWS - 1
                               - source_row) * VIEW_STRIDE;
         for (byte = 0; byte < VIEW_STRIDE; ++byte) {
-            first = fgetc(file);
-            second = fgetc(file);
-            if (first == EOF || second == EOF) {
-                fclose(file);
-                return;
-            }
             dest[byte] = (unsigned char)(
-                ((first & 0x30) << 2) | ((first & 0x03) << 4)
-                | ((second & 0x30) >> 2) | (second & 0x03));
+                ((source[byte * 2] & 0x30) << 2)
+                | ((source[byte * 2] & 0x03) << 4)
+                | ((source[byte * 2 + 1] & 0x30) >> 2)
+                | (source[byte * 2 + 1] & 0x03));
         }
     }
-    fclose(file);
+
+done:
+    close(file);
+    for (byte = 0; byte < VIEW_STRIDE * 2; ++byte) source[byte] = 0;
 }
 
 void splash_screen_show(void)
@@ -91,11 +84,13 @@ void splash_screen_show(void)
         view_buffer[addr] = 0;
 
     splash_load_bitmap();
-    textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER, "Chased3D", 7, 3, 2);
+    textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER, "Chased3D", 7, 3,
+                              TEXTPLOT_SIZE_DOUBLE);
     textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER,
-                              "by Alex Viroli, 2026", 18, 2, 1);
+                              "by Alex Viroli, 2026", 18, 2,
+                              TEXTPLOT_SIZE_NORMAL);
     textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER,
-                              SPLASH_REVISION, 35, 3, 1);
+                              SPLASH_REVISION, 35, 3, TEXTPLOT_SIZE_HALF);
     splash_build_dlist();
 
     COLOR0 = 0x3A;

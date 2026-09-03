@@ -10,13 +10,209 @@
 	.importzp	c_sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
-	.dbg		file, "C:\Users\Alex\Chased3D\textplot.c", 3676, 1788300845
-	.dbg		file, "C:\Users\Alex\Chased3D/textplot.h", 424, 1788300845
-	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1299, 1788211929
+	.dbg		file, "C:\Users\Alex\Chased3D\textplot.c", 5912, 1788473040
+	.dbg		file, "C:\Users\Alex\Chased3D/textplot.h", 440, 1788473040
+	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1410, 1788473348
+	.dbg		file, "C:\Users\Alex\Chased3D/maze.h", 550, 1787868964
 	.dbg		sym, "view_buffer", "00", extern, "_view_buffer"
-	.export		_textplot_print
 	.export		_textplot_print_fullscreen
 	.import		_view_buffer
+
+.segment	"RODATA"
+
+_compact_font:
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$44
+	.byte	$40
+	.byte	$40
+	.byte	$AA
+	.byte	$00
+	.byte	$00
+	.byte	$AF
+	.byte	$AA
+	.byte	$FA
+	.byte	$6F
+	.byte	$C7
+	.byte	$F6
+	.byte	$92
+	.byte	$48
+	.byte	$90
+	.byte	$4A
+	.byte	$4B
+	.byte	$A5
+	.byte	$44
+	.byte	$00
+	.byte	$00
+	.byte	$24
+	.byte	$88
+	.byte	$42
+	.byte	$84
+	.byte	$22
+	.byte	$48
+	.byte	$0A
+	.byte	$4A
+	.byte	$00
+	.byte	$04
+	.byte	$E4
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$48
+	.byte	$00
+	.byte	$E0
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$04
+	.byte	$12
+	.byte	$24
+	.byte	$88
+	.byte	$69
+	.byte	$BD
+	.byte	$96
+	.byte	$4C
+	.byte	$44
+	.byte	$4E
+	.byte	$69
+	.byte	$16
+	.byte	$8F
+	.byte	$E1
+	.byte	$61
+	.byte	$96
+	.byte	$26
+	.byte	$AF
+	.byte	$22
+	.byte	$F8
+	.byte	$E1
+	.byte	$96
+	.byte	$68
+	.byte	$E9
+	.byte	$96
+	.byte	$F1
+	.byte	$24
+	.byte	$44
+	.byte	$69
+	.byte	$69
+	.byte	$96
+	.byte	$69
+	.byte	$97
+	.byte	$16
+	.byte	$04
+	.byte	$00
+	.byte	$40
+	.byte	$04
+	.byte	$00
+	.byte	$48
+	.byte	$24
+	.byte	$84
+	.byte	$20
+	.byte	$0E
+	.byte	$0E
+	.byte	$00
+	.byte	$84
+	.byte	$24
+	.byte	$80
+	.byte	$69
+	.byte	$24
+	.byte	$04
+	.byte	$69
+	.byte	$BB
+	.byte	$87
+	.byte	$69
+	.byte	$9F
+	.byte	$99
+	.byte	$E9
+	.byte	$E9
+	.byte	$9E
+	.byte	$78
+	.byte	$88
+	.byte	$87
+	.byte	$E9
+	.byte	$99
+	.byte	$9E
+	.byte	$F8
+	.byte	$E8
+	.byte	$8F
+	.byte	$F8
+	.byte	$E8
+	.byte	$88
+	.byte	$78
+	.byte	$B9
+	.byte	$97
+	.byte	$99
+	.byte	$F9
+	.byte	$99
+	.byte	$E4
+	.byte	$44
+	.byte	$4E
+	.byte	$11
+	.byte	$19
+	.byte	$96
+	.byte	$9A
+	.byte	$CA
+	.byte	$A9
+	.byte	$88
+	.byte	$88
+	.byte	$8F
+	.byte	$9F
+	.byte	$F9
+	.byte	$99
+	.byte	$9D
+	.byte	$B9
+	.byte	$99
+	.byte	$69
+	.byte	$99
+	.byte	$96
+	.byte	$E9
+	.byte	$9E
+	.byte	$88
+	.byte	$69
+	.byte	$9B
+	.byte	$A5
+	.byte	$E9
+	.byte	$9E
+	.byte	$A9
+	.byte	$78
+	.byte	$61
+	.byte	$1E
+	.byte	$F4
+	.byte	$44
+	.byte	$44
+	.byte	$99
+	.byte	$99
+	.byte	$96
+	.byte	$99
+	.byte	$99
+	.byte	$66
+	.byte	$99
+	.byte	$9F
+	.byte	$F9
+	.byte	$99
+	.byte	$66
+	.byte	$99
+	.byte	$99
+	.byte	$64
+	.byte	$44
+	.byte	$F1
+	.byte	$24
+	.byte	$8F
+	.byte	$E8
+	.byte	$88
+	.byte	$8E
+	.byte	$84
+	.byte	$42
+	.byte	$11
+	.byte	$E2
+	.byte	$22
+	.byte	$2E
+	.byte	$4A
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$0F
 
 .segment	"BSS"
 
@@ -26,63 +222,8 @@ _plot_y:
 	.res	1,$00
 _plot_size:
 	.res	1,$00
-
-; ---------------------------------------------------------------
-; void __near__ textplot_print (unsigned char alignment, const char *text, unsigned char y, unsigned char color, unsigned char size)
-; ---------------------------------------------------------------
-
-.segment	"CODE"
-
-.proc	_textplot_print: near
-
-	.dbg	func, "textplot_print", "00", static, "_textplot_print"
-	.dbg	sym, "alignment", "00", auto, 5
-	.dbg	sym, "text", "00", auto, 3
-	.dbg	sym, "y", "00", auto, 2
-	.dbg	sym, "color", "00", auto, 1
-	.dbg	sym, "size", "00", auto, 0
-
-.segment	"CODE"
-
-;
-; {
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 100
-	jsr     pusha
-;
-; textplot_print_area(alignment, text, y, color, size,
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 101
-	ldy     #$05
-	lda     (c_sp),y
-	jsr     pusha
-	ldy     #$07
-	jsr     pushwysp
-	ldy     #$05
-	lda     (c_sp),y
-	jsr     pusha
-	ldy     #$05
-	lda     (c_sp),y
-	jsr     pusha
-	ldy     #$05
-	lda     (c_sp),y
-	jsr     pusha
-;
-; VIEW3D_X_PIXELS, VIEW3D_WIDTH_PIXELS);
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 102
-	lda     #$14
-	jsr     pusha
-	lda     #$8C
-	jsr     _textplot_print_area
-;
-; }
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 103
-	jmp     incsp6
-
-	.dbg	line
-.endproc
+_plot_compact:
+	.res	1,$00
 
 ; ---------------------------------------------------------------
 ; void __near__ textplot_print_fullscreen (unsigned char alignment, const char *text, unsigned char y, unsigned char color, unsigned char size)
@@ -104,12 +245,12 @@ _plot_size:
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 108
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 148
 	jsr     pusha
 ;
 ; textplot_print_area(alignment, text, y, color, size,
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 109
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 149
 	ldy     #$05
 	lda     (c_sp),y
 	jsr     pusha
@@ -127,7 +268,7 @@ _plot_size:
 ;
 ; 0, VIEW_STRIDE * 4);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 110
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 150
 	lda     #$00
 	jsr     pusha
 	lda     #$A0
@@ -135,7 +276,7 @@ _plot_size:
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 111
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 151
 	jmp     incsp6
 
 	.dbg	line
@@ -157,12 +298,12 @@ _plot_size:
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 13
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 35
 	jsr     pusha
 ;
 ; if (character >= 32 && character <= 95)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 14
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 36
 	ldy     #$00
 	lda     (c_sp),y
 	cmp     #$20
@@ -172,7 +313,7 @@ _plot_size:
 ;
 ; return character - 32;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 15
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 37
 	ldx     #$00
 	lda     (c_sp),y
 	ldy     #$20
@@ -182,7 +323,7 @@ _plot_size:
 ;
 ; if (character >= 96 && character <= 127)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 16
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 38
 L000E:	lda     (c_sp),y
 	cmp     #$60
 	tya
@@ -196,12 +337,70 @@ L000E:	lda     (c_sp),y
 ;
 ; return character;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 17
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 39
 L0011:	lda     (c_sp),y
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 19
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 41
+L0001:	jmp     incsp1
+
+	.dbg	line
+.endproc
+
+; ---------------------------------------------------------------
+; unsigned char __near__ atascii_to_compact_code (unsigned char character)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_atascii_to_compact_code: near
+
+	.dbg	func, "atascii_to_compact_code", "00", static, "_atascii_to_compact_code"
+	.dbg	sym, "character", "00", auto, 0
+
+.segment	"CODE"
+
+;
+; {
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 44
+	jsr     pusha
+;
+; if (character >= 'a' && character <= 'z') character -= 32;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 45
+	ldy     #$00
+	lda     (c_sp),y
+	cmp     #$61
+	bcc     L000E
+	cmp     #$7B
+	bcs     L000E
+	sec
+	sbc     #$20
+	sta     (c_sp),y
+;
+; if (character >= 32 && character <= 95) return character - 32;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 46
+L000E:	lda     (c_sp),y
+	cmp     #$20
+	tya
+	tax
+	bcc     L0001
+	lda     (c_sp),y
+	cmp     #$60
+	bcc     L0011
+	txa
+	jmp     incsp1
+L0011:	lda     (c_sp),y
+	ldy     #$20
+	jsr     decaxy
+	ldx     #$00
+;
+; }
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 48
 L0001:	jmp     incsp1
 
 	.dbg	line
@@ -226,12 +425,12 @@ L0001:	jmp     incsp1
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 22
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 51
 	jsr     pusha
 ;
 ; shift = (unsigned char)(6 - ((x & 3) << 1));
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 26
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 55
 	jsr     decsp3
 	lda     #$06
 	jsr     pusha0
@@ -247,7 +446,7 @@ L0002:	jsr     tossubax
 ;
 ; dest = view_buffer + (unsigned int)y * VIEW_STRIDE + (x >> 2);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 27
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 56
 	iny
 	lda     (c_sp),y
 	jsr     pusha0
@@ -272,7 +471,7 @@ L0003:	jsr     stax0sp
 ;
 ; *dest = (unsigned char)((*dest & ~(3 << shift)) | (plot_color << shift));
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 28
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 57
 	sta     sreg
 	stx     sreg+1
 	jsr     ldptr10sp
@@ -300,7 +499,7 @@ L0003:	jsr     stax0sp
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 29
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 58
 	jmp     incsp5
 
 	.dbg	line
@@ -329,18 +528,146 @@ L0003:	jsr     stax0sp
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 32
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 61
 	jsr     pusha
 ;
-; glyph = OS_CHARSET_BASE
+; if (plot_compact) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 40
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 69
 	jsr     decsp7
+	lda     _plot_compact
+	jeq     L0002
+;
+; glyph = &compact_font[atascii_to_compact_code(character)][0];
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 70
+	ldy     #$07
+	lda     (c_sp),y
+	jsr     _atascii_to_compact_code
+	jsr     mulax3
+	clc
+	adc     #<(_compact_font)
+	tay
+	txa
+	adc     #>(_compact_font)
+	tax
+	tya
+	ldy     #$05
+	jsr     staxysp
+;
+; for (row = 0; row < COMPACT_GLYPH_HEIGHT; ++row) {
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 71
+	lda     #$00
+	ldy     #$04
+L0024:	sta     (c_sp),y
+	cmp     #$06
+	jcs     L000F
+;
+; bits = glyph[row >> 1];
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 72
+	lda     (c_sp),y
+	lsr     a
+	clc
+	iny
+	adc     (c_sp),y
+	sta     ptr1
+	lda     #$00
+	iny
+	adc     (c_sp),y
+	sta     ptr1+1
+	ldy     #$00
+	lda     (ptr1),y
+	ldy     #$02
+	sta     (c_sp),y
+;
+; bits = row & 1 ? bits & 0x0F : bits >> 4;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 73
+	ldy     #$04
+	lda     (c_sp),y
+	and     #$01
+	beq     L0007
+	ldy     #$02
+	lda     (c_sp),y
+	and     #$0F
+	jmp     L002A
+L0007:	ldy     #$02
+	lda     (c_sp),y
+	lsr     a
+	lsr     a
+	lsr     a
+	lsr     a
+L002A:	sta     (c_sp),y
+;
+; for (column = 0; column < COMPACT_GLYPH_WIDTH; ++column) {
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 74
+	lda     #$00
+	iny
+L0023:	sta     (c_sp),y
+	cmp     #$04
+	bcs     L0005
+;
+; if (bits & (0x08 >> column))
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 75
+	dey
+	lda     (c_sp),y
+	sta     ptr1
+	iny
+	lda     (c_sp),y
+	tay
+	lda     #$08
+	ldx     #$00
+	jsr     asraxy
+	and     ptr1
+	pha
+	pla
+	beq     L000B
+;
+; plot_text_pixel((unsigned char)(x + column),
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 76
+	ldy     #$03
+	lda     (c_sp),y
+	clc
+	ldy     #$08
+	adc     (c_sp),y
+	jsr     pusha
+;
+; (unsigned char)(plot_y + row));
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 77
+	ldy     #$05
+	lda     (c_sp),y
+	clc
+	adc     _plot_y
+	jsr     _plot_text_pixel
+;
+; for (column = 0; column < COMPACT_GLYPH_WIDTH; ++column) {
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 74
+L000B:	ldy     #$03
+	clc
+	lda     #$01
+	adc     (c_sp),y
+	jmp     L0023
+;
+; for (row = 0; row < COMPACT_GLYPH_HEIGHT; ++row) {
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 71
+L0005:	iny
+	clc
+	lda     #$01
+	adc     (c_sp),y
+	jmp     L0024
 ;
 ; + (unsigned int)atascii_to_screen_code(character) * GLYPH_HEIGHT;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 41
-	ldy     #$07
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 84
+L0002:	ldy     #$07
 	lda     (c_sp),y
 	jsr     _atascii_to_screen_code
 	jsr     shlax3
@@ -358,16 +685,16 @@ L0003:	jsr     stax0sp
 ;
 ; for (row = 0; row < GLYPH_HEIGHT; ++row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 42
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 85
 	lda     #$00
 	ldy     #$04
-L0018:	sta     (c_sp),y
+L0028:	sta     (c_sp),y
 	cmp     #$08
-	jcs     L0003
+	jcs     L000F
 ;
 ; bits = glyph[row];
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 43
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 86
 	ldy     #$06
 	jsr     ldptr1ysp
 	ldy     #$04
@@ -379,16 +706,16 @@ L0018:	sta     (c_sp),y
 ;
 ; for (column = 0; column < GLYPH_WIDTH; ++column) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 44
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 87
 	lda     #$00
 	iny
-L0017:	sta     (c_sp),y
+L0027:	sta     (c_sp),y
 	cmp     #$08
-	jcs     L0004
+	jcs     L0010
 ;
 ; if (bits & (0x80 >> column)) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 45
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 88
 	dey
 	lda     (c_sp),y
 	sta     ptr1
@@ -401,29 +728,29 @@ L0017:	sta     (c_sp),y
 	and     ptr1
 	pha
 	pla
-	beq     L0008
+	beq     L0014
 ;
 ; for (scale_y = 0; scale_y < plot_size; ++scale_y) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 46
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 89
 	txa
 	tay
-L0016:	sta     (c_sp),y
+L0026:	sta     (c_sp),y
 	cmp     _plot_size
-	bcs     L0008
+	bcs     L0014
 ;
 ; for (scale_x = 0; scale_x < plot_size; ++scale_x) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 47
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 90
 	tya
 	iny
-L0015:	sta     (c_sp),y
+L0025:	sta     (c_sp),y
 	cmp     _plot_size
-	bcs     L000D
+	bcs     L0019
 ;
 ; plot_text_pixel((unsigned char)(x + column * plot_size + scale_x),
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 48
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 91
 	ldy     #$08
 	lda     (c_sp),y
 	jsr     pusha0
@@ -442,7 +769,7 @@ L0015:	sta     (c_sp),y
 ;
 ; (unsigned char)(plot_y + row * plot_size + scale_y));
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 49
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 92
 	lda     _plot_y
 	jsr     pusha0
 	ldy     #$07
@@ -460,44 +787,44 @@ L0015:	sta     (c_sp),y
 ;
 ; for (scale_x = 0; scale_x < plot_size; ++scale_x) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 47
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 90
 	ldy     #$01
 	clc
 	tya
 	adc     (c_sp),y
-	jmp     L0015
+	jmp     L0025
 ;
 ; for (scale_y = 0; scale_y < plot_size; ++scale_y) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 46
-L000D:	dey
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 89
+L0019:	dey
 	clc
 	lda     #$01
 	adc     (c_sp),y
-	jmp     L0016
+	jmp     L0026
 ;
 ; for (column = 0; column < GLYPH_WIDTH; ++column) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 44
-L0008:	ldy     #$03
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 87
+L0014:	ldy     #$03
 	clc
 	lda     #$01
 	adc     (c_sp),y
-	jmp     L0017
+	jmp     L0027
 ;
 ; for (row = 0; row < GLYPH_HEIGHT; ++row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 42
-L0004:	iny
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 85
+L0010:	iny
 	clc
 	lda     #$01
 	adc     (c_sp),y
-	jmp     L0018
+	jmp     L0028
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 55
-L0003:	ldy     #$09
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 98
+L000F:	ldy     #$09
 	jmp     addysp
 
 	.dbg	line
@@ -532,65 +859,98 @@ L0003:	ldy     #$09
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 61
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 104
 	jsr     pusha
 ;
 ; if (text == 0) return;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 70
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 113
 	jsr     decsp7
 	ldy     #$0C
 	lda     (c_sp),y
 	iny
 	ora     (c_sp),y
-	jeq     L0013
+	jeq     L0018
+;
+; plot_compact = size == TEXTPLOT_SIZE_HALF;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 114
+	ldy     #$09
+	lda     (c_sp),y
+	cmp     #$80
+	jsr     booleq
+	sta     _plot_compact
+;
+; if (plot_compact) size = 1;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 115
+	lda     _plot_compact
+	beq     L0023
+	lda     #$01
+	sta     (c_sp),y
 ;
 ; if (size == 0) size = 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 71
-	ldy     #$09
-	lda     (c_sp),y
-	bne     L001E
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 116
+L0023:	lda     (c_sp),y
+	bne     L0025
 	lda     #$01
 	sta     (c_sp),y
 ;
 ; if (size > VIEW_ROWS / GLYPH_HEIGHT) size = VIEW_ROWS / GLYPH_HEIGHT;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 72
-L001E:	lda     (c_sp),y
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 117
+L0025:	lda     (c_sp),y
 	cmp     #$0C
-	bcc     L0020
+	bcc     L0027
 	lda     #$0B
 	sta     (c_sp),y
 ;
 ; plot_size = size;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 73
-L0020:	lda     (c_sp),y
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 118
+L0027:	lda     (c_sp),y
 	sta     _plot_size
 ;
-; char_width = GLYPH_WIDTH * plot_size;
+; char_width = plot_compact ? COMPACT_GLYPH_WIDTH
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 74
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 119
+	lda     _plot_compact
+	beq     L0028
+;
+; : GLYPH_WIDTH * plot_size;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 120
+	lda     #$04
+	jmp     L0029
+L0028:	lda     _plot_size
 	asl     a
 	asl     a
 	asl     a
-	ldy     #$02
+L0029:	ldy     #$02
 	sta     (c_sp),y
 ;
-; height = GLYPH_HEIGHT * plot_size;
+; height = plot_compact ? COMPACT_GLYPH_HEIGHT
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 75
-	lda     _plot_size
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 121
+	lda     _plot_compact
+	beq     L002A
+;
+; : GLYPH_HEIGHT * plot_size;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 122
+	lda     #$06
+	jmp     L002B
+L002A:	lda     _plot_size
 	asl     a
 	asl     a
 	asl     a
-	ldy     #$00
+L002B:	ldy     #$00
 	sta     (c_sp),y
 ;
 ; max_chars = area_width / char_width;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 76
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 123
 	ldy     #$07
 	lda     (c_sp),y
 	jsr     pusha0
@@ -602,7 +962,7 @@ L0020:	lda     (c_sp),y
 ;
 ; plot_y = y > VIEW_ROWS - height ? VIEW_ROWS - height : y;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 77
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 124
 	ldy     #$0B
 	lda     (c_sp),y
 	jsr     pusha0
@@ -610,23 +970,23 @@ L0020:	lda     (c_sp),y
 	sec
 	ldy     #$02
 	sbc     (c_sp),y
-	bcs     L0016
+	bcs     L001B
 	dex
-L0016:	jsr     tosicmp
-	bmi     L0006
-	beq     L0006
+L001B:	jsr     tosicmp
+	bmi     L000B
+	beq     L000B
 	lda     #$5C
 	sec
 	ldy     #$00
 	sbc     (c_sp),y
-	jmp     L0021
-L0006:	ldy     #$0B
+	jmp     L002C
+L000B:	ldy     #$0B
 	lda     (c_sp),y
-L0021:	sta     _plot_y
+L002C:	sta     _plot_y
 ;
 ; plot_color = color & 3;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 78
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 125
 	ldy     #$0A
 	lda     (c_sp),y
 	and     #$03
@@ -634,36 +994,36 @@ L0021:	sta     _plot_y
 ;
 ; length = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 80
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 127
 	lda     #$00
 	ldy     #$06
 ;
 ; while (text[length] != '\0' && length < max_chars) ++length;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 81
-	jmp     L001A
-L0008:	ldy     #$06
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 128
+	jmp     L001F
+L000D:	ldy     #$06
 	clc
 	lda     #$01
 	adc     (c_sp),y
-L001A:	sta     (c_sp),y
+L001F:	sta     (c_sp),y
 	ldy     #$0D
 	jsr     ldptr1ysp
 	ldy     #$06
 	lda     (c_sp),y
 	tay
 	lda     (ptr1),y
-	beq     L0019
+	beq     L001E
 	ldy     #$06
 	lda     (c_sp),y
 	ldy     #$01
 	cmp     (c_sp),y
-	bcc     L0008
+	bcc     L000D
 ;
 ; width = (unsigned char)(length * char_width);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 82
-L0019:	ldy     #$06
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 129
+L001E:	ldy     #$06
 	lda     (c_sp),y
 	jsr     pusha0
 	ldy     #$04
@@ -674,15 +1034,15 @@ L0019:	ldy     #$06
 ;
 ; if (alignment == TEXTPLOT_ALIGN_RIGHT) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 84
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 131
 	ldy     #$0E
 	lda     (c_sp),y
 	cmp     #$02
-	bne     L0026
+	bne     L0031
 ;
 ; x = area_x + area_width - width;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 85
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 132
 	ldy     #$07
 	lda     (c_sp),y
 	clc
@@ -694,15 +1054,15 @@ L0019:	ldy     #$06
 ;
 ; } else if (alignment == TEXTPLOT_ALIGN_CENTER) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 86
-	jmp     L0027
-L0026:	lda     (c_sp),y
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 133
+	jmp     L0032
+L0031:	lda     (c_sp),y
 	cmp     #$01
-	bne     L0010
+	bne     L0015
 ;
 ; x = area_x + (area_width - width) / 2;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 87
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 134
 	ldy     #$08
 	lda     (c_sp),y
 	jsr     pusha0
@@ -711,39 +1071,39 @@ L0026:	lda     (c_sp),y
 	sec
 	ldy     #$05
 	sbc     (c_sp),y
-	bcs     L0017
+	bcs     L001C
 	dex
-L0017:	jsr     pushax
+L001C:	jsr     pushax
 	lda     #$02
 	jsr     tosdiva0
 	jsr     tosaddax
 ;
 ; } else {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 88
-	jmp     L0027
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 135
+	jmp     L0032
 ;
 ; x = area_x;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 89
-L0010:	ldy     #$08
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 136
+L0015:	ldy     #$08
 	lda     (c_sp),y
-L0027:	ldy     #$05
+L0032:	ldy     #$05
 	sta     (c_sp),y
 ;
 ; for (index = 0; index < length; ++index) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 92
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 139
 	lda     #$00
 	dey
-L001C:	sta     (c_sp),y
+L0021:	sta     (c_sp),y
 	ldy     #$06
 	cmp     (c_sp),y
-	bcs     L0013
+	bcs     L0018
 ;
 ; draw_character(x, (unsigned char)text[index]);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 93
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 140
 	dey
 	lda     (c_sp),y
 	jsr     pusha
@@ -757,7 +1117,7 @@ L001C:	sta     (c_sp),y
 ;
 ; x += char_width;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 94
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 141
 	ldy     #$02
 	lda     (c_sp),y
 	ldy     #$05
@@ -767,17 +1127,17 @@ L001C:	sta     (c_sp),y
 ;
 ; for (index = 0; index < length; ++index) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 92
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 139
 	dey
 	clc
 	lda     #$01
 	adc     (c_sp),y
-	jmp     L001C
+	jmp     L0021
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 96
-L0013:	ldy     #$0F
+	.dbg	line, "C:\Users\Alex\Chased3D\textplot.c", 143
+L0018:	ldy     #$0F
 	jmp     addysp
 
 	.dbg	line

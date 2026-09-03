@@ -30,6 +30,7 @@
 #define PROJ_X 121                      /* (view width / 2) / tan(FOV / 2) */
 
 #define MAX_TARGETS 24
+#define MAX_LASERS 4
 #define RANGE_44 192                    /* 12 cells, in 1/16 cell units */
 #define COLLECT_RADIUS 160              /* 0.625 cell, in 8.8 world units */
 #define TARGET_COLOR 0x1E               /* bright yellow */
@@ -73,11 +74,12 @@ static const unsigned char laser_sprite[16] = {
 
 #pragma rodata-name (pop)
 
+#pragma bss-name (push, "AUXBSS")
 static unsigned int exit_px;
 static unsigned int exit_py;
-static unsigned int laser_px;
-static unsigned int laser_py;
-static unsigned char laser_found;
+static unsigned int laser_px[MAX_LASERS];
+static unsigned int laser_py[MAX_LASERS];
+static unsigned char laser_count;
 
 static unsigned int target_px[MAX_TARGETS];
 static unsigned int target_py[MAX_TARGETS];
@@ -100,6 +102,7 @@ static unsigned char player_clear_top[PMG_PLAYERS];
 static unsigned char player_clear_height[PMG_PLAYERS];
 static unsigned char decoy_clear_top;
 static unsigned char decoy_clear_height;
+#pragma bss-name (pop)
 
 static void draw_billboard(unsigned char player, unsigned char sx,
                            unsigned char top, unsigned char height,
@@ -155,47 +158,32 @@ void sprite3d_build_targets(void)
     targets_left = target_count;
 }
 
-/* Reservoir sampling chooses a new tile without storing a candidate list. */
+/* Reservoir sampling chooses a uniform subset without storing every laser
+ * tile in the level. */
 void sprite3d_build_laser(unsigned int avoid_x, unsigned int avoid_y)
 {
     unsigned char row;
     unsigned char col;
-    unsigned char count;
-    unsigned char fallback_col;
-    unsigned char fallback_row;
-    unsigned char fallback_found;
-    unsigned char old_col;
-    unsigned char old_row;
+    unsigned char seen;
+    unsigned char slot;
 
-    old_col = (unsigned char)(laser_px >> 8);
-    old_row = (unsigned char)(laser_py >> 8);
-    count = 0;
-    fallback_found = 0;
+    seen = 0;
+    laser_count = 0;
     for (row = 0; row < MAZE_H; ++row) {
         for (col = 0; col < MAZE_W; ++col) {
             if (maze_map[row][col] != 6) continue;
-            if (!fallback_found) {
-                fallback_col = col;
-                fallback_row = row;
-                fallback_found = 1;
-            }
-            if (laser_found && col == old_col && row == old_row) continue;
             if (col == (unsigned char)(avoid_x >> 8)
                 && row == (unsigned char)(avoid_y >> 8)) continue;
-            ++count;
-            if ((unsigned int)rand() % count != 0) continue;
-            laser_px = ((unsigned int)col << 8) | 0x80;
-            laser_py = ((unsigned int)row << 8) | 0x80;
+            ++seen;
+            if (laser_count < MAX_LASERS) {
+                slot = laser_count++;
+            } else {
+                slot = (unsigned char)((unsigned int)rand() % seen);
+                if (slot >= MAX_LASERS) continue;
+            }
+            laser_px[slot] = ((unsigned int)col << 8) | 0x80;
+            laser_py[slot] = ((unsigned int)row << 8) | 0x80;
         }
-    }
-    if (count != 0) {
-        laser_found = 1;
-    } else if (fallback_found) {
-        laser_px = ((unsigned int)fallback_col << 8) | 0x80;
-        laser_py = ((unsigned int)fallback_row << 8) | 0x80;
-        laser_found = 1;
-    } else {
-        laser_found = 0;
     }
 }
 
@@ -253,16 +241,19 @@ unsigned char sprite3d_collect(unsigned int px, unsigned int py)
 
 unsigned char sprite3d_hit_laser(unsigned int px, unsigned int py)
 {
+    unsigned char i;
     int dx;
     int dy;
 
-    if (!laser_found) return 0;
-    dx = (int)laser_px - (int)px;
-    if (dx < 0) dx = -dx;
-    if (dx >= COLLECT_RADIUS) return 0;
-    dy = (int)laser_py - (int)py;
-    if (dy < 0) dy = -dy;
-    return dy < COLLECT_RADIUS;
+    for (i = 0; i < laser_count; ++i) {
+        dx = (int)laser_px[i] - (int)px;
+        if (dx < 0) dx = -dx;
+        if (dx >= COLLECT_RADIUS) continue;
+        dy = (int)laser_py[i] - (int)py;
+        if (dy < 0) dy = -dy;
+        if (dy < COLLECT_RADIUS) return 1;
+    }
+    return 0;
 }
 
 static void clear_player(unsigned char player)
@@ -471,14 +462,24 @@ void sprite3d_draw_targets(unsigned int px, unsigned int py, unsigned int angle)
 {
     unsigned char i;
     unsigned char first_player;
+    unsigned char laser_visible;
     unsigned char used;
 
     cand_count = 0;
     first_player = 1;
-
-    if (laser_found && project_object(px, py, angle, laser_px, laser_py)) {
+    laser_visible = 0;
+    for (i = 0; i < laser_count; ++i) {
+        if (!project_object(px, py, angle, laser_px[i], laser_py[i])) continue;
+        if (laser_visible && projected_dist >= cand_dist[0]) continue;
+        cand_dist[0] = projected_dist;
+        cand_x[0] = projected_x;
+        cand_top[0] = projected_top;
+        cand_height[0] = projected_height;
+        laser_visible = 1;
+    }
+    if (laser_visible) {
         *(volatile unsigned char *)(PCOLR0 + 1) = LASER_COLOR;
-        draw_billboard(1, projected_x, projected_top, projected_height,
+        draw_billboard(1, cand_x[0], cand_top[0], cand_height[0],
                        laser_sprite, 16);
         first_player = 2;
     } else {

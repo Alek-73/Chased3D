@@ -1,5 +1,5 @@
 param(
-    [string]$SourcePath = (Join-Path $PSScriptRoot "image (1).png"),
+    [string]$SourcePath = (Join-Path $PSScriptRoot "chased_splash.bmp"),
     [string]$OutputPath = (Join-Path $PSScriptRoot "SPLASH.BMP")
 )
 

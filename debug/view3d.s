@@ -10,7 +10,7 @@
 	.importzp	c_sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
-	.dbg		file, "C:\Users\Alex\Chased3D\view3d.c", 14873, 1788301383
+	.dbg		file, "C:\Users\Alex\Chased3D\view3d.c", 14731, 1788473348
 	.dbg		file, "C:\tools\cc65\include/atari.h", 22152, 1786840064
 	.dbg		file, "C:\tools\cc65\include/_atarios.h", 40084, 1786840064
 	.dbg		file, "C:\tools\cc65\include/_gtia.h", 13839, 1786840064
@@ -20,8 +20,8 @@
 	.dbg		file, "C:\tools\cc65\include/_antic.h", 11827, 1786840064
 	.dbg		file, "C:\Users\Alex\Chased3D/maze.h", 550, 1787868964
 	.dbg		file, "C:\Users\Alex\Chased3D/trig3d.h", 333, 1787781160
-	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1299, 1788211929
-	.dbg		file, "C:\Users\Alex\Chased3D/build_number.h", 136, 1788301656
+	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1410, 1788473348
+	.dbg		file, "C:\Users\Alex\Chased3D/build_number.h", 136, 1788473352
 	.dbg		sym, "ray_offset", "00", extern, "_ray_offset"
 	.dbg		sym, "cos_rel", "00", extern, "_cos_rel"
 	.dbg		sym, "col3d_x", "00", extern, "_col3d_x"
@@ -167,7 +167,7 @@ _floor_rotation:
 ;
 ; for (addr = 0; addr < VIEW_STRIDE * VIEW_ROWS; ++addr)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 433
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 425
 	jsr     decsp4
 	ldx     #$00
 	txa
@@ -184,7 +184,7 @@ L0006:	bcs     L0003
 ;
 ; view_buffer[addr] = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 434
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 426
 	ldy     #$03
 	jsr     ldaxysp
 	clc
@@ -199,7 +199,7 @@ L0006:	bcs     L0003
 ;
 ; for (addr = 0; addr < VIEW_STRIDE * VIEW_ROWS; ++addr)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 433
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 425
 	ldy     #$02
 	tax
 	lda     #$01
@@ -208,7 +208,7 @@ L0006:	bcs     L0003
 ;
 ; for (i = 0; i < sizeof(hud_line); ++i) hud_line[i] = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 436
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 428
 L0003:	lda     #$00
 	ldy     #$01
 L0027:	sta     (c_sp),y
@@ -226,31 +226,31 @@ L0027:	sta     (c_sp),y
 ;
 ; hud_line[16] = HUD_CHAR('B');
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 438
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 430
 L0029:	lda     #$62
 	sta     _hud_line+16
 ;
 ; hud_line[17] = HUD_DIGIT(BUILD_DIGIT_100);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 439
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 431
 	lda     #$90
 	sta     _hud_line+17
 ;
 ; hud_line[18] = HUD_DIGIT(BUILD_DIGIT_10);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 440
-	lda     #$95
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 432
+	lda     #$97
 	sta     _hud_line+18
 ;
 ; hud_line[19] = HUD_DIGIT(BUILD_DIGIT_1);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 441
-	lda     #$94
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 433
+	lda     #$99
 	sta     _hud_line+19
 ;
 ; for (addr = 0; addr < HEIGHT_STEPS; ++addr) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 444
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 436
 	ldx     #$00
 	txa
 	iny
@@ -266,7 +266,7 @@ L0010:	bcs     L000D
 ;
 ; n = (addr <= (DIST_MIN >> 4))
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 445
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 437
 	ldy     #$03
 	lda     (c_sp),y
 	cmp     #$00
@@ -277,12 +277,12 @@ L0010:	bcs     L000D
 ;
 ; ? VIEW_ROWS
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 446
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 438
 L0011:	bcs     L0012
 ;
 ; : (unsigned char)(WALL_SCALE / (addr << 4) > VIEW_ROWS
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 447
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 439
 	lda     #$5C
 	jmp     L002A
 L0012:	ldx     #$5C
@@ -295,7 +295,7 @@ L0012:	ldx     #$5C
 ;
 ; ? VIEW_ROWS
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 448
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 440
 	cmp     #$5D
 	txa
 	sbc     #$00
@@ -303,7 +303,7 @@ L0012:	ldx     #$5C
 ;
 ; : WALL_SCALE / (addr << 4));
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 449
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 441
 	lda     #$5C
 	jmp     L002A
 L0014:	ldx     #$5C
@@ -318,7 +318,7 @@ L002A:	ldy     #$00
 ;
 ; height_table[addr] = n;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 450
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 442
 	ldy     #$03
 	jsr     ldaxysp
 	clc
@@ -333,7 +333,7 @@ L002A:	ldy     #$00
 ;
 ; for (addr = 0; addr < HEIGHT_STEPS; ++addr) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 444
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 436
 	ldy     #$02
 	ldx     #$00
 	lda     #$01
@@ -342,7 +342,7 @@ L002A:	ldy     #$00
 ;
 ; addr = (unsigned int)view_buffer;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 453
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 445
 L000D:	lda     #<(_view_buffer)
 	ldx     #>(_view_buffer)
 	ldy     #$02
@@ -350,14 +350,14 @@ L000D:	lda     #<(_view_buffer)
 ;
 ; n = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 454
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 446
 	lda     #$00
 	tay
 	sta     (c_sp),y
 ;
 ; view_dlist[n++] = 0x70;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 455
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 447
 	lda     #$70
 	sta     _view_dlist,y
 	clc
@@ -367,7 +367,7 @@ L000D:	lda     #<(_view_buffer)
 ;
 ; view_dlist[n++] = 0x70;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 456
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 448
 	tay
 	lda     #$70
 	sta     _view_dlist,y
@@ -379,7 +379,7 @@ L000D:	lda     #<(_view_buffer)
 ;
 ; view_dlist[n++] = 0x70;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 457
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 449
 	tay
 	lda     #$70
 	sta     _view_dlist,y
@@ -391,7 +391,7 @@ L000D:	lda     #<(_view_buffer)
 ;
 ; view_dlist[n++] = 0x4D;                        /* mode D + load memory scan */
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 458
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 450
 	tay
 	lda     #$4D
 	sta     _view_dlist,y
@@ -403,7 +403,7 @@ L000D:	lda     #<(_view_buffer)
 ;
 ; view_dlist[n++] = (unsigned char)addr;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 459
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 451
 	tax
 	ldy     #$02
 	lda     (c_sp),y
@@ -416,7 +416,7 @@ L000D:	lda     #<(_view_buffer)
 ;
 ; view_dlist[n++] = (unsigned char)(addr >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 460
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 452
 	lda     #<(_view_dlist)
 	ldx     #>(_view_dlist)
 	clc
@@ -436,7 +436,7 @@ L001B:	sta     ptr1
 ;
 ; for (i = 1; i < VIEW_ROWS; ++i) view_dlist[n++] = 0x0D;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 461
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 453
 	lda     #$01
 	iny
 L0028:	sta     (c_sp),y
@@ -460,7 +460,7 @@ L0028:	sta     (c_sp),y
 ;
 ; addr = (unsigned int)hud_line;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 462
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 454
 L001D:	lda     #<(_hud_line)
 	ldx     #>(_hud_line)
 	iny
@@ -468,7 +468,7 @@ L001D:	lda     #<(_hud_line)
 ;
 ; view_dlist[n++] = 0x46;                        /* mode 6 text + load memory scan */
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 463
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 455
 	ldy     #$00
 	lda     (c_sp),y
 	tay
@@ -482,7 +482,7 @@ L001D:	lda     #<(_hud_line)
 ;
 ; view_dlist[n++] = (unsigned char)addr;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 464
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 456
 	tax
 	ldy     #$02
 	lda     (c_sp),y
@@ -495,7 +495,7 @@ L001D:	lda     #<(_hud_line)
 ;
 ; view_dlist[n++] = (unsigned char)(addr >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 465
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 457
 	lda     #<(_view_dlist)
 	ldx     #>(_view_dlist)
 	clc
@@ -515,7 +515,7 @@ L0023:	sta     ptr1
 ;
 ; addr = (unsigned int)view_dlist;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 466
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 458
 	lda     #<(_view_dlist)
 	ldx     #>(_view_dlist)
 	ldy     #$02
@@ -523,7 +523,7 @@ L0023:	sta     ptr1
 ;
 ; view_dlist[n++] = 0x41;                        /* jump and wait for vblank */
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 467
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 459
 	ldy     #$00
 	lda     (c_sp),y
 	tay
@@ -537,7 +537,7 @@ L0023:	sta     ptr1
 ;
 ; view_dlist[n++] = (unsigned char)addr;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 468
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 460
 	tax
 	ldy     #$02
 	lda     (c_sp),y
@@ -550,7 +550,7 @@ L0023:	sta     ptr1
 ;
 ; view_dlist[n++] = (unsigned char)(addr >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 469
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 461
 	lda     #<(_view_dlist)
 	ldx     #>(_view_dlist)
 	clc
@@ -570,31 +570,31 @@ L0026:	sta     ptr1
 ;
 ; COLOR0 = COLOR_FLOOR;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 471
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 463
 	lda     #$28
 	sta     $02C4
 ;
 ; COLOR1 = COLOR_WALL_Y;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 472
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 464
 	lda     #$06
 	sta     $02C5
 ;
 ; COLOR2 = COLOR_WALL_X;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 473
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 465
 	lda     #$0A
 	sta     $02C6
 ;
 ; COLOR4 = COLOR_CEILING;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 474
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 466
 	lda     #$92
 	sta     $02C8
 ;
 ; OS.sdlst = view_dlist;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 476
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 468
 	lda     #>(_view_dlist)
 	sta     $0230+1
 	lda     #<(_view_dlist)
@@ -602,39 +602,39 @@ L0026:	sta     ptr1
 ;
 ; OS.sdmctl = 0x22;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 477
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 469
 	lda     #$22
 	sta     $022F
 ;
 ; ANTIC.dmactl = 0x22;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 478
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 470
 	sta     $D400
 ;
 ; floor_phase = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 479
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 471
 	tya
 	sta     _floor_phase
 ;
 ; floor_rotation = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 480
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 472
 	sta     _floor_rotation
 ;
 ; set_floor_dlis();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 481
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 473
 	jsr     _set_floor_dlis
 ;
 ; floor_dli_install();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 482
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 474
 	jsr     _floor_dli_install
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 483
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 475
 	jmp     incsp4
 
 	.dbg	line
@@ -659,12 +659,12 @@ L0026:	sta     ptr1
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 192
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 190
 	jsr     pushax
 ;
 ; for (col = 0; col < VIEW_COLS; ++col) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 195
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 193
 	jsr     decsp1
 	lda     #$00
 	tay
@@ -674,7 +674,7 @@ L0007:	sta     (c_sp),y
 ;
 ; cast_column(col, angle + (unsigned int)ray_offset[col], px, py);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 196
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 194
 	lda     (c_sp),y
 	jsr     pusha
 	ldx     #$00
@@ -709,7 +709,7 @@ L0008:	adc     #<(_ray_offset)
 ;
 ; for (col = 0; col < VIEW_COLS; ++col) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 195
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 193
 	ldy     #$00
 	clc
 	lda     #$01
@@ -718,7 +718,7 @@ L0008:	adc     #<(_ray_offset)
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 198
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 196
 L0003:	jmp     incsp7
 
 	.dbg	line
@@ -740,12 +740,12 @@ L0003:	jmp     incsp7
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 215
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 213
 	jsr     pusha
 ;
 ; if (direction > 0) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 216
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 214
 	ldy     #$00
 	lda     (c_sp),y
 	sec
@@ -756,7 +756,7 @@ L0004:	bpl     L000E
 ;
 ; if (++floor_phase >= FLOOR_BAND_ROWS) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 217
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 215
 	inc     _floor_phase
 	lda     _floor_phase
 	cmp     #$07
@@ -764,17 +764,17 @@ L0004:	bpl     L000E
 ;
 ; floor_phase = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 218
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 216
 	sty     _floor_phase
 ;
 ; floor_rotation = floor_rotation == 0
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 219
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 217
 	lda     _floor_rotation
 ;
 ; ? FLOOR_BANDS - 1 : (unsigned char)(floor_rotation - 1);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 220
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 218
 	bne     L000C
 	lda     #$05
 	jmp     L000D
@@ -785,29 +785,29 @@ L000D:	sta     _floor_rotation
 ;
 ; floor_dli_set_rotation(floor_rotation);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 221
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 219
 	jsr     _floor_dli_set_rotation
 ;
 ; } else {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 223
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 221
 	jmp     L000B
 ;
 ; if (floor_phase == 0) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 224
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 222
 L000E:	lda     _floor_phase
 	bne     L0010
 ;
 ; floor_phase = FLOOR_BAND_ROWS - 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 225
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 223
 	lda     #$06
 	sta     _floor_phase
 ;
 ; if (++floor_rotation >= FLOOR_BANDS) floor_rotation = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 226
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 224
 	inc     _floor_rotation
 	lda     _floor_rotation
 	cmp     #$06
@@ -816,28 +816,28 @@ L000E:	lda     _floor_phase
 ;
 ; floor_dli_set_rotation(floor_rotation);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 227
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 225
 L000F:	lda     _floor_rotation
 	jsr     _floor_dli_set_rotation
 ;
 ; } else {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 228
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 226
 	jmp     L000B
 ;
 ; --floor_phase;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 229
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 227
 L0010:	dec     _floor_phase
 ;
 ; set_floor_dlis();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 232
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 230
 L000B:	jsr     _set_floor_dlis
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 233
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 231
 	jmp     incsp1
 
 	.dbg	line
@@ -859,19 +859,19 @@ L000B:	jsr     _set_floor_dlis
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 421
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 413
 	jsr     pushax
 ;
 ; dist >>= 4;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 422
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 414
 	jsr     ldax0sp
 	jsr     shrax4
 	jsr     stax0sp
 ;
 ; if (dist >= HEIGHT_STEPS) dist = HEIGHT_STEPS - 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 423
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 415
 	cmp     #$90
 	txa
 	sbc     #$01
@@ -882,7 +882,7 @@ L000B:	jsr     _set_floor_dlis
 ;
 ; return height_table[dist];
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 424
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 416
 L0002:	jsr     ldax0sp
 	sta     ptr1
 	txa
@@ -895,7 +895,7 @@ L0002:	jsr     ldax0sp
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 425
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 417
 	jmp     incsp2
 
 	.dbg	line
@@ -919,7 +919,7 @@ L0002:	jsr     ldax0sp
 ;
 ; for (row = 0; row < MAZE_H; ++row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 242
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 240
 	jsr     decsp3
 	lda     #$00
 	ldy     #$02
@@ -929,7 +929,7 @@ L0014:	sta     (c_sp),y
 ;
 ; for (byte = 0; byte < MINI_BYTES; ++byte) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 243
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 241
 	lda     #$00
 	tay
 L0012:	sta     (c_sp),y
@@ -938,7 +938,7 @@ L0012:	sta     (c_sp),y
 ;
 ; minimap_bits[row][byte] = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 244
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 242
 	ldy     #$02
 	ldx     #$00
 	lda     (c_sp),y
@@ -963,7 +963,7 @@ L0010:	sta     ptr1
 ;
 ; for (byte = 0; byte < MINI_BYTES; ++byte) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 243
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 241
 	clc
 	lda     #$01
 	adc     (c_sp),y
@@ -971,7 +971,7 @@ L0010:	sta     ptr1
 ;
 ; for (col = 0; col < MAZE_W; ++col) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 246
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 244
 L0015:	tya
 	iny
 L0013:	sta     (c_sp),y
@@ -980,7 +980,7 @@ L0013:	sta     (c_sp),y
 ;
 ; if (maze_solid(col, row)) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 247
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 245
 	lda     (c_sp),y
 	jsr     pusha
 	ldy     #$03
@@ -991,7 +991,7 @@ L0013:	sta     (c_sp),y
 ;
 ; minimap_bits[row][col >> 2] |=
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 248
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 246
 	ldy     #$02
 	ldx     #$00
 	lda     (c_sp),y
@@ -1014,7 +1014,7 @@ L0013:	sta     (c_sp),y
 ;
 ; (unsigned char)(0x02 << (6 - ((col & 3) << 1)));
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 249
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 247
 L0011:	jsr     pushax
 	sta     ptr1
 	stx     ptr1+1
@@ -1039,7 +1039,7 @@ L000F:	jsr     tossubax
 ;
 ; for (col = 0; col < MAZE_W; ++col) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 246
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 244
 L000C:	ldy     #$01
 	clc
 	tya
@@ -1048,7 +1048,7 @@ L000C:	ldy     #$01
 ;
 ; for (row = 0; row < MAZE_H; ++row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 242
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 240
 L0004:	iny
 	clc
 	lda     #$01
@@ -1057,7 +1057,7 @@ L0004:	iny
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 253
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 251
 L0003:	jmp     incsp3
 
 	.dbg	line
@@ -1081,7 +1081,7 @@ L0003:	jmp     incsp3
 ;
 ; dest = view_buffer;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 262
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 260
 	jsr     decsp4
 	lda     #<(_view_buffer)
 	ldx     #>(_view_buffer)
@@ -1090,7 +1090,7 @@ L0003:	jmp     incsp3
 ;
 ; for (row = 0; row < MAZE_H; ++row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 263
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 261
 	lda     #$00
 	ldy     #$01
 L000B:	sta     (c_sp),y
@@ -1099,7 +1099,7 @@ L000B:	sta     (c_sp),y
 ;
 ; for (byte = 0; byte < MINI_BYTES; ++byte) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 264
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 262
 	lda     #$00
 	dey
 L000A:	sta     (c_sp),y
@@ -1108,7 +1108,7 @@ L000A:	sta     (c_sp),y
 ;
 ; dest[byte] = minimap_bits[row][byte];
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 265
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 263
 	lda     (c_sp),y
 	clc
 	ldy     #$02
@@ -1137,7 +1137,7 @@ L000A:	sta     (c_sp),y
 ;
 ; for (byte = 0; byte < MINI_BYTES; ++byte) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 264
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 262
 	clc
 	lda     #$01
 	adc     (c_sp),y
@@ -1145,7 +1145,7 @@ L000A:	sta     (c_sp),y
 ;
 ; dest += VIEW_STRIDE;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 267
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 265
 L0007:	ldy     #$02
 	ldx     #$00
 	lda     #$28
@@ -1153,7 +1153,7 @@ L0007:	ldy     #$02
 ;
 ; for (row = 0; row < MAZE_H; ++row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 263
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 261
 	ldy     #$01
 	clc
 	tya
@@ -1162,7 +1162,7 @@ L0007:	ldy     #$02
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 269
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 267
 L0003:	jmp     incsp4
 
 	.dbg	line
@@ -1191,31 +1191,31 @@ L0003:	jmp     incsp4
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 296
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 294
 	jsr     pushax
 ;
 ; minimap_restore_row(marker_row);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 301
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 299
 	jsr     decsp3
 	lda     _marker_row
 	jsr     _minimap_restore_row
 ;
 ; minimap_restore_row(nose_row);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 302
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 300
 	lda     _nose_row
 	jsr     _minimap_restore_row
 ;
 ; minimap_restore_row(pursuer_row);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 303
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 301
 	lda     _pursuer_row
 	jsr     _minimap_restore_row
 ;
 ; col = (unsigned char)(px >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 305
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 303
 	ldy     #$0C
 	lda     (c_sp),y
 	ldy     #$02
@@ -1223,7 +1223,7 @@ L0003:	jmp     incsp4
 ;
 ; row = (unsigned char)(py >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 306
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 304
 	ldy     #$0A
 	lda     (c_sp),y
 	ldy     #$01
@@ -1231,7 +1231,7 @@ L0003:	jmp     incsp4
 ;
 ; facing = (unsigned char)(((((unsigned int)(angle >> 8)) + 16) >> 5) & 7);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 307
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 305
 	ldy     #$08
 	ldx     #$00
 	lda     (c_sp),y
@@ -1245,7 +1245,7 @@ L0003:	jmp     incsp4
 ;
 ; nose_row = (unsigned char)(row + dir_dy[facing]);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 309
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 307
 	lda     #<(_dir_dy)
 	ldx     #>(_dir_dy)
 	clc
@@ -1260,7 +1260,7 @@ L0006:	jsr     ldaidx
 ;
 ; minimap_plot((unsigned char)(col + dir_dx[facing]), nose_row, 0x01);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 310
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 308
 	lda     #<(_dir_dx)
 	ldx     #>(_dir_dx)
 	clc
@@ -1280,7 +1280,7 @@ L0007:	jsr     ldaidx
 ;
 ; minimap_plot(col, row, 0x03);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 311
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 309
 	ldy     #$02
 	lda     (c_sp),y
 	jsr     pusha
@@ -1292,21 +1292,21 @@ L0007:	jsr     ldaidx
 ;
 ; marker_row = row;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 312
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 310
 	ldy     #$01
 	lda     (c_sp),y
 	sta     _marker_row
 ;
 ; pursuer_row = (unsigned char)(pursuer_y >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 314
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 312
 	ldy     #$04
 	lda     (c_sp),y
 	sta     _pursuer_row
 ;
 ; minimap_plot((unsigned char)(pursuer_x >> 8), pursuer_row, 0x01);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 315
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 313
 	ldy     #$06
 	lda     (c_sp),y
 	jsr     pusha
@@ -1317,7 +1317,7 @@ L0007:	jsr     ldaidx
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 316
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 314
 	ldy     #$0D
 	jmp     addysp
 
@@ -1340,12 +1340,12 @@ L0007:	jsr     ldaidx
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 326
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 325
 	jsr     pusha
 ;
 ; if (fps > 99) fps = 99;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 328
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 326
 	ldy     #$00
 	lda     (c_sp),y
 	cmp     #$64
@@ -1355,25 +1355,25 @@ L0007:	jsr     ldaidx
 ;
 ; hud_line[0] = HUD_CHAR('F');
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 329
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 327
 L0003:	lda     #$66
 	sta     _hud_line
 ;
 ; hud_line[1] = HUD_CHAR('P');
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 330
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 328
 	lda     #$70
 	sta     _hud_line+1
 ;
 ; hud_line[2] = HUD_CHAR('S');
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 331
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 329
 	lda     #$73
 	sta     _hud_line+2
 ;
 ; hud_line[4] = HUD_DIGIT(fps / 10);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 332
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 330
 	lda     (c_sp),y
 	jsr     pusha0
 	lda     #$0A
@@ -1385,7 +1385,7 @@ L0003:	lda     #$66
 ;
 ; hud_line[5] = HUD_DIGIT(fps % 10);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 333
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 331
 	ldx     #$00
 	lda     (c_sp,x)
 	jsr     pusha0
@@ -1398,7 +1398,7 @@ L0003:	lda     #$66
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 337
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 332
 	jmp     incsp1
 
 	.dbg	line
@@ -1420,12 +1420,12 @@ L0003:	lda     #$66
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 340
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 335
 	jsr     pusha
 ;
 ; if (remaining > 99) remaining = 99;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 342
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 336
 	ldy     #$00
 	lda     (c_sp),y
 	cmp     #$64
@@ -1435,25 +1435,25 @@ L0003:	lda     #$66
 ;
 ; hud_line[10] = HUD_CHAR('T');
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 343
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 337
 L0003:	lda     #$74
 	sta     _hud_line+10
 ;
 ; hud_line[11] = HUD_CHAR('G');
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 344
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 338
 	lda     #$67
 	sta     _hud_line+11
 ;
 ; hud_line[12] = HUD_CHAR('T');
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 345
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 339
 	lda     #$74
 	sta     _hud_line+12
 ;
 ; hud_line[14] = HUD_DIGIT(remaining / 10);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 346
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 340
 	lda     (c_sp),y
 	jsr     pusha0
 	lda     #$0A
@@ -1465,7 +1465,7 @@ L0003:	lda     #$74
 ;
 ; hud_line[15] = HUD_DIGIT(remaining % 10);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 347
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 341
 	ldx     #$00
 	lda     (c_sp,x)
 	jsr     pusha0
@@ -1478,7 +1478,7 @@ L0003:	lda     #$74
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 351
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 342
 	jmp     incsp1
 
 	.dbg	line
@@ -1503,12 +1503,12 @@ L0003:	lda     #$74
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 369
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 361
 	jsr     pushax
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 391
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 383
 	jmp     incsp6
 
 	.dbg	line
@@ -1537,12 +1537,12 @@ L0003:	lda     #$74
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 394
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 386
 	jsr     pusha
 ;
 ; filled = maximum == 0 ? DECOY_BAR_INNER_WIDTH
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 402
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 394
 	jsr     decsp7
 	ldy     #$07
 	lda     (c_sp),y
@@ -1550,7 +1550,7 @@ L0003:	lda     #$74
 ;
 ; : (unsigned char)(((unsigned int)progress * DECOY_BAR_INNER_WIDTH) / maximum);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 403
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 395
 	lda     #$12
 	jmp     L0018
 L0002:	iny
@@ -1567,7 +1567,7 @@ L0018:	ldy     #$06
 ;
 ; if (filled > DECOY_BAR_INNER_WIDTH) filled = DECOY_BAR_INNER_WIDTH;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 404
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 396
 	cmp     #$13
 	lda     #$00
 	bcc     L001A
@@ -1576,7 +1576,7 @@ L0018:	ldy     #$06
 ;
 ; for (row = 0; row < DECOY_BAR_HEIGHT; ++row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 406
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 398
 	lda     #$00
 L001A:	ldy     #$04
 L0016:	sta     (c_sp),y
@@ -1585,7 +1585,7 @@ L0016:	sta     (c_sp),y
 ;
 ; dest = view_buffer + (unsigned int)(DECOY_BAR_TOP + row) * VIEW_STRIDE;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 407
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 399
 	ldx     #$00
 	lda     (c_sp),y
 	ldy     #$3D
@@ -1604,7 +1604,7 @@ L0016:	sta     (c_sp),y
 ;
 ; for (col = 0; col < MAZE_W; ++col) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 408
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 400
 	lda     #$00
 	ldy     #$05
 L0015:	sta     (c_sp),y
@@ -1613,7 +1613,7 @@ L0015:	sta     (c_sp),y
 ;
 ; if (row == 0 || row == DECOY_BAR_HEIGHT - 1 || col == 0 || col == MAZE_W - 1)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 409
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 401
 	dey
 	lda     (c_sp),y
 	beq     L001B
@@ -1627,17 +1627,17 @@ L0015:	sta     (c_sp),y
 ;
 ; value = 2;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 410
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 402
 L001B:	lda     #$02
 ;
 ; else
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 411
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 403
 	jmp     L0020
 ;
 ; value = col <= filled ? 3 : 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 412
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 404
 L001D:	lda     (c_sp),y
 	iny
 	cmp     (c_sp),y
@@ -1651,7 +1651,7 @@ L0020:	ldy     #$03
 ;
 ; shift = (unsigned char)(6 - ((col & 3) << 1));
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 413
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 405
 	lda     #$06
 	jsr     pusha0
 	ldy     #$07
@@ -1666,7 +1666,7 @@ L0013:	jsr     tossubax
 ;
 ; dest[col >> 2] = (unsigned char)(
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 414
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 406
 	ldx     #$00
 	ldy     #$05
 	lda     (c_sp),y
@@ -1683,7 +1683,7 @@ L0013:	jsr     tossubax
 ;
 ; (dest[col >> 2] & ~(0x03 << shift)) | (value << shift));
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 415
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 407
 	ldy     #$05
 	lda     (c_sp),y
 	lsr     a
@@ -1721,7 +1721,7 @@ L0013:	jsr     tossubax
 ;
 ; for (col = 0; col < MAZE_W; ++col) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 408
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 400
 	ldy     #$05
 	clc
 	lda     #$01
@@ -1730,7 +1730,7 @@ L0013:	jsr     tossubax
 ;
 ; for (row = 0; row < DECOY_BAR_HEIGHT; ++row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 406
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 398
 L0007:	dey
 	clc
 	lda     #$01
@@ -1739,7 +1739,7 @@ L0007:	dey
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 418
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 410
 L0006:	ldy     #$09
 	jmp     addysp
 
@@ -1762,53 +1762,53 @@ L0006:	ldy     #$09
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 101
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 99
 	jsr     pusha
 ;
 ; col3d_x = x;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 102
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 100
 	ldy     #$00
 	lda     (c_sp),y
 	sta     _col3d_x
 ;
 ; col3d_row = HORIZON;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 103
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 101
 	lda     #$2E
 	sta     _col3d_row
 ;
 ; col3d_color = PIX_FLOOR;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 104
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 102
 	lda     #$55
 	sta     _col3d_color
 ;
 ; col3d_fill_down();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 105
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 103
 	jsr     _col3d_fill_down
 ;
 ; col3d_row = HORIZON - 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 106
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 104
 	lda     #$2D
 	sta     _col3d_row
 ;
 ; col3d_color = PIX_CEILING;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 107
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 105
 	lda     #$00
 	sta     _col3d_color
 ;
 ; col3d_fill_up();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 108
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 106
 	jsr     _col3d_fill_up
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 109
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 107
 	jmp     incsp1
 
 	.dbg	line
@@ -1831,12 +1831,12 @@ L0006:	ldy     #$09
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 112
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 110
 	jsr     pusha
 ;
 ; x = (unsigned char)(MINI_BYTES + (col << 1));
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 115
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 113
 	jsr     decsp1
 	ldy     #$01
 	lda     (c_sp),y
@@ -1848,12 +1848,12 @@ L0006:	ldy     #$09
 ;
 ; draw_open_byte(x);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 116
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 114
 	jsr     _draw_open_byte
 ;
 ; if (x + 1 < VIEW_STRIDE) draw_open_byte(x + 1);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 117
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 115
 	ldy     #$00
 	ldx     #$00
 	lda     (c_sp),y
@@ -1871,7 +1871,7 @@ L0003:	bpl     L0002
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 118
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 116
 L0002:	jmp     incsp2
 
 	.dbg	line
@@ -1896,26 +1896,26 @@ L0002:	jmp     incsp2
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 122
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 120
 	jsr     pusha
 ;
 ; col3d_x = x;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 123
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 121
 	ldy     #$03
 	lda     (c_sp),y
 	sta     _col3d_x
 ;
 ; col3d_row = top;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 124
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 122
 	dey
 	lda     (c_sp),y
 	sta     _col3d_row
 ;
 ; col3d_end = bottom + 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 125
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 123
 	dey
 	lda     (c_sp),y
 	clc
@@ -1924,19 +1924,19 @@ L0002:	jmp     incsp2
 ;
 ; col3d_color = wall;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 126
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 124
 	dey
 	lda     (c_sp),y
 	sta     _col3d_color
 ;
 ; col3d_fill_span();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 127
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 125
 	jsr     _col3d_fill_span
 ;
 ; if (bottom < VIEW_ROWS - 1) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 128
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 126
 	ldy     #$01
 	lda     (c_sp),y
 	cmp     #$5B
@@ -1944,50 +1944,50 @@ L0002:	jmp     incsp2
 ;
 ; col3d_row = bottom + 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 129
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 127
 	clc
 	adc     #$01
 	sta     _col3d_row
 ;
 ; col3d_color = PIX_FLOOR;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 130
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 128
 	lda     #$55
 	sta     _col3d_color
 ;
 ; col3d_fill_down();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 131
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 129
 	jsr     _col3d_fill_down
 ;
 ; if (top > 0) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 133
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 131
 L0002:	ldy     #$02
 	lda     (c_sp),y
 	beq     L0003
 ;
 ; col3d_row = top - 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 134
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 132
 	sec
 	sbc     #$01
 	sta     _col3d_row
 ;
 ; col3d_color = PIX_CEILING;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 135
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 133
 	lda     #$00
 	sta     _col3d_color
 ;
 ; col3d_fill_up();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 136
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 134
 	jsr     _col3d_fill_up
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 138
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 136
 L0003:	jmp     incsp4
 
 	.dbg	line
@@ -2013,12 +2013,12 @@ L0003:	jmp     incsp4
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 142
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 140
 	jsr     pusha
 ;
 ; x = (unsigned char)(MINI_BYTES + (col << 1));
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 145
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 143
 	jsr     decsp1
 	ldy     #$04
 	lda     (c_sp),y
@@ -2030,7 +2030,7 @@ L0003:	jmp     incsp4
 ;
 ; draw_wall_byte(x, top, bottom, wall);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 146
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 144
 	jsr     pusha
 	ldy     #$04
 	lda     (c_sp),y
@@ -2044,7 +2044,7 @@ L0003:	jmp     incsp4
 ;
 ; if (x + 1 < VIEW_STRIDE) draw_wall_byte(x + 1, top, bottom, wall);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 147
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 145
 	ldy     #$00
 	ldx     #$00
 	lda     (c_sp),y
@@ -2071,7 +2071,7 @@ L0003:	bpl     L0002
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 148
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 146
 L0002:	jmp     incsp5
 
 	.dbg	line
@@ -2096,12 +2096,12 @@ L0002:	jmp     incsp5
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 152
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 150
 	jsr     pushax
 ;
 ; ray_setup_angle = ray_angle;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 153
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 151
 	ldy     #$05
 	jsr     ldaxysp
 	sta     _ray_setup_angle
@@ -2109,7 +2109,7 @@ L0002:	jmp     incsp5
 ;
 ; ray_setup_px = px;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 154
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 152
 	ldy     #$03
 	jsr     ldaxysp
 	sta     _ray_setup_px
@@ -2117,25 +2117,25 @@ L0002:	jmp     incsp5
 ;
 ; ray_setup_py = py;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 155
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 153
 	jsr     ldax0sp
 	sta     _ray_setup_py
 	stx     _ray_setup_py+1
 ;
 ; ray_setup_and_cast();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 156
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 154
 	jsr     _ray_setup_and_cast
 ;
 ; if (!dda_hit) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 158
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 156
 	lda     _dda_hit
 	bne     L0002
 ;
 ; col_dist[col] = 0xFFFFu;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 159
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 157
 	ldy     #$06
 	tax
 	lda     (c_sp),y
@@ -2156,25 +2156,25 @@ L000D:	adc     #<(_col_dist)
 ;
 ; draw_open_column(col);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 160
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 158
 	ldy     #$06
 	lda     (c_sp),y
 	jsr     _draw_open_column
 ;
 ; return;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 161
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 159
 	jmp     incsp7
 ;
 ; if (dda_side == 0) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 164
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 162
 L0002:	lda     _dda_side
 	bne     L0003
 ;
 ; ray_dist = dda_side_x - dda_delta_x;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 165
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 163
 	lda     _dda_side_x
 	sec
 	sbc     _dda_delta_x
@@ -2185,17 +2185,17 @@ L0002:	lda     _dda_side
 ;
 ; ray_wall = PIX_WALL_X;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 166
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 164
 	lda     #$FF
 ;
 ; } else {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 167
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 165
 	jmp     L000B
 ;
 ; ray_dist = dda_side_y - dda_delta_y;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 168
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 166
 L0003:	lda     _dda_side_y
 	sec
 	sbc     _dda_delta_y
@@ -2206,13 +2206,13 @@ L0003:	lda     _dda_side_y
 ;
 ; ray_wall = PIX_WALL_Y;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 169
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 167
 	lda     #$AA
 L000B:	sta     _ray_wall
 ;
 ; ray_mag = cos_rel[col];
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 172
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 170
 	ldy     #$06
 	ldx     #$00
 	lda     (c_sp),y
@@ -2232,7 +2232,7 @@ L000E:	adc     #<(_cos_rel)
 ;
 ; ray_dist = ((ray_dist >> 8) * ray_mag)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 173
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 171
 	lda     _ray_dist+1
 	jsr     pusha0
 	lda     _ray_mag
@@ -2241,7 +2241,7 @@ L000E:	adc     #<(_cos_rel)
 ;
 ; + (((ray_dist & 0x00FFu) * ray_mag) >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 174
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 172
 	jsr     pushax
 	lda     _ray_dist
 	jsr     pusha0
@@ -2255,7 +2255,7 @@ L000E:	adc     #<(_cos_rel)
 ;
 ; col_dist[col] = ray_dist;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 175
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 173
 	ldy     #$06
 	ldx     #$00
 	lda     (c_sp),y
@@ -2277,7 +2277,7 @@ L000F:	adc     #<(_col_dist)
 ;
 ; ray_dist >>= 4;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 177
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 175
 	lda     _ray_dist
 	ldx     _ray_dist+1
 	jsr     shrax4
@@ -2286,7 +2286,7 @@ L000F:	adc     #<(_col_dist)
 ;
 ; if (ray_dist >= HEIGHT_STEPS) ray_dist = HEIGHT_STEPS - 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 178
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 176
 	cmp     #$90
 	txa
 	sbc     #$01
@@ -2298,7 +2298,7 @@ L000F:	adc     #<(_col_dist)
 ;
 ; ray_height = height_table[ray_dist];
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 179
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 177
 L0005:	lda     _ray_dist
 	sta     ptr1
 	lda     _ray_dist+1
@@ -2313,7 +2313,7 @@ L0005:	lda     _ray_dist
 ;
 ; if (ray_height >= VIEW_ROWS) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 181
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 179
 	cmp     #$5C
 	txa
 	sbc     #$00
@@ -2321,22 +2321,22 @@ L0005:	lda     _ray_dist
 ;
 ; ray_top = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 182
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 180
 	stx     _ray_top
 ;
 ; ray_bottom = VIEW_ROWS - 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 183
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 181
 	lda     #$5B
 ;
 ; } else {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 184
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 182
 	jmp     L000C
 ;
 ; ray_top = (unsigned char)((VIEW_ROWS - ray_height) >> 1);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 185
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 183
 L0010:	lda     #$5C
 	sec
 	sbc     _ray_height
@@ -2350,7 +2350,7 @@ L0010:	lda     #$5C
 ;
 ; ray_bottom = (unsigned char)(ray_top + ray_height - 1);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 186
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 184
 	clc
 	adc     _ray_height
 	sec
@@ -2359,7 +2359,7 @@ L000C:	sta     _ray_bottom
 ;
 ; draw_wall_column(col, ray_top, ray_bottom, ray_wall);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 188
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 186
 	ldy     #$06
 	lda     (c_sp),y
 	jsr     pusha
@@ -2372,7 +2372,7 @@ L000C:	sta     _ray_bottom
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 189
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 187
 	jmp     incsp7
 
 	.dbg	line
@@ -2395,7 +2395,7 @@ L000C:	sta     _ray_bottom
 ;
 ; for (row = HORIZON - 1; row < VIEW_ROWS; ++row)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 205
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 203
 	jsr     decsp2
 	lda     #$2D
 	ldy     #$00
@@ -2405,7 +2405,7 @@ L000A:	sta     (c_sp),y
 ;
 ; view_dlist[5 + row] &= 0x7F;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 206
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 204
 	ldx     #$00
 	lda     (c_sp),y
 	jsr     incax5
@@ -2422,7 +2422,7 @@ L000A:	sta     (c_sp),y
 ;
 ; for (row = HORIZON - 1; row < VIEW_ROWS; ++row)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 205
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 203
 	clc
 	lda     #$01
 	adc     (c_sp),y
@@ -2430,7 +2430,7 @@ L000A:	sta     (c_sp),y
 ;
 ; for (i = 0; i < FLOOR_BANDS; ++i) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 207
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 205
 L000C:	tya
 	iny
 L000B:	sta     (c_sp),y
@@ -2439,7 +2439,7 @@ L000B:	sta     (c_sp),y
 ;
 ; row = (unsigned char)(HORIZON + floor_phase + i * FLOOR_BAND_ROWS);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 208
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 206
 	ldx     #$00
 	lda     _floor_phase
 	ldy     #$2E
@@ -2461,7 +2461,7 @@ L000B:	sta     (c_sp),y
 ;
 ; view_dlist[5 + row - 1] |= 0x80;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 209
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 207
 	ldx     #$00
 	lda     (c_sp),y
 	jsr     incax4
@@ -2478,7 +2478,7 @@ L000B:	sta     (c_sp),y
 ;
 ; for (i = 0; i < FLOOR_BANDS; ++i) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 207
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 205
 	iny
 	clc
 	tya
@@ -2487,14 +2487,14 @@ L000B:	sta     (c_sp),y
 ;
 ; view_dlist[5 + VIEW_ROWS - 1] |= 0x80;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 211
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 209
 L000D:	lda     _view_dlist+96
 	ora     #$80
 	sta     _view_dlist+96
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 212
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 210
 	jmp     incsp2
 
 	.dbg	line
@@ -2518,12 +2518,12 @@ L000D:	lda     _view_dlist+96
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 272
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 270
 	jsr     pusha
 ;
 ; if (row >= MAZE_H) return;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 276
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 274
 	jsr     decsp3
 	ldy     #$03
 	lda     (c_sp),y
@@ -2532,7 +2532,7 @@ L000D:	lda     _view_dlist+96
 ;
 ; dest = view_buffer + (unsigned int)row * VIEW_STRIDE;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 277
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 275
 	lda     (c_sp),y
 	jsr     pusha0
 	lda     #$28
@@ -2549,7 +2549,7 @@ L000D:	lda     _view_dlist+96
 ;
 ; for (byte = 0; byte < MINI_BYTES; ++byte) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 278
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 276
 	lda     #$00
 	tay
 L0007:	sta     (c_sp),y
@@ -2558,7 +2558,7 @@ L0007:	sta     (c_sp),y
 ;
 ; dest[byte] = minimap_bits[row][byte];
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 279
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 277
 	lda     (c_sp),y
 	clc
 	iny
@@ -2587,7 +2587,7 @@ L0007:	sta     (c_sp),y
 ;
 ; for (byte = 0; byte < MINI_BYTES; ++byte) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 278
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 276
 	clc
 	lda     #$01
 	adc     (c_sp),y
@@ -2595,7 +2595,7 @@ L0007:	sta     (c_sp),y
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 281
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 279
 L0004:	jmp     incsp4
 
 	.dbg	line
@@ -2621,12 +2621,12 @@ L0004:	jmp     incsp4
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 284
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 282
 	jsr     pusha
 ;
 ; if (col >= MAZE_W || row >= MAZE_H) return;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 288
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 286
 	jsr     decsp3
 	ldy     #$05
 	lda     (c_sp),y
@@ -2639,7 +2639,7 @@ L0004:	jmp     incsp4
 ;
 ; shift = (unsigned char)(6 - ((col & 3) << 1));
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 289
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 287
 	lda     #$06
 	jsr     pusha0
 	ldy     #$07
@@ -2654,7 +2654,7 @@ L0005:	jsr     tossubax
 ;
 ; dest = view_buffer + (unsigned int)row * VIEW_STRIDE + (col >> 2);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 290
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 288
 	ldy     #$04
 	lda     (c_sp),y
 	jsr     pusha0
@@ -2680,7 +2680,7 @@ L0006:	ldy     #$01
 ;
 ; *dest = (unsigned char)((*dest & ~(0x03 << shift)) | (value << shift));
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 291
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 289
 	sta     ptr2
 	stx     ptr2+1
 	ldy     #$02
@@ -2710,7 +2710,7 @@ L0006:	ldy     #$01
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 292
+	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 290
 L0001:	jmp     incsp6
 
 	.dbg	line

@@ -40,8 +40,6 @@ unsigned int col_dist[VIEW_COLS];
  * It owns the left 5 screen bytes; the 3D view starts after it so that the
  * raycaster never overwrites the map. */
 #define MINI_BYTES 5
-#define DECOY_BAR_TOP (MAZE_H + 2)
-#define DECOY_BAR_HEIGHT 6
 #define DECOY_BAR_INNER_WIDTH (MAZE_W - 2)
 
 extern unsigned char col3d_x;
@@ -89,7 +87,6 @@ static unsigned char minimap_bits[MAZE_H][MINI_BYTES];
 
 static unsigned char marker_row = 0xFF;
 static unsigned char nose_row = 0xFF;
-static unsigned char pursuer_row = 0xFF;
 static unsigned char floor_phase;
 static unsigned char floor_rotation;
 
@@ -291,8 +288,7 @@ static void minimap_plot(unsigned char col, unsigned char row, unsigned char val
     *dest = (unsigned char)((*dest & ~(0x03 << shift)) | (value << shift));
 }
 
-void minimap_update(unsigned int px, unsigned int py, unsigned int angle,
-                    unsigned int pursuer_x, unsigned int pursuer_y)
+void minimap_update(unsigned int px, unsigned int py, unsigned int angle)
 {
     unsigned char col;
     unsigned char row;
@@ -300,7 +296,6 @@ void minimap_update(unsigned int px, unsigned int py, unsigned int angle,
 
     minimap_restore_row(marker_row);
     minimap_restore_row(nose_row);
-    minimap_restore_row(pursuer_row);
 
     col = (unsigned char)(px >> 8);
     row = (unsigned char)(py >> 8);
@@ -310,9 +305,6 @@ void minimap_update(unsigned int px, unsigned int py, unsigned int angle,
     minimap_plot((unsigned char)(col + dir_dx[facing]), nose_row, 0x01);
     minimap_plot(col, row, 0x03);
     marker_row = row;
-
-    pursuer_row = (unsigned char)(pursuer_y >> 8);
-    minimap_plot((unsigned char)(pursuer_x >> 8), pursuer_row, 0x01);
 }
 
 /* ANTIC mode 6 uses internal character codes, not ATASCII; bits 6-7 select
@@ -322,33 +314,27 @@ void minimap_update(unsigned int px, unsigned int py, unsigned int angle,
 #define HUD_CHAR(character) ((unsigned char)(((character) - 32) | HUD_LABEL_COLOR))
 #define HUD_DIGIT(digit) ((unsigned char)((16 + (digit)) | HUD_NUMBER_COLOR))
 
+#ifdef DEBUG_HUD
 void hud_set_fps(unsigned char fps)
 {
-#ifdef DEBUG_HUD
     if (fps > 99) fps = 99;
     hud_line[0] = HUD_CHAR('F');
     hud_line[1] = HUD_CHAR('P');
     hud_line[2] = HUD_CHAR('S');
     hud_line[4] = HUD_DIGIT(fps / 10);
     hud_line[5] = HUD_DIGIT(fps % 10);
-#else
-    (void)fps;
-#endif
 }
 
 void hud_set_targets(unsigned char remaining)
 {
-#ifdef DEBUG_HUD
     if (remaining > 99) remaining = 99;
     hud_line[10] = HUD_CHAR('T');
     hud_line[11] = HUD_CHAR('G');
     hud_line[12] = HUD_CHAR('T');
     hud_line[14] = HUD_DIGIT(remaining / 10);
     hud_line[15] = HUD_DIGIT(remaining % 10);
-#else
-    (void)remaining;
-#endif
 }
+#endif
 
 #ifndef DEBUG_HUD
 static void hud_set_number5(unsigned char offset, unsigned int value)

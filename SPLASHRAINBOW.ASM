@@ -8,6 +8,7 @@ COLPF2 = $D018
 STRIG0 = $D010
 CONSOL = $D01F
 CH     = $02FC
+ATRACT = $4D
 SDMCTL = $022F
 DMACTL = $D400
 
@@ -32,6 +33,8 @@ _splash_screen_rainbow:
         sta CH
 
 rainbow_loop:
+        lda #$00
+        sta ATRACT
         lda VCOUNT
         clc
         adc rainbow_phase

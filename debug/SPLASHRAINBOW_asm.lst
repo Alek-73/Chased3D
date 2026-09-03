@@ -12,6 +12,7 @@ Current file: C:\Users\Alex\Chased3D\SPLASHRAINBOW.ASM
 000000r 1               STRIG0 = $D010
 000000r 1               CONSOL = $D01F
 000000r 1               CH     = $02FC
+000000r 1               ATRACT = $4D
 000000r 1               SDMCTL = $022F
 000000r 1               DMACTL = $D400
 000000r 1               
@@ -36,33 +37,35 @@ Current file: C:\Users\Alex\Chased3D\SPLASHRAINBOW.ASM
 000008r 1  8D FC 02             sta CH
 00000Br 1               
 00000Br 1               rainbow_loop:
-00000Br 1  AD 0B D4             lda VCOUNT
-00000Er 1  18                   clc
-00000Fr 1  65 rr                adc rainbow_phase
-000011r 1  8D 0A D4             sta WSYNC
-000014r 1  8D 18 D0             sta COLPF2
-000017r 1               
-000017r 1  E6 rr                inc rainbow_delay
-000019r 1  D0 02                bne rainbow_input
-00001Br 1  E6 rr                inc rainbow_phase
-00001Dr 1               
-00001Dr 1               rainbow_input:
-00001Dr 1  AD 10 D0             lda STRIG0
-000020r 1  F0 0E                beq rainbow_done
-000022r 1  AD 1F D0             lda CONSOL
-000025r 1  29 01                and #$01
-000027r 1  F0 07                beq rainbow_done
-000029r 1  AD FC 02             lda CH
-00002Cr 1  C9 FF                cmp #$FF
-00002Er 1  F0 DB                beq rainbow_loop
-000030r 1               
-000030r 1               rainbow_done:
-000030r 1  A9 FF                lda #$FF
-000032r 1  8D FC 02             sta CH
-000035r 1  A9 1E                lda #STATIC_TITLE
-000037r 1  8D 18 D0             sta COLPF2
-00003Ar 1  A9 00                lda #$00
-00003Cr 1  8D 2F 02             sta SDMCTL
-00003Fr 1  8D 00 D4             sta DMACTL
-000042r 1  60                   rts
-000042r 1               
+00000Br 1  A9 00                lda #$00
+00000Dr 1  85 4D                sta ATRACT
+00000Fr 1  AD 0B D4             lda VCOUNT
+000012r 1  18                   clc
+000013r 1  65 rr                adc rainbow_phase
+000015r 1  8D 0A D4             sta WSYNC
+000018r 1  8D 18 D0             sta COLPF2
+00001Br 1               
+00001Br 1  E6 rr                inc rainbow_delay
+00001Dr 1  D0 02                bne rainbow_input
+00001Fr 1  E6 rr                inc rainbow_phase
+000021r 1               
+000021r 1               rainbow_input:
+000021r 1  AD 10 D0             lda STRIG0
+000024r 1  F0 0E                beq rainbow_done
+000026r 1  AD 1F D0             lda CONSOL
+000029r 1  29 01                and #$01
+00002Br 1  F0 07                beq rainbow_done
+00002Dr 1  AD FC 02             lda CH
+000030r 1  C9 FF                cmp #$FF
+000032r 1  F0 D7                beq rainbow_loop
+000034r 1               
+000034r 1               rainbow_done:
+000034r 1  A9 FF                lda #$FF
+000036r 1  8D FC 02             sta CH
+000039r 1  A9 1E                lda #STATIC_TITLE
+00003Br 1  8D 18 D0             sta COLPF2
+00003Er 1  A9 00                lda #$00
+000040r 1  8D 2F 02             sta SDMCTL
+000043r 1  8D 00 D4             sta DMACTL
+000046r 1  60                   rts
+000046r 1               
