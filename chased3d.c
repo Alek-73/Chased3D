@@ -27,7 +27,7 @@
 #define PURSUER_PER_TICK 12
 #define PURSUER_STUCK_TICKS 200
 #define THREAT_DISTANCE 4096
-#define DECOY_CAPTURE_TICKS 40
+#define DECOY_CAPTURE_TICKS 250
 #define DECOY_RECHARGE_TICKS 200
 #define DECOY_ACTIVE_TICKS 500
 #define LASER_SECONDS 5
@@ -52,7 +52,7 @@ extern unsigned char startup_memtop[2];
  * followed by the loading tune while the next level is prepared. */
 #define LEVEL_CLEAR_MELODY "C12C14E18B08C14A14G18F14E18D18E14D14C14P01"
 #define LEVEL_LOAD_MELODY "C14C14E14C18F18C18E18C14D14P04"
-#define GAME_OVER_MELODY LEVEL_LOAD_MELODY
+#define GAME_OVER_MELODY "E24D24C24B14A14G14E14C18P04"
 #define VICTORY_MELODY "C14C14C14C24C24C24B18A18G18F18E18D18C12"
 #define DECOY_DEPLOY_MELODY "C21G21C22"
 #define DECOY_TRAPPED_MELODY "G11D11G02"
@@ -421,6 +421,7 @@ static void start_new_game(void)
 #endif
     start_life();
     update_game_hud();
+    melody_play(LEVEL_LOAD_MELODY);
 }
 
 static unsigned char restart_pressed(void)
@@ -439,11 +440,10 @@ static void show_end_screen(const char *message, unsigned char size,
     textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER, message, 2, 1, size);
     textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER, "Press Space or Fire",
                               20, 1, TEXTPLOT_SIZE_HALF);
-    melody_play(melody);
+    if (melody) melody_play(melody);
 
     while (restart_pressed()) wait_frame();
     while (!restart_pressed()) wait_frame();
-    while (restart_pressed()) wait_frame();
 }
 
 static void game_over(void)

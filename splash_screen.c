@@ -93,7 +93,7 @@ void splash_screen_show(void)
                               SPLASH_REVISION, 35, 3, TEXTPLOT_SIZE_HALF);
     splash_build_dlist();
 
-    COLOR0 = 0x3A;
+    COLOR0 = 0x8A;
     COLOR1 = 0xCA;
     COLOR2 = 0x1E;
     COLOR3 = 0x00;

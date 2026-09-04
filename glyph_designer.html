@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Glyph Lab</title>
+  <meta name="description" content="Pixel glyph and sprite byte editor for Atari 8-bit development.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f3f0e7;
+      --ink: #171a19;
+      --muted: #68706c;
+      --line: #c7cbc5;
+      --panel: #fffdf7;
+      --screen: #151918;
+      --pixel: #55d6be;
+      --pixel-shadow: #1b8e82;
+      --coral: #ea684f;
+      --yellow: #e1b83e;
+      --focus: #167c71;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image:
+        linear-gradient(rgb(23 26 25 / 4%) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(23 26 25 / 4%) 1px, transparent 1px);
+      background-size: 20px 20px;
+      font-family: "Space Grotesk", sans-serif;
+    }
+
+    button, select, textarea, input { font: inherit; }
+    button { color: inherit; }
+
+    .app {
+      width: min(1280px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 32px;
+    }
+
+    header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 10px 0 20px;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .brand { display: flex; align-items: center; gap: 14px; }
+
+    .brand-mark {
+      display: grid;
+      grid-template-columns: repeat(3, 8px);
+      gap: 3px;
+      padding: 9px;
+      background: var(--screen);
+    }
+
+    .brand-mark span { width: 8px; height: 8px; background: var(--pixel); }
+    .brand-mark span:nth-child(2), .brand-mark span:nth-child(4) { background: transparent; }
+    .brand-mark span:nth-child(6) { background: var(--coral); }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.55rem, 3vw, 2.35rem);
+      line-height: 1;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .subtitle, .readout, label, .hint {
+      font-family: "IBM Plex Mono", monospace;
+    }
+
+    .subtitle { margin-top: 5px; color: var(--muted); font-size: 0.75rem; }
+    .readout { color: var(--muted); font-size: 0.72rem; white-space: nowrap; }
+
+    .size-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px 0;
+    }
+
+    .segmented { display: inline-flex; border: 1px solid var(--ink); background: var(--panel); }
+
+    .segmented button {
+      min-width: 74px;
+      padding: 9px 14px;
+      border: 0;
+      border-right: 1px solid var(--ink);
+      background: transparent;
+      cursor: pointer;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .segmented button:last-child { border-right: 0; }
+    .segmented button[aria-pressed="true"] { color: #071210; background: var(--pixel); }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 72px minmax(340px, 1fr) minmax(330px, 0.85fr);
+      min-height: 610px;
+      border: 2px solid var(--ink);
+      background: var(--panel);
+      box-shadow: 10px 10px 0 rgb(23 26 25 / 12%);
+    }
+
+    .tools {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 14px 10px;
+      border-right: 1px solid var(--line);
+      background: #e8e7df;
+    }
+
+    .tool-button {
+      width: 50px;
+      height: 44px;
+      flex: 0 0 50px;
+      border: 1px solid transparent;
+      background: transparent;
+      cursor: pointer;
+      font: 600 0.7rem "IBM Plex Mono", monospace;
+      white-space: nowrap;
+    }
+
+    .tool-button:hover { border-color: var(--ink); background: var(--panel); }
+    .tool-button[aria-pressed="true"] { color: white; background: var(--ink); }
+    .tool-divider { height: 1px; margin: 4px 0; background: var(--line); }
+    .tool-button .icon { display: block; font-size: 1.15rem; line-height: 1; margin-bottom: 4px; }
+
+    .editor {
+      display: grid;
+      place-items: center;
+      min-width: 0;
+      padding: 34px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 42%, rgb(85 214 190 / 10%), transparent 45%),
+        var(--screen);
+    }
+
+    .pixel-grid {
+      --cols: 8;
+      --rows: 8;
+      display: grid;
+      grid-template-columns: repeat(var(--cols), 1fr);
+      gap: 2px;
+      width: min(100%, calc(var(--cols) * 34px));
+      aspect-ratio: var(--cols) / var(--rows);
+      touch-action: none;
+      user-select: none;
+    }
+
+    .pixel {
+      min-width: 0;
+      min-height: 0;
+      padding: 0;
+      border: 1px solid #3a4441;
+      border-radius: 1px;
+      background: #202725;
+      cursor: crosshair;
+    }
+
+    .pixel:hover { border-color: #8e9d98; }
+    .pixel.on {
+      border-color: #80ead7;
+      background: var(--pixel);
+      box-shadow: inset 0 -4px 0 var(--pixel-shadow);
+    }
+
+    .output-panel {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      border-left: 1px solid var(--line);
+    }
+
+    .panel-section { padding: 20px; border-bottom: 1px solid var(--line); }
+    .panel-section:last-child { border-bottom: 0; }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    h2 { margin: 0; font-size: 0.95rem; letter-spacing: 0; text-transform: uppercase; }
+
+    select, textarea {
+      width: 100%;
+      border: 1px solid var(--ink);
+      border-radius: 0;
+      background: #f9f7ef;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.78rem;
+    }
+
+    select { width: auto; padding: 7px 30px 7px 9px; }
+    textarea { min-height: 188px; padding: 12px; resize: vertical; line-height: 1.55; }
+    #importInput { min-height: 82px; }
+
+    .button-row { display: flex; gap: 8px; margin-top: 10px; }
+
+    .command {
+      padding: 9px 13px;
+      border: 1px solid var(--ink);
+      background: var(--panel);
+      cursor: pointer;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .command.primary { color: #071210; background: var(--pixel); }
+    .command:hover { box-shadow: 3px 3px 0 var(--ink); transform: translate(-1px, -1px); }
+    .command:active { box-shadow: none; transform: none; }
+
+    .byte-strip {
+      display: grid;
+      grid-template-columns: repeat(var(--byte-cols, 1), minmax(0, 1fr));
+      gap: 5px;
+      margin-top: 14px;
+    }
+
+    .byte-chip {
+      padding: 5px 2px;
+      color: var(--pixel);
+      background: var(--screen);
+      text-align: center;
+      font: 500 0.68rem "IBM Plex Mono", monospace;
+    }
+
+    .hint { margin: 10px 0 0; color: var(--muted); font-size: 0.68rem; }
+    .status { color: var(--focus); font-weight: 600; }
+
+    button:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid var(--yellow);
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 900px) {
+      .workspace { grid-template-columns: 64px minmax(0, 1fr); }
+      .output-panel { grid-column: 1 / -1; border-top: 1px solid var(--line); border-left: 0; }
+      .editor { min-height: 500px; }
+      .tools { grid-row: 1; }
+    }
+
+    @media (max-width: 560px) {
+      .app { width: min(100% - 18px, 1280px); padding-top: 10px; }
+      header { align-items: start; }
+      .readout { display: none; }
+      .size-bar { align-items: stretch; flex-direction: column; }
+      .segmented { width: 100%; }
+      .segmented button { min-width: 0; flex: 1; padding-inline: 5px; }
+      .workspace { grid-template-columns: 1fr; }
+      .tools {
+        grid-row: auto;
+        flex-direction: row;
+        overflow-x: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .tool-divider { width: 1px; height: 44px; margin: 0 4px; flex: 0 0 auto; }
+      .editor { min-height: 420px; padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <span></span><span></span><span></span>
+          <span></span><span></span><span></span>
+          <span></span><span></span><span></span>
+        </div>
+        <div>
+          <h1>Glyph Lab</h1>
+          <div class="subtitle">Atari sprite byte workshop</div>
+        </div>
+      </div>
+      <div class="readout" id="readout">8 × 8 · 8 bytes</div>
+    </header>
+
+    <section class="size-bar" aria-label="Glyph dimensions">
+      <div class="segmented" id="sizeSelector">
+        <button type="button" data-width="8" data-height="8" aria-pressed="true">8 × 8</button>
+        <button type="button" data-width="8" data-height="16" aria-pressed="false">8 × 16</button>
+        <button type="button" data-width="16" data-height="8" aria-pressed="false">16 × 8</button>
+        <button type="button" data-width="16" data-height="16" aria-pressed="false">16 × 16</button>
+      </div>
+      <div class="readout">MSB LEFT · ROW MAJOR · 1 BPP</div>
+    </section>
+
+    <section class="workspace">
+      <nav class="tools" aria-label="Drawing tools">
+        <button class="tool-button" id="drawTool" type="button" aria-pressed="true" title="Draw pixels">
+          <span class="icon">✎</span>DRAW
+        </button>
+        <button class="tool-button" id="eraseTool" type="button" aria-pressed="false" title="Erase pixels">
+          <span class="icon">◇</span>ERASE
+        </button>
+        <div class="tool-divider"></div>
+        <button class="tool-button" id="undoButton" type="button" title="Undo">
+          <span class="icon">↶</span>UNDO
+        </button>
+        <button class="tool-button" id="clearButton" type="button" title="Clear glyph">
+          <span class="icon">×</span>CLEAR
+        </button>
+        <button class="tool-button" id="invertButton" type="button" title="Invert pixels">
+          <span class="icon">◐</span>INV
+        </button>
+        <div class="tool-divider"></div>
+        <button class="tool-button" id="flipHButton" type="button" title="Flip horizontally">
+          <span class="icon">↔</span>FLIP H
+        </button>
+        <button class="tool-button" id="flipVButton" type="button" title="Flip vertically">
+          <span class="icon">↕</span>FLIP V
+        </button>
+        <button class="tool-button" id="shiftLeftButton" type="button" title="Shift left">
+          <span class="icon">←</span>LEFT
+        </button>
+        <button class="tool-button" id="shiftRightButton" type="button" title="Shift right">
+          <span class="icon">→</span>RIGHT
+        </button>
+        <button class="tool-button" id="shiftUpButton" type="button" title="Shift up">
+          <span class="icon">↑</span>UP
+        </button>
+        <button class="tool-button" id="shiftDownButton" type="button" title="Shift down">
+          <span class="icon">↓</span>DOWN
+        </button>
+      </nav>
+
+      <div class="editor">
+        <div class="pixel-grid" id="pixelGrid" role="grid" aria-label="8 by 8 pixel editor"></div>
+      </div>
+
+      <aside class="output-panel">
+        <section class="panel-section">
+          <div class="section-heading">
+            <h2>Generated bytes</h2>
+            <select id="outputFormat" aria-label="Output format">
+              <option value="c">C array</option>
+              <option value="asm">Assembly</option>
+              <option value="basic">BASIC DATA</option>
+              <option value="hex">Hex bytes</option>
+              <option value="binary">Binary</option>
+            </select>
+          </div>
+          <textarea id="output" readonly spellcheck="false" aria-label="Generated byte code"></textarea>
+          <div class="button-row">
+            <button class="command primary" id="copyButton" type="button">Copy code</button>
+            <span class="hint status" id="status" role="status" aria-live="polite"></span>
+          </div>
+          <div class="byte-strip" id="byteStrip" aria-label="Generated hexadecimal bytes"></div>
+        </section>
+
+        <section class="panel-section">
+          <div class="section-heading">
+            <h2>Import bytes</h2>
+            <span class="hint" id="expectedBytes">EXPECTS 8 BYTES</span>
+          </div>
+          <textarea id="importInput" spellcheck="false" placeholder="$3C, $42, $A5, $81, $A5, $99, $42, $3C" aria-label="Bytes to import"></textarea>
+          <div class="button-row">
+            <button class="command" id="loadButton" type="button">Load bytes</button>
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const grid = document.querySelector('#pixelGrid');
+    const output = document.querySelector('#output');
+    const outputFormat = document.querySelector('#outputFormat');
+    const byteStrip = document.querySelector('#byteStrip');
+    const status = document.querySelector('#status');
+    const readout = document.querySelector('#readout');
+    const expectedBytes = document.querySelector('#expectedBytes');
+    const importInput = document.querySelector('#importInput');
+    let width = 8;
+    let height = 8;
+    let pixels = new Uint8Array(width * height);
+    let mode = 'draw';
+    let painting = false;
+    let strokeValue = 1;
+    let history = [];
+
+    function snapshot() {
+      history.push({ width, height, pixels: pixels.slice() });
+      if (history.length > 50) history.shift();
+    }
+
+    function setStatus(message) {
+      status.textContent = message;
+      window.clearTimeout(setStatus.timer);
+      setStatus.timer = window.setTimeout(() => { status.textContent = ''; }, 1800);
+    }
+
+    function renderGrid() {
+      grid.innerHTML = '';
+      grid.style.setProperty('--cols', width);
+      grid.style.setProperty('--rows', height);
+      grid.setAttribute('aria-label', `${width} by ${height} pixel editor`);
+      for (let index = 0; index < pixels.length; index += 1) {
+        const pixel = document.createElement('button');
+        const row = Math.floor(index / width);
+        const column = index % width;
+        pixel.type = 'button';
+        pixel.className = `pixel${pixels[index] ? ' on' : ''}`;
+        pixel.dataset.index = index;
+        pixel.setAttribute('role', 'gridcell');
+        pixel.setAttribute('aria-label', `Row ${row + 1}, column ${column + 1}`);
+        pixel.setAttribute('aria-pressed', pixels[index] ? 'true' : 'false');
+        grid.appendChild(pixel);
+      }
+      updateOutput();
+    }
+
+    function paint(pixel, value) {
+      const index = Number(pixel.dataset.index);
+      if (pixels[index] === value) return;
+      pixels[index] = value;
+      pixel.classList.toggle('on', value === 1);
+      pixel.setAttribute('aria-pressed', value ? 'true' : 'false');
+      updateOutput();
+    }
+
+    function getBytes() {
+      const bytes = [];
+      for (let row = 0; row < height; row += 1) {
+        for (let block = 0; block < width / 8; block += 1) {
+          let value = 0;
+          for (let bit = 0; bit < 8; bit += 1) {
+            value |= pixels[row * width + block * 8 + bit] << (7 - bit);
+          }
+          bytes.push(value);
+        }
+      }
+      return bytes;
+    }
+
+    function hexByte(value, prefix = '0x') {
+      return `${prefix}${value.toString(16).toUpperCase().padStart(2, '0')}`;
+    }
+
+    function formatBytes(bytes) {
+      const perRow = width / 8;
+      const lines = [];
+      for (let index = 0; index < bytes.length; index += perRow) {
+        lines.push(bytes.slice(index, index + perRow));
+      }
+      if (outputFormat.value === 'c') {
+        return `static const unsigned char glyph[${bytes.length}] = {\n${lines.map(line => `    ${line.map(value => hexByte(value)).join(', ')}`).join(',\n')}\n};`;
+      }
+      if (outputFormat.value === 'asm') {
+        return lines.map(line => `    .byte ${line.map(value => hexByte(value, '$')).join(', ')}`).join('\n');
+      }
+      if (outputFormat.value === 'basic') {
+        return lines.map(line => `DATA ${line.join(',')}`).join('\n');
+      }
+      if (outputFormat.value === 'binary') {
+        return lines.map(line => line.map(value => `%${value.toString(2).padStart(8, '0')}`).join(', ')).join('\n');
+      }
+      return lines.map(line => line.map(value => hexByte(value, '$')).join(', ')).join('\n');
+    }
+
+    function updateOutput() {
+      const bytes = getBytes();
+      output.value = formatBytes(bytes);
+      readout.textContent = `${width} × ${height} · ${bytes.length} bytes`;
+      expectedBytes.textContent = `EXPECTS ${bytes.length} BYTES`;
+      byteStrip.style.setProperty('--byte-cols', width / 8);
+      byteStrip.innerHTML = bytes.map(value => `<span class="byte-chip">${hexByte(value, '$')}</span>`).join('');
+    }
+
+    function transform(operation) {
+      snapshot();
+      const next = new Uint8Array(pixels.length);
+      for (let row = 0; row < height; row += 1) {
+        for (let column = 0; column < width; column += 1) {
+          let sourceRow = row;
+          let sourceColumn = column;
+          if (operation === 'flipH') sourceColumn = width - 1 - column;
+          if (operation === 'flipV') sourceRow = height - 1 - row;
+          if (operation === 'left') sourceColumn = column + 1;
+          if (operation === 'right') sourceColumn = column - 1;
+          if (operation === 'up') sourceRow = row + 1;
+          if (operation === 'down') sourceRow = row - 1;
+          if (sourceRow >= 0 && sourceRow < height && sourceColumn >= 0 && sourceColumn < width) {
+            next[row * width + column] = pixels[sourceRow * width + sourceColumn];
+          }
+        }
+      }
+      pixels = next;
+      renderGrid();
+    }
+
+    function setMode(nextMode) {
+      mode = nextMode;
+      document.querySelector('#drawTool').setAttribute('aria-pressed', mode === 'draw');
+      document.querySelector('#eraseTool').setAttribute('aria-pressed', mode === 'erase');
+    }
+
+    grid.addEventListener('pointerdown', event => {
+      const pixel = event.target.closest('.pixel');
+      if (!pixel) return;
+      event.preventDefault();
+      snapshot();
+      painting = true;
+      strokeValue = event.button === 2 ? 0 : mode === 'draw' ? 1 : 0;
+      pixel.setPointerCapture(event.pointerId);
+      paint(pixel, strokeValue);
+    });
+
+    grid.addEventListener('pointermove', event => {
+      if (!painting) return;
+      const target = document.elementFromPoint(event.clientX, event.clientY);
+      const pixel = target && target.closest('.pixel');
+      if (pixel && grid.contains(pixel)) paint(pixel, strokeValue);
+    });
+
+    window.addEventListener('pointerup', () => { painting = false; });
+    grid.addEventListener('contextmenu', event => event.preventDefault());
+
+    document.querySelector('#sizeSelector').addEventListener('click', event => {
+      const button = event.target.closest('button');
+      if (!button) return;
+      snapshot();
+      width = Number(button.dataset.width);
+      height = Number(button.dataset.height);
+      pixels = new Uint8Array(width * height);
+      document.querySelectorAll('#sizeSelector button').forEach(item => {
+        item.setAttribute('aria-pressed', item === button);
+      });
+      renderGrid();
+    });
+
+    document.querySelector('#drawTool').addEventListener('click', () => setMode('draw'));
+    document.querySelector('#eraseTool').addEventListener('click', () => setMode('erase'));
+    document.querySelector('#clearButton').addEventListener('click', () => {
+      snapshot(); pixels.fill(0); renderGrid();
+    });
+    document.querySelector('#invertButton').addEventListener('click', () => {
+      snapshot(); pixels = pixels.map(value => value ? 0 : 1); renderGrid();
+    });
+    document.querySelector('#flipHButton').addEventListener('click', () => transform('flipH'));
+    document.querySelector('#flipVButton').addEventListener('click', () => transform('flipV'));
+    document.querySelector('#shiftLeftButton').addEventListener('click', () => transform('left'));
+    document.querySelector('#shiftRightButton').addEventListener('click', () => transform('right'));
+    document.querySelector('#shiftUpButton').addEventListener('click', () => transform('up'));
+    document.querySelector('#shiftDownButton').addEventListener('click', () => transform('down'));
+    document.querySelector('#undoButton').addEventListener('click', () => {
+      const previous = history.pop();
+      if (!previous) return setStatus('Nothing to undo');
+      width = previous.width;
+      height = previous.height;
+      pixels = previous.pixels;
+      document.querySelectorAll('#sizeSelector button').forEach(button => {
+        button.setAttribute('aria-pressed', Number(button.dataset.width) === width && Number(button.dataset.height) === height);
+      });
+      renderGrid();
+    });
+
+    outputFormat.addEventListener('change', updateOutput);
+
+    document.querySelector('#copyButton').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(output.value);
+      } catch {
+        output.select();
+        document.execCommand('copy');
+      }
+      setStatus('Copied');
+    });
+
+    document.querySelector('#loadButton').addEventListener('click', () => {
+      const initializer = importInput.value.match(/\{([\s\S]*?)\}/);
+      const source = initializer ? initializer[1] : importInput.value;
+      const tokens = source.match(/(?:0x|\$|%)[0-9a-fA-F]+|\b\d+\b/g) || [];
+      const values = tokens.map(token => {
+        if (token.startsWith('$')) return parseInt(token.slice(1), 16);
+        if (token.startsWith('%')) return parseInt(token.slice(1), 2);
+        if (token.toLowerCase().startsWith('0x')) return parseInt(token.slice(2), 16);
+        return parseInt(token, 10);
+      });
+      const expected = width / 8 * height;
+      if (values.length !== expected || values.some(value => !Number.isInteger(value) || value < 0 || value > 255)) {
+        setStatus(`Need ${expected} valid bytes`);
+        return;
+      }
+      snapshot();
+      pixels.fill(0);
+      let byteIndex = 0;
+      for (let row = 0; row < height; row += 1) {
+        for (let block = 0; block < width / 8; block += 1) {
+          const value = values[byteIndex++];
+          for (let bit = 0; bit < 8; bit += 1) {
+            pixels[row * width + block * 8 + bit] = (value >> (7 - bit)) & 1;
+          }
+        }
+      }
+      renderGrid();
+      setStatus('Bytes loaded');
+    });
+
+    window.addEventListener('keydown', event => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+        event.preventDefault();
+        document.querySelector('#undoButton').click();
+      }
+    });
+
+    renderGrid();
+  </script>
+</body>
+</html>

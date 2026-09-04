@@ -56,9 +56,9 @@ static const unsigned char pursuer_sprite[22] = {
     189, 153, 66, 0, 0, 0, 0, 0, 0, 0
 };
 
-/* Custom character 10 from chased1V3.BAS lines 16007 and 194. */
-static const unsigned char decoy_sprite[8] = {
-    18, 22, 24, 60, 60, 24, 104, 72
+static const unsigned char decoy_sprite[16] = {
+    0x18, 0x24, 0x42, 0x81, 0x18, 0x24, 0x42, 0x00,
+    0x18, 0x24, 0x42, 0x18, 0x24, 0x81, 0xFF, 0xFF
 };
 
 /* Thick upward arrow marking the open exit. */
@@ -442,7 +442,7 @@ void sprite3d_draw_decoy(unsigned char active, unsigned int px, unsigned int py,
         left = VIEW_RIGHT_PX + 1 - width;
 
     dest = pmg_ram + PMG_MISSILE_OFFSET + PMG_TOP_OFFSET + projected_top;
-    step = ((unsigned int)8 << 8) / height;
+    step = ((unsigned int)16 << 8) / height;
     acc = 0;
     for (i = 0; i < height; ++i) {
         dest[i] = decoy_sprite[acc >> 8];
@@ -454,7 +454,7 @@ void sprite3d_draw_decoy(unsigned char active, unsigned int px, unsigned int py,
     *(volatile unsigned char *)0xD00C = size;
     for (i = 0; i < 4; ++i) {
         *(volatile unsigned char *)(0xD004 + i) =
-            (unsigned char)(48 + left + i * missile_width);
+            (unsigned char)(48 + left + (3 - i) * missile_width);
     }
 }
 
@@ -551,10 +551,6 @@ void sprite3d_draw_pursuer(unsigned int px, unsigned int py, unsigned int angle,
         if (maze_solid((unsigned char)col, (unsigned char)row)) return;
     }
 
-    if (projected_height > 32) {
-        projected_height = 32;
-        projected_top = (VIEW_ROWS - 32) >> 1;
-    }
     draw_billboard(0, projected_x, projected_top, projected_height,
                    pursuer_sprite, 22);
 }
