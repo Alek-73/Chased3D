@@ -19,7 +19,7 @@ if (-not (Test-Path (Join-Path $root "build_number.h"))) {
 
 New-Item -ItemType Directory -Force $debugDir | Out-Null
 
-& (Join-Path $root "convert_splash_mono.ps1")
+& python (Join-Path $root "gen_splash_redraw.py")
 if ($LASTEXITCODE -ne 0) {
     throw "Splash artwork conversion failed with exit code $LASTEXITCODE."
 }

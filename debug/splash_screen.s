@@ -10,7 +10,7 @@
 	.importzp	c_sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
-	.dbg		file, "C:\Users\Alex\Chased3D\splash_screen.c", 3417, 1788469805
+	.dbg		file, "C:\Users\Alex\Chased3D\splash_screen.c", 3389, 1788558670
 	.dbg		file, "C:\tools\cc65\include/atari.h", 22152, 1786840064
 	.dbg		file, "C:\tools\cc65\include/_atarios.h", 40084, 1786840064
 	.dbg		file, "C:\tools\cc65\include/_gtia.h", 13839, 1786840064
@@ -18,34 +18,33 @@
 	.dbg		file, "C:\tools\cc65\include/_pokey.h", 11376, 1786840064
 	.dbg		file, "C:\tools\cc65\include/_pia.h", 3044, 1786840064
 	.dbg		file, "C:\tools\cc65\include/_antic.h", 11827, 1786840064
-	.dbg		file, "C:\tools\cc65\include/stdio.h", 6999, 1786840065
+	.dbg		file, "C:\tools\cc65\include/fcntl.h", 3550, 1786840065
+	.dbg		file, "C:\tools\cc65\include/unistd.h", 4340, 1786840065
 	.dbg		file, "C:\Users\Alex\Chased3D/splash_screen.h", 127, 1788301734
-	.dbg		file, "C:\Users\Alex\Chased3D/textplot.h", 440, 1788473040
-	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1410, 1788473348
+	.dbg		file, "C:\Users\Alex\Chased3D/textplot.h", 440, 1788474191
+	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1356, 1788475720
 	.dbg		file, "C:\Users\Alex\Chased3D/maze.h", 550, 1787868964
-	.dbg		file, "C:\Users\Alex\Chased3D/build_number.h", 136, 1788473352
+	.dbg		file, "C:\Users\Alex\Chased3D/build_number.h", 136, 1788631232
 	.dbg		sym, "view_buffer", "00", extern, "_view_buffer"
-	.import		_fclose
-	.import		_fgetc
-	.import		_fopen
+	.import		_open
+	.import		_close
+	.import		_read
 	.export		_splash_screen_show
 	.import		_textplot_print_fullscreen
 	.import		_view_buffer
 
 .segment	"RODATA"
 
-S0006:
+S0005:
 	.byte	$62,$79,$20,$41,$6C,$65,$78,$20,$56,$69,$72,$6F,$6C,$69,$2C,$20
 	.byte	$32,$30,$32,$36,$00
-S0007:
-	.byte	$52,$65,$76,$31,$2E,$30,$37,$39,$20,$70,$72,$65,$73,$73,$20,$46
+S0006:
+	.byte	$52,$65,$76,$31,$2E,$31,$32,$35,$20,$70,$72,$65,$73,$73,$20,$46
 	.byte	$69,$72,$65,$00
 S0003:
 	.byte	$44,$3A,$53,$50,$4C,$41,$53,$48,$2E,$42,$4D,$50,$00
-S0005:
-	.byte	$43,$68,$61,$73,$65,$64,$33,$44,$00
 S0004:
-	.byte	$72,$62,$00
+	.byte	$43,$68,$61,$73,$65,$64,$33,$44,$00
 
 .segment	"BSS"
 
@@ -71,19 +70,19 @@ _splash_dlist:
 ;
 ; OS.sdmctl = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 88
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 81
 	jsr     decsp2
 	lda     #$00
 	sta     $022F
 ;
 ; ANTIC.dmactl = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 89
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 82
 	sta     $D400
 ;
 ; for (addr = 0; addr < VIEW_STRIDE * VIEW_ROWS; ++addr)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 90
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 83
 	tax
 	jsr     stax0sp
 L0002:	ldy     #$01
@@ -97,7 +96,7 @@ L0006:	bcs     L0003
 ;
 ; view_buffer[addr] = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 91
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 84
 	jsr     ldax0sp
 	clc
 	adc     #<(_view_buffer)
@@ -111,7 +110,7 @@ L0006:	bcs     L0003
 ;
 ; for (addr = 0; addr < VIEW_STRIDE * VIEW_ROWS; ++addr)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 90
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 83
 	tax
 	lda     #$01
 	jsr     addeq0sp
@@ -119,16 +118,16 @@ L0006:	bcs     L0003
 ;
 ; splash_load_bitmap();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 93
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 86
 L0003:	jsr     _splash_load_bitmap
 ;
 ; textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER, "Chased3D", 7, 3,
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 94
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 87
 	lda     #$01
 	jsr     pusha
-	lda     #<(S0005)
-	ldx     #>(S0005)
+	lda     #<(S0004)
+	ldx     #>(S0004)
 	jsr     pushax
 	lda     #$07
 	jsr     pusha
@@ -137,21 +136,21 @@ L0003:	jsr     _splash_load_bitmap
 ;
 ; TEXTPLOT_SIZE_DOUBLE);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 95
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 88
 	lda     #$02
 	jsr     _textplot_print_fullscreen
 ;
 ; textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER,
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 96
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 89
 	lda     #$01
 	jsr     pusha
 ;
 ; "by Alex Viroli, 2026", 18, 2,
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 97
-	lda     #<(S0006)
-	ldx     #>(S0006)
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 90
+	lda     #<(S0005)
+	ldx     #>(S0005)
 	jsr     pushax
 	lda     #$12
 	jsr     pusha
@@ -160,21 +159,21 @@ L0003:	jsr     _splash_load_bitmap
 ;
 ; TEXTPLOT_SIZE_NORMAL);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 98
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 91
 	lda     #$01
 	jsr     _textplot_print_fullscreen
 ;
 ; textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER,
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 99
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 92
 	lda     #$01
 	jsr     pusha
 ;
 ; SPLASH_REVISION, 35, 3, TEXTPLOT_SIZE_HALF);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 100
-	lda     #<(S0007)
-	ldx     #>(S0007)
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 93
+	lda     #<(S0006)
+	ldx     #>(S0006)
 	jsr     pushax
 	lda     #$23
 	jsr     pusha
@@ -185,42 +184,42 @@ L0003:	jsr     _splash_load_bitmap
 ;
 ; splash_build_dlist();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 101
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 94
 	jsr     _splash_build_dlist
 ;
-; COLOR0 = 0x3A;
+; COLOR0 = 0x8A;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 103
-	lda     #$3A
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 96
+	lda     #$8A
 	sta     $02C4
 ;
 ; COLOR1 = 0xCA;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 104
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 97
 	lda     #$CA
 	sta     $02C5
 ;
 ; COLOR2 = 0x1E;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 105
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 98
 	lda     #$1E
 	sta     $02C6
 ;
 ; COLOR3 = 0x00;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 106
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 99
 	lda     #$00
 	sta     $02C7
 ;
 ; COLOR4 = 0x02;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 107
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 100
 	lda     #$02
 	sta     $02C8
 ;
 ; OS.sdlst = splash_dlist;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 108
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 101
 	lda     #>(_splash_dlist)
 	sta     $0230+1
 	lda     #<(_splash_dlist)
@@ -228,18 +227,18 @@ L0003:	jsr     _splash_load_bitmap
 ;
 ; OS.sdmctl = 0x22;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 109
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 102
 	lda     #$22
 	sta     $022F
 ;
 ; ANTIC.dmactl = 0x22;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 110
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 103
 	sta     $D400
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 111
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 104
 	jmp     incsp2
 
 	.dbg	line
@@ -264,7 +263,7 @@ L0003:	jsr     _splash_load_bitmap
 ;
 ; screen_addr = (unsigned int)view_buffer;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 28
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 29
 	jsr     decsp6
 	lda     #<(_view_buffer)
 	ldx     #>(_view_buffer)
@@ -273,21 +272,9 @@ L0003:	jsr     _splash_load_bitmap
 ;
 ; index = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 29
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 30
 	lda     #$00
 	ldy     #$01
-	sta     (c_sp),y
-;
-; splash_dlist[index++] = 0x70;
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 30
-	tay
-	lda     #$70
-	sta     _splash_dlist,y
-	iny
-	clc
-	tya
-	adc     (c_sp),y
 	sta     (c_sp),y
 ;
 ; splash_dlist[index++] = 0x70;
@@ -296,7 +283,7 @@ L0003:	jsr     _splash_load_bitmap
 	tay
 	lda     #$70
 	sta     _splash_dlist,y
-	ldy     #$01
+	iny
 	clc
 	tya
 	adc     (c_sp),y
@@ -314,9 +301,21 @@ L0003:	jsr     _splash_load_bitmap
 	adc     (c_sp),y
 	sta     (c_sp),y
 ;
-; splash_dlist[index++] = 0x4D;
+; splash_dlist[index++] = 0x70;
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 33
+	tay
+	lda     #$70
+	sta     _splash_dlist,y
+	ldy     #$01
+	clc
+	tya
+	adc     (c_sp),y
+	sta     (c_sp),y
+;
+; splash_dlist[index++] = 0x4D;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 34
 	tay
 	lda     #$4D
 	sta     _splash_dlist,y
@@ -328,7 +327,7 @@ L0003:	jsr     _splash_load_bitmap
 ;
 ; splash_dlist[index++] = (unsigned char)screen_addr;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 34
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 35
 	tax
 	ldy     #$04
 	lda     (c_sp),y
@@ -341,7 +340,7 @@ L0003:	jsr     _splash_load_bitmap
 ;
 ; splash_dlist[index++] = (unsigned char)(screen_addr >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 35
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 36
 	lda     #<(_splash_dlist)
 	ldx     #>(_splash_dlist)
 	clc
@@ -362,7 +361,7 @@ L0007:	sta     ptr1
 ;
 ; for (row = 1; row < VIEW_ROWS; ++row) splash_dlist[index++] = 0x0D;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 36
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 37
 	tya
 	dey
 L0010:	sta     (c_sp),y
@@ -386,7 +385,7 @@ L0010:	sta     (c_sp),y
 ;
 ; dlist_addr = (unsigned int)splash_dlist;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 37
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 38
 L0009:	lda     #<(_splash_dlist)
 	ldx     #>(_splash_dlist)
 	ldy     #$02
@@ -394,7 +393,7 @@ L0009:	lda     #<(_splash_dlist)
 ;
 ; splash_dlist[index++] = 0x41;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 38
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 39
 	ldy     #$01
 	lda     (c_sp),y
 	tay
@@ -408,7 +407,7 @@ L0009:	lda     #<(_splash_dlist)
 ;
 ; splash_dlist[index++] = (unsigned char)dlist_addr;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 39
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 40
 	tax
 	iny
 	lda     (c_sp),y
@@ -421,7 +420,7 @@ L0009:	lda     #<(_splash_dlist)
 ;
 ; splash_dlist[index] = (unsigned char)(dlist_addr >> 8);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 40
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 41
 	lda     #<(_splash_dlist)
 	ldx     #>(_splash_dlist)
 	clc
@@ -437,7 +436,7 @@ L000F:	sta     ptr1
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 41
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 42
 	jmp     incsp6
 
 	.dbg	line
@@ -453,111 +452,110 @@ L000F:	sta     ptr1
 
 	.dbg	func, "splash_load_bitmap", "00", static, "_splash_load_bitmap"
 	.dbg	sym, "file", "00", auto, -2
-	.dbg	sym, "dest", "00", auto, -4
-	.dbg	sym, "source_row", "00", auto, -5
-	.dbg	sym, "byte", "00", auto, -6
-	.dbg	sym, "first", "00", auto, -8
-	.dbg	sym, "second", "00", auto, -10
+	.dbg	sym, "source", "00", auto, -4
+	.dbg	sym, "dest", "00", auto, -6
+	.dbg	sym, "source_row", "00", auto, -7
+	.dbg	sym, "byte", "00", auto, -8
 
 .segment	"CODE"
 
 ;
-; file = fopen("D:SPLASH.BMP", "rb");
+; source = view_buffer;
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 52
-	ldy     #$0A
-	jsr     subysp
+	jsr     decsp8
+	lda     #<(_view_buffer)
+	ldx     #>(_view_buffer)
+	ldy     #$04
+	jsr     staxysp
+;
+; file = open("D:SPLASH.BMP", O_RDONLY);
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 53
 	lda     #<(S0003)
 	ldx     #>(S0003)
 	jsr     pushax
-	lda     #<(S0004)
-	ldx     #>(S0004)
-	jsr     _fopen
-	ldy     #$08
+	lda     #$01
+	jsr     pusha0
+	ldy     #$04
+	jsr     _open
+	ldy     #$06
 	jsr     staxysp
 ;
-; if (file == 0) return;
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 53
-	cpx     #$00
-	bne     L0023
-	cmp     #$00
-	jeq     L0001
-;
-; if (fgetc(file) != 'B' || fgetc(file) != 'M') {
+; if (file < 0) return;
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 54
-L0023:	ldy     #$09
-	jsr     ldaxysp
-	jsr     _fgetc
-	cpx     #$00
-	jne     L0010
-	cmp     #$42
-	jne     L0010
-	ldy     #$09
-	jsr     ldaxysp
-	jsr     _fgetc
-	cpx     #$00
-	jne     L0010
-	cmp     #$4D
+	cpx     #$80
+	jcs     L0013
 ;
-; return;
+; if (read(file, source, SPLASH_BMP_DATA_OFFSET) != SPLASH_BMP_DATA_OFFSET
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 55
+	ldy     #$09
+	jsr     pushwysp
+	ldy     #$09
+	jsr     pushwysp
+	ldx     #$00
+	lda     #$46
+	jsr     _read
+;
+; || source[0] != 'B' || source[1] != 'M') goto done;
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 56
-	jne     L0010
-;
-; for (byte = 2; byte < SPLASH_BMP_DATA_OFFSET; ++byte) {
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 58
-	lda     #$02
-	ldy     #$04
-L001E:	sta     (c_sp),y
+	cpx     #$00
+	jne     L0009
 	cmp     #$46
-	bcs     L0022
-;
-; if (fgetc(file) == EOF) {
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 59
-	ldy     #$09
+	jne     L0009
+	ldy     #$05
+	jsr     ldptr1ysp
+	ldy     #$00
+	lda     (ptr1),y
+	cmp     #$42
+	jne     L0009
+	ldy     #$05
 	jsr     ldaxysp
-	jsr     _fgetc
-	cpx     #$FF
-	bne     L000B
-	cmp     #$FF
-;
-; return;
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 61
-	jeq     L0010
-;
-; for (byte = 2; byte < SPLASH_BMP_DATA_OFFSET; ++byte) {
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 58
-L000B:	ldy     #$04
-	clc
-	lda     #$01
-	adc     (c_sp),y
-	jmp     L001E
+	jsr     incax1
+	sta     ptr1
+	stx     ptr1+1
+	ldy     #$00
+	lda     (ptr1),y
+	cmp     #$4D
+	jne     L0009
+	tya
 ;
 ; for (source_row = 0; source_row < SPLASH_BITMAP_ROWS; ++source_row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 65
-L0022:	lda     #$00
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 58
 	iny
-L0020:	sta     (c_sp),y
+L001C:	sta     (c_sp),y
 	cmp     #$2E
-	jcs     L0010
+	jcs     L0009
+;
+; if (read(file, source, VIEW_STRIDE * 2) != VIEW_STRIDE * 2) goto done;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 59
+	ldy     #$09
+	jsr     pushwysp
+	ldy     #$09
+	jsr     pushwysp
+	ldx     #$00
+	lda     #$50
+	jsr     _read
+	cpx     #$00
+	jne     L0009
+	cmp     #$50
+	jne     L0009
 ;
 ; - source_row) * VIEW_STRIDE;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 68
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 62
 	lda     #$5B
 	sec
+	ldy     #$01
 	sbc     (c_sp),y
-	ldx     #$00
-	bcs     L001C
+	bcs     L001A
 	dex
-L001C:	jsr     pushax
+L001A:	jsr     pushax
 	lda     #$28
 	jsr     tosumula0
 	clc
@@ -567,133 +565,189 @@ L001C:	jsr     pushax
 	adc     #>(_view_buffer)
 	tax
 	tya
-	ldy     #$06
+	ldy     #$02
 	jsr     staxysp
 ;
 ; for (byte = 0; byte < VIEW_STRIDE; ++byte) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 69
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 63
 	lda     #$00
-	ldy     #$04
-L001F:	sta     (c_sp),y
+	tay
+L001B:	sta     (c_sp),y
 	cmp     #$28
-	bcs     L0011
-;
-; first = fgetc(file);
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 70
-	ldy     #$09
-	jsr     ldaxysp
-	jsr     _fgetc
-	ldy     #$02
-	jsr     staxysp
-;
-; second = fgetc(file);
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 71
-	ldy     #$09
-	jsr     ldaxysp
-	jsr     _fgetc
-	jsr     stax0sp
-;
-; if (first == EOF || second == EOF) {
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 72
-	ldy     #$03
-	lda     (c_sp),y
-	cmp     #$FF
-	bne     L0024
-	dey
-	lda     (c_sp),y
-	cmp     #$FF
-	beq     L0010
-L0024:	ldy     #$01
-	lda     (c_sp),y
-	cmp     #$FF
-	bne     L0017
-	dey
-	lda     (c_sp),y
-	cmp     #$FF
-	beq     L0010
+	jcs     L000A
 ;
 ; dest[byte] = (unsigned char)(
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 76
-L0017:	ldy     #$04
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 64
 	lda     (c_sp),y
 	clc
-	ldy     #$06
+	ldy     #$02
 	adc     (c_sp),y
-	sta     sreg
+	sta     ptr2
 	lda     #$00
 	iny
 	adc     (c_sp),y
-	sta     sreg+1
+	sta     ptr2+1
 ;
-; ((first & 0x30) << 2) | ((first & 0x03) << 4)
+; ((source[byte * 2] & 0x30) << 2)
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 77
-	ldy     #$02
-	lda     (c_sp),y
-	and     #$30
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 65
+	ldx     #$00
+	lda     (c_sp,x)
 	asl     a
-	asl     a
+	bcc     L001E
+	inx
+	clc
+L001E:	iny
+	adc     (c_sp),y
 	sta     ptr1
-	lda     (c_sp),y
-	and     #$03
-	asl     a
-	asl     a
-	asl     a
-	asl     a
-;
-; | ((second & 0x30) >> 2) | (second & 0x03));
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 78
-	ora     ptr1
-	sta     ptr1
+	txa
+	iny
+	adc     (c_sp),y
+	sta     ptr1+1
 	ldy     #$00
+	lda     (ptr1),y
+	and     #$30
+	asl     a
+	asl     a
+;
+; | ((source[byte * 2] & 0x03) << 4)
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 66
+	sta     sreg
+	ldx     #$00
 	lda     (c_sp),y
+	asl     a
+	bcc     L001F
+	inx
+	clc
+L001F:	ldy     #$04
+	adc     (c_sp),y
+	sta     ptr1
+	txa
+	iny
+	adc     (c_sp),y
+	sta     ptr1+1
+	ldy     #$00
+	lda     (ptr1),y
+	and     #$03
+	asl     a
+	asl     a
+	asl     a
+	asl     a
+;
+; | ((source[byte * 2 + 1] & 0x30) >> 2)
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 67
+	ora     sreg
+	sta     sreg
+	ldx     #$00
+	lda     (c_sp),y
+	asl     a
+	bcc     L0018
+	inx
+L0018:	jsr     incax1
+	clc
+	ldy     #$04
+	adc     (c_sp),y
+	sta     ptr1
+	txa
+	iny
+	adc     (c_sp),y
+	sta     ptr1+1
+	ldy     #$00
+	lda     (ptr1),y
 	and     #$30
 	lsr     a
 	lsr     a
-	ora     ptr1
-	sta     ptr1
+;
+; | (source[byte * 2 + 1] & 0x03));
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 68
+	ora     sreg
+	sta     sreg
+	ldx     #$00
 	lda     (c_sp),y
+	asl     a
+	bcc     L0019
+	inx
+L0019:	jsr     incax1
+	clc
+	ldy     #$04
+	adc     (c_sp),y
+	sta     ptr1
+	txa
+	iny
+	adc     (c_sp),y
+	sta     ptr1+1
+	ldy     #$00
+	lda     (ptr1),y
 	and     #$03
-	ora     ptr1
-	sta     (sreg),y
+	ora     sreg
+	sta     (ptr2),y
 ;
 ; for (byte = 0; byte < VIEW_STRIDE; ++byte) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 69
-	ldy     #$04
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 63
 	clc
 	lda     #$01
 	adc     (c_sp),y
-	jmp     L001F
+	jmp     L001B
 ;
 ; for (source_row = 0; source_row < SPLASH_BITMAP_ROWS; ++source_row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 65
-L0011:	iny
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 58
+L000A:	iny
+	clc
+	tya
+	adc     (c_sp),y
+	jmp     L001C
+;
+; close(file);
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 73
+L0009:	ldy     #$07
+	jsr     ldaxysp
+	jsr     _close
+;
+; for (byte = 0; byte < VIEW_STRIDE * 2; ++byte) source[byte] = 0;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 74
+	lda     #$00
+	tay
+L001D:	sta     (c_sp),y
+	cmp     #$50
+	bcs     L0013
+	lda     (c_sp),y
+	clc
+	ldy     #$04
+	adc     (c_sp),y
+	sta     ptr1
+	lda     #$00
+	iny
+	adc     (c_sp),y
+	sta     ptr1+1
+	lda     #$00
+	tay
+	sta     (ptr1),y
 	clc
 	lda     #$01
 	adc     (c_sp),y
-	jmp     L0020
-;
-; fclose(file);
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 81
-L0010:	ldy     #$09
-	jsr     ldaxysp
-	jsr     _fclose
+	jmp     L001D
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 82
-L0001:	ldy     #$0A
-	jmp     addysp
+	.dbg	line, "C:\Users\Alex\Chased3D\splash_screen.c", 75
+L0013:	jmp     incsp8
 
 	.dbg	line
+.segment	"RODATA"
+
+M0001:
+	.word	$0000
+M0002:
+	.word	$0000
+
 .endproc
 

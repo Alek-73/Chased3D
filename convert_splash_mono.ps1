@@ -1,5 +1,5 @@
 param(
-    [string]$SourcePath = (Join-Path $PSScriptRoot "file_0000000092c88243a16e0ce85dacfb0e.png"),
+    [string]$SourcePath = (Join-Path $PSScriptRoot "ugug.png"),
     [string]$OutputPath = (Join-Path $PSScriptRoot "SPLASH.BMP")
 )
 
@@ -18,9 +18,9 @@ try {
     $graphics = [Drawing.Graphics]::FromImage($scaled)
     try {
         $graphics.Clear([Drawing.Color]::Black)
-        $graphics.InterpolationMode = [Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
-        $graphics.PixelOffsetMode = [Drawing.Drawing2D.PixelOffsetMode]::HighQuality
-        $graphics.DrawImage($source, 0, 0, $width, $height)
+        $destX = [int](($width - $source.Width) / 2)
+        $destY = [int](($height - $source.Height) / 2)
+        $graphics.DrawImageUnscaled($source, $destX, $destY)
     }
     finally {
         $graphics.Dispose()
@@ -32,48 +32,6 @@ try {
             $color = $scaled.GetPixel($x, $y)
             $luminance = (30 * $color.R + 59 * $color.G + 11 * $color.B) / 100
             $indices[$y, $x] = if ($luminance -ge 128) { 1 } else { 0 }
-        }
-    }
-
-    for ($y = 8; $y -lt 24; ++$y) {
-        for ($x = 13; $x -lt 30; ++$x) {
-            $indices[$y, $x] = 0
-        }
-    }
-    $targetGlyph = @(225, 146, 76, 74, 49, 49, 77, 131,
-                     128, 128, 128, 128, 128, 128, 255, 255)
-    for ($y = 0; $y -lt $targetGlyph.Count; ++$y) {
-        for ($x = 0; $x -lt 8; ++$x) {
-            if ($targetGlyph[$y] -band (0x80 -shr $x)) {
-                $indices[(8 + $y), (18 + $x)] = 1
-            }
-        }
-    }
-
-    for ($y = 21; $y -lt 36; ++$y) {
-        for ($x = 35; $x -lt 55; ++$x) {
-            $indices[$y, $x] = 0
-        }
-    }
-    $ugugGlyph = @(
-        ".....####.....",
-        "....######....",
-        "...########...",
-        "..##########..",
-        ".############.",
-        "##############",
-        "###..####..###",
-        "##############",
-        ".####....####.",
-        ".############.",
-        "..##########..",
-        "...########...",
-        "...###..###...",
-        "..####..####.."
-    )
-    for ($y = 0; $y -lt $ugugGlyph.Count; ++$y) {
-        for ($x = 0; $x -lt $ugugGlyph[$y].Length; ++$x) {
-            $indices[(22 + $y), (38 + $x)] = if ($ugugGlyph[$y][$x] -eq '#') { 1 } else { 0 }
         }
     }
 

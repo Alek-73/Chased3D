@@ -103,7 +103,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000000r 2                       .endif
 000000r 2               .endmacro
 000000r 2               
-000000r 1               	.dbg		file, "C:\Users\Alex\Chased3D\view3d.c", 14731, 1788473348
+000000r 1               	.dbg		file, "C:\Users\Alex\Chased3D\view3d.c", 14456, 1788475720
 000000r 1               	.dbg		file, "C:\tools\cc65\include/atari.h", 22152, 1786840064
 000000r 1               	.dbg		file, "C:\tools\cc65\include/_atarios.h", 40084, 1786840064
 000000r 1               	.dbg		file, "C:\tools\cc65\include/_gtia.h", 13839, 1786840064
@@ -113,8 +113,8 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000000r 1               	.dbg		file, "C:\tools\cc65\include/_antic.h", 11827, 1786840064
 000000r 1               	.dbg		file, "C:\Users\Alex\Chased3D/maze.h", 550, 1787868964
 000000r 1               	.dbg		file, "C:\Users\Alex\Chased3D/trig3d.h", 333, 1787781160
-000000r 1               	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1410, 1788473348
-000000r 1               	.dbg		file, "C:\Users\Alex\Chased3D/build_number.h", 136, 1788473352
+000000r 1               	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1356, 1788475720
+000000r 1               	.dbg		file, "C:\Users\Alex\Chased3D/build_number.h", 136, 1788631232
 000000r 1               	.dbg		sym, "ray_offset", "00", extern, "_ray_offset"
 000000r 1               	.dbg		sym, "cos_rel", "00", extern, "_cos_rel"
 000000r 1               	.dbg		sym, "col3d_x", "00", extern, "_col3d_x"
@@ -172,10 +172,8 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000000r 1  FF           	.byte	$FF
 000001r 1               _nose_row:
 000001r 1  FF           	.byte	$FF
-000002r 1               _pursuer_row:
-000002r 1  FF           	.byte	$FF
-000003r 1               
-000003r 1               .segment	"RODATA"
+000002r 1               
+000002r 1               .segment	"RODATA"
 000000r 1               
 000000r 1               _dir_dx:
 000000r 1  01           	.byte	$01
@@ -272,7 +270,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000000r 1               ;
 000000r 1               ; for (addr = 0; addr < VIEW_STRIDE * VIEW_ROWS; ++addr)
 000000r 1               ;
-000000r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 425
+000000r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 419
 000000r 1  20 rr rr     	jsr     decsp4
 000003r 1  A2 00        	ldx     #$00
 000005r 1  8A           	txa
@@ -289,7 +287,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 00001Ar 1               ;
 00001Ar 1               ; view_buffer[addr] = 0;
 00001Ar 1               ;
-00001Ar 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 426
+00001Ar 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 420
 00001Ar 1  A0 03        	ldy     #$03
 00001Cr 1  20 rr rr     	jsr     ldaxysp
 00001Fr 1  18           	clc
@@ -304,7 +302,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 00002Er 1               ;
 00002Er 1               ; for (addr = 0; addr < VIEW_STRIDE * VIEW_ROWS; ++addr)
 00002Er 1               ;
-00002Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 425
+00002Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 419
 00002Er 1  A0 02        	ldy     #$02
 000030r 1  AA           	tax
 000031r 1  A9 01        	lda     #$01
@@ -313,7 +311,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000039r 1               ;
 000039r 1               ; for (i = 0; i < sizeof(hud_line); ++i) hud_line[i] = 0;
 000039r 1               ;
-000039r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 428
+000039r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 422
 000039r 1  A9 00        L0003:	lda     #$00
 00003Br 1  A0 01        	ldy     #$01
 00003Dr 1  91 rr        L0027:	sta     (c_sp),y
@@ -331,31 +329,31 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000054r 1               ;
 000054r 1               ; hud_line[16] = HUD_CHAR('B');
 000054r 1               ;
-000054r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 430
+000054r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 424
 000054r 1  A9 62        L0029:	lda     #$62
 000056r 1  8D rr rr     	sta     _hud_line+16
 000059r 1               ;
 000059r 1               ; hud_line[17] = HUD_DIGIT(BUILD_DIGIT_100);
 000059r 1               ;
-000059r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 431
-000059r 1  A9 90        	lda     #$90
+000059r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 425
+000059r 1  A9 91        	lda     #$91
 00005Br 1  8D rr rr     	sta     _hud_line+17
 00005Er 1               ;
 00005Er 1               ; hud_line[18] = HUD_DIGIT(BUILD_DIGIT_10);
 00005Er 1               ;
-00005Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 432
-00005Er 1  A9 97        	lda     #$97
+00005Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 426
+00005Er 1  A9 92        	lda     #$92
 000060r 1  8D rr rr     	sta     _hud_line+18
 000063r 1               ;
 000063r 1               ; hud_line[19] = HUD_DIGIT(BUILD_DIGIT_1);
 000063r 1               ;
-000063r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 433
-000063r 1  A9 99        	lda     #$99
+000063r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 427
+000063r 1  A9 95        	lda     #$95
 000065r 1  8D rr rr     	sta     _hud_line+19
 000068r 1               ;
 000068r 1               ; for (addr = 0; addr < HEIGHT_STEPS; ++addr) {
 000068r 1               ;
-000068r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 436
+000068r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 430
 000068r 1  A2 00        	ldx     #$00
 00006Ar 1  8A           	txa
 00006Br 1  C8           	iny
@@ -371,7 +369,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 00007Er 1               ;
 00007Er 1               ; n = (addr <= (DIST_MIN >> 4))
 00007Er 1               ;
-00007Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 437
+00007Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 431
 00007Er 1  A0 03        	ldy     #$03
 000080r 1  B1 rr        	lda     (c_sp),y
 000082r 1  C9 00        	cmp     #$00
@@ -382,12 +380,12 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 00008Br 1               ;
 00008Br 1               ; ? VIEW_ROWS
 00008Br 1               ;
-00008Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 438
+00008Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 432
 00008Br 1  B0 05        L0011:	bcs     L0012
 00008Dr 1               ;
 00008Dr 1               ; : (unsigned char)(WALL_SCALE / (addr << 4) > VIEW_ROWS
 00008Dr 1               ;
-00008Dr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 439
+00008Dr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 433
 00008Dr 1  A9 5C        	lda     #$5C
 00008Fr 1  4C rr rr     	jmp     L002A
 000092r 1  A2 5C        L0012:	ldx     #$5C
@@ -400,7 +398,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0000A4r 1               ;
 0000A4r 1               ; ? VIEW_ROWS
 0000A4r 1               ;
-0000A4r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 440
+0000A4r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 434
 0000A4r 1  C9 5D        	cmp     #$5D
 0000A6r 1  8A           	txa
 0000A7r 1  E9 00        	sbc     #$00
@@ -408,7 +406,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0000ABr 1               ;
 0000ABr 1               ; : WALL_SCALE / (addr << 4));
 0000ABr 1               ;
-0000ABr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 441
+0000ABr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 435
 0000ABr 1  A9 5C        	lda     #$5C
 0000ADr 1  4C rr rr     	jmp     L002A
 0000B0r 1  A2 5C        L0014:	ldx     #$5C
@@ -423,7 +421,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0000C6r 1               ;
 0000C6r 1               ; height_table[addr] = n;
 0000C6r 1               ;
-0000C6r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 442
+0000C6r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 436
 0000C6r 1  A0 03        	ldy     #$03
 0000C8r 1  20 rr rr     	jsr     ldaxysp
 0000CBr 1  18           	clc
@@ -438,7 +436,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0000DBr 1               ;
 0000DBr 1               ; for (addr = 0; addr < HEIGHT_STEPS; ++addr) {
 0000DBr 1               ;
-0000DBr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 436
+0000DBr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 430
 0000DBr 1  A0 02        	ldy     #$02
 0000DDr 1  A2 00        	ldx     #$00
 0000DFr 1  A9 01        	lda     #$01
@@ -447,7 +445,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0000E7r 1               ;
 0000E7r 1               ; addr = (unsigned int)view_buffer;
 0000E7r 1               ;
-0000E7r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 445
+0000E7r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 439
 0000E7r 1  A9 rr        L000D:	lda     #<(_view_buffer)
 0000E9r 1  A2 rr        	ldx     #>(_view_buffer)
 0000EBr 1  A0 02        	ldy     #$02
@@ -455,14 +453,14 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0000F0r 1               ;
 0000F0r 1               ; n = 0;
 0000F0r 1               ;
-0000F0r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 446
+0000F0r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 440
 0000F0r 1  A9 00        	lda     #$00
 0000F2r 1  A8           	tay
 0000F3r 1  91 rr        	sta     (c_sp),y
 0000F5r 1               ;
 0000F5r 1               ; view_dlist[n++] = 0x70;
 0000F5r 1               ;
-0000F5r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 447
+0000F5r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 441
 0000F5r 1  A9 70        	lda     #$70
 0000F7r 1  99 rr rr     	sta     _view_dlist,y
 0000FAr 1  18           	clc
@@ -472,7 +470,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000101r 1               ;
 000101r 1               ; view_dlist[n++] = 0x70;
 000101r 1               ;
-000101r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 448
+000101r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 442
 000101r 1  A8           	tay
 000102r 1  A9 70        	lda     #$70
 000104r 1  99 rr rr     	sta     _view_dlist,y
@@ -484,7 +482,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000110r 1               ;
 000110r 1               ; view_dlist[n++] = 0x70;
 000110r 1               ;
-000110r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 449
+000110r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 443
 000110r 1  A8           	tay
 000111r 1  A9 70        	lda     #$70
 000113r 1  99 rr rr     	sta     _view_dlist,y
@@ -496,7 +494,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 00011Fr 1               ;
 00011Fr 1               ; view_dlist[n++] = 0x4D;                        /* mode D + load memory scan */
 00011Fr 1               ;
-00011Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 450
+00011Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 444
 00011Fr 1  A8           	tay
 000120r 1  A9 4D        	lda     #$4D
 000122r 1  99 rr rr     	sta     _view_dlist,y
@@ -508,7 +506,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 00012Er 1               ;
 00012Er 1               ; view_dlist[n++] = (unsigned char)addr;
 00012Er 1               ;
-00012Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 451
+00012Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 445
 00012Er 1  AA           	tax
 00012Fr 1  A0 02        	ldy     #$02
 000131r 1  B1 rr        	lda     (c_sp),y
@@ -521,7 +519,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 00013Fr 1               ;
 00013Fr 1               ; view_dlist[n++] = (unsigned char)(addr >> 8);
 00013Fr 1               ;
-00013Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 452
+00013Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 446
 00013Fr 1  A9 rr        	lda     #<(_view_dlist)
 000141r 1  A2 rr        	ldx     #>(_view_dlist)
 000143r 1  18           	clc
@@ -541,7 +539,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 00015Cr 1               ;
 00015Cr 1               ; for (i = 1; i < VIEW_ROWS; ++i) view_dlist[n++] = 0x0D;
 00015Cr 1               ;
-00015Cr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 453
+00015Cr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 447
 00015Cr 1  A9 01        	lda     #$01
 00015Er 1  C8           	iny
 00015Fr 1  91 rr        L0028:	sta     (c_sp),y
@@ -565,7 +563,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 00017Fr 1               ;
 00017Fr 1               ; addr = (unsigned int)hud_line;
 00017Fr 1               ;
-00017Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 454
+00017Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 448
 00017Fr 1  A9 rr        L001D:	lda     #<(_hud_line)
 000181r 1  A2 rr        	ldx     #>(_hud_line)
 000183r 1  C8           	iny
@@ -573,7 +571,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000187r 1               ;
 000187r 1               ; view_dlist[n++] = 0x46;                        /* mode 6 text + load memory scan */
 000187r 1               ;
-000187r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 455
+000187r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 449
 000187r 1  A0 00        	ldy     #$00
 000189r 1  B1 rr        	lda     (c_sp),y
 00018Br 1  A8           	tay
@@ -587,7 +585,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 00019Ar 1               ;
 00019Ar 1               ; view_dlist[n++] = (unsigned char)addr;
 00019Ar 1               ;
-00019Ar 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 456
+00019Ar 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 450
 00019Ar 1  AA           	tax
 00019Br 1  A0 02        	ldy     #$02
 00019Dr 1  B1 rr        	lda     (c_sp),y
@@ -600,7 +598,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0001ABr 1               ;
 0001ABr 1               ; view_dlist[n++] = (unsigned char)(addr >> 8);
 0001ABr 1               ;
-0001ABr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 457
+0001ABr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 451
 0001ABr 1  A9 rr        	lda     #<(_view_dlist)
 0001ADr 1  A2 rr        	ldx     #>(_view_dlist)
 0001AFr 1  18           	clc
@@ -620,7 +618,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0001C8r 1               ;
 0001C8r 1               ; addr = (unsigned int)view_dlist;
 0001C8r 1               ;
-0001C8r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 458
+0001C8r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 452
 0001C8r 1  A9 rr        	lda     #<(_view_dlist)
 0001CAr 1  A2 rr        	ldx     #>(_view_dlist)
 0001CCr 1  A0 02        	ldy     #$02
@@ -628,7 +626,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0001D1r 1               ;
 0001D1r 1               ; view_dlist[n++] = 0x41;                        /* jump and wait for vblank */
 0001D1r 1               ;
-0001D1r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 459
+0001D1r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 453
 0001D1r 1  A0 00        	ldy     #$00
 0001D3r 1  B1 rr        	lda     (c_sp),y
 0001D5r 1  A8           	tay
@@ -642,7 +640,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0001E4r 1               ;
 0001E4r 1               ; view_dlist[n++] = (unsigned char)addr;
 0001E4r 1               ;
-0001E4r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 460
+0001E4r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 454
 0001E4r 1  AA           	tax
 0001E5r 1  A0 02        	ldy     #$02
 0001E7r 1  B1 rr        	lda     (c_sp),y
@@ -655,7 +653,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0001F5r 1               ;
 0001F5r 1               ; view_dlist[n++] = (unsigned char)(addr >> 8);
 0001F5r 1               ;
-0001F5r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 461
+0001F5r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 455
 0001F5r 1  A9 rr        	lda     #<(_view_dlist)
 0001F7r 1  A2 rr        	ldx     #>(_view_dlist)
 0001F9r 1  18           	clc
@@ -675,31 +673,31 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000212r 1               ;
 000212r 1               ; COLOR0 = COLOR_FLOOR;
 000212r 1               ;
-000212r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 463
+000212r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 457
 000212r 1  A9 28        	lda     #$28
 000214r 1  8D C4 02     	sta     $02C4
 000217r 1               ;
 000217r 1               ; COLOR1 = COLOR_WALL_Y;
 000217r 1               ;
-000217r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 464
+000217r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 458
 000217r 1  A9 06        	lda     #$06
 000219r 1  8D C5 02     	sta     $02C5
 00021Cr 1               ;
 00021Cr 1               ; COLOR2 = COLOR_WALL_X;
 00021Cr 1               ;
-00021Cr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 465
+00021Cr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 459
 00021Cr 1  A9 0A        	lda     #$0A
 00021Er 1  8D C6 02     	sta     $02C6
 000221r 1               ;
 000221r 1               ; COLOR4 = COLOR_CEILING;
 000221r 1               ;
-000221r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 466
+000221r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 460
 000221r 1  A9 92        	lda     #$92
 000223r 1  8D C8 02     	sta     $02C8
 000226r 1               ;
 000226r 1               ; OS.sdlst = view_dlist;
 000226r 1               ;
-000226r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 468
+000226r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 462
 000226r 1  A9 rr        	lda     #>(_view_dlist)
 000228r 1  8D 31 02     	sta     $0230+1
 00022Br 1  A9 rr        	lda     #<(_view_dlist)
@@ -707,39 +705,39 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000230r 1               ;
 000230r 1               ; OS.sdmctl = 0x22;
 000230r 1               ;
-000230r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 469
+000230r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 463
 000230r 1  A9 22        	lda     #$22
 000232r 1  8D 2F 02     	sta     $022F
 000235r 1               ;
 000235r 1               ; ANTIC.dmactl = 0x22;
 000235r 1               ;
-000235r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 470
+000235r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 464
 000235r 1  8D 00 D4     	sta     $D400
 000238r 1               ;
 000238r 1               ; floor_phase = 0;
 000238r 1               ;
-000238r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 471
+000238r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 465
 000238r 1  98           	tya
 000239r 1  8D rr rr     	sta     _floor_phase
 00023Cr 1               ;
 00023Cr 1               ; floor_rotation = 0;
 00023Cr 1               ;
-00023Cr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 472
+00023Cr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 466
 00023Cr 1  8D rr rr     	sta     _floor_rotation
 00023Fr 1               ;
 00023Fr 1               ; set_floor_dlis();
 00023Fr 1               ;
-00023Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 473
+00023Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 467
 00023Fr 1  20 rr rr     	jsr     _set_floor_dlis
 000242r 1               ;
 000242r 1               ; floor_dli_install();
 000242r 1               ;
-000242r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 474
+000242r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 468
 000242r 1  20 rr rr     	jsr     _floor_dli_install
 000245r 1               ;
 000245r 1               ; }
 000245r 1               ;
-000245r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 475
+000245r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 469
 000245r 1  4C rr rr     	jmp     incsp4
 000248r 1               
 000248r 1               	.dbg	line
@@ -764,12 +762,12 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000248r 1               ;
 000248r 1               ; {
 000248r 1               ;
-000248r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 190
+000248r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 189
 000248r 1  20 rr rr     	jsr     pushax
 00024Br 1               ;
 00024Br 1               ; for (col = 0; col < VIEW_COLS; ++col) {
 00024Br 1               ;
-00024Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 193
+00024Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 192
 00024Br 1  20 rr rr     	jsr     decsp1
 00024Er 1  A9 00        	lda     #$00
 000250r 1  A8           	tay
@@ -779,7 +777,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000257r 1               ;
 000257r 1               ; cast_column(col, angle + (unsigned int)ray_offset[col], px, py);
 000257r 1               ;
-000257r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 194
+000257r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 193
 000257r 1  B1 rr        	lda     (c_sp),y
 000259r 1  20 rr rr     	jsr     pusha
 00025Cr 1  A2 00        	ldx     #$00
@@ -814,7 +812,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 00028Er 1               ;
 00028Er 1               ; for (col = 0; col < VIEW_COLS; ++col) {
 00028Er 1               ;
-00028Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 193
+00028Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 192
 00028Er 1  A0 00        	ldy     #$00
 000290r 1  18           	clc
 000291r 1  A9 01        	lda     #$01
@@ -823,7 +821,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000298r 1               ;
 000298r 1               ; }
 000298r 1               ;
-000298r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 196
+000298r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 195
 000298r 1  4C rr rr     L0003:	jmp     incsp7
 00029Br 1               
 00029Br 1               	.dbg	line
@@ -845,12 +843,12 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 00029Br 1               ;
 00029Br 1               ; {
 00029Br 1               ;
-00029Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 213
+00029Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 212
 00029Br 1  20 rr rr     	jsr     pusha
 00029Er 1               ;
 00029Er 1               ; if (direction > 0) {
 00029Er 1               ;
-00029Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 214
+00029Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 213
 00029Er 1  A0 00        	ldy     #$00
 0002A0r 1  B1 rr        	lda     (c_sp),y
 0002A2r 1  38           	sec
@@ -861,7 +859,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0002ABr 1               ;
 0002ABr 1               ; if (++floor_phase >= FLOOR_BAND_ROWS) {
 0002ABr 1               ;
-0002ABr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 215
+0002ABr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 214
 0002ABr 1  EE rr rr     	inc     _floor_phase
 0002AEr 1  AD rr rr     	lda     _floor_phase
 0002B1r 1  C9 07        	cmp     #$07
@@ -869,17 +867,17 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0002B5r 1               ;
 0002B5r 1               ; floor_phase = 0;
 0002B5r 1               ;
-0002B5r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 216
+0002B5r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 215
 0002B5r 1  8C rr rr     	sty     _floor_phase
 0002B8r 1               ;
 0002B8r 1               ; floor_rotation = floor_rotation == 0
 0002B8r 1               ;
-0002B8r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 217
+0002B8r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 216
 0002B8r 1  AD rr rr     	lda     _floor_rotation
 0002BBr 1               ;
 0002BBr 1               ; ? FLOOR_BANDS - 1 : (unsigned char)(floor_rotation - 1);
 0002BBr 1               ;
-0002BBr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 218
+0002BBr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 217
 0002BBr 1  D0 05        	bne     L000C
 0002BDr 1  A9 05        	lda     #$05
 0002BFr 1  4C rr rr     	jmp     L000D
@@ -890,29 +888,29 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0002CBr 1               ;
 0002CBr 1               ; floor_dli_set_rotation(floor_rotation);
 0002CBr 1               ;
-0002CBr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 219
+0002CBr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 218
 0002CBr 1  20 rr rr     	jsr     _floor_dli_set_rotation
 0002CEr 1               ;
 0002CEr 1               ; } else {
 0002CEr 1               ;
-0002CEr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 221
+0002CEr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 220
 0002CEr 1  4C rr rr     	jmp     L000B
 0002D1r 1               ;
 0002D1r 1               ; if (floor_phase == 0) {
 0002D1r 1               ;
-0002D1r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 222
+0002D1r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 221
 0002D1r 1  AD rr rr     L000E:	lda     _floor_phase
 0002D4r 1  D0 1B        	bne     L0010
 0002D6r 1               ;
 0002D6r 1               ; floor_phase = FLOOR_BAND_ROWS - 1;
 0002D6r 1               ;
-0002D6r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 223
+0002D6r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 222
 0002D6r 1  A9 06        	lda     #$06
 0002D8r 1  8D rr rr     	sta     _floor_phase
 0002DBr 1               ;
 0002DBr 1               ; if (++floor_rotation >= FLOOR_BANDS) floor_rotation = 0;
 0002DBr 1               ;
-0002DBr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 224
+0002DBr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 223
 0002DBr 1  EE rr rr     	inc     _floor_rotation
 0002DEr 1  AD rr rr     	lda     _floor_rotation
 0002E1r 1  C9 06        	cmp     #$06
@@ -921,28 +919,28 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0002E8r 1               ;
 0002E8r 1               ; floor_dli_set_rotation(floor_rotation);
 0002E8r 1               ;
-0002E8r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 225
+0002E8r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 224
 0002E8r 1  AD rr rr     L000F:	lda     _floor_rotation
 0002EBr 1  20 rr rr     	jsr     _floor_dli_set_rotation
 0002EEr 1               ;
 0002EEr 1               ; } else {
 0002EEr 1               ;
-0002EEr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 226
+0002EEr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 225
 0002EEr 1  4C rr rr     	jmp     L000B
 0002F1r 1               ;
 0002F1r 1               ; --floor_phase;
 0002F1r 1               ;
-0002F1r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 227
+0002F1r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 226
 0002F1r 1  CE rr rr     L0010:	dec     _floor_phase
 0002F4r 1               ;
 0002F4r 1               ; set_floor_dlis();
 0002F4r 1               ;
-0002F4r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 230
+0002F4r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 229
 0002F4r 1  20 rr rr     L000B:	jsr     _set_floor_dlis
 0002F7r 1               ;
 0002F7r 1               ; }
 0002F7r 1               ;
-0002F7r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 231
+0002F7r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 230
 0002F7r 1  4C rr rr     	jmp     incsp1
 0002FAr 1               
 0002FAr 1               	.dbg	line
@@ -964,19 +962,19 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0002FAr 1               ;
 0002FAr 1               ; {
 0002FAr 1               ;
-0002FAr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 413
+0002FAr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 407
 0002FAr 1  20 rr rr     	jsr     pushax
 0002FDr 1               ;
 0002FDr 1               ; dist >>= 4;
 0002FDr 1               ;
-0002FDr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 414
+0002FDr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 408
 0002FDr 1  20 rr rr     	jsr     ldax0sp
 000300r 1  20 rr rr     	jsr     shrax4
 000303r 1  20 rr rr     	jsr     stax0sp
 000306r 1               ;
 000306r 1               ; if (dist >= HEIGHT_STEPS) dist = HEIGHT_STEPS - 1;
 000306r 1               ;
-000306r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 415
+000306r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 409
 000306r 1  C9 90        	cmp     #$90
 000308r 1  8A           	txa
 000309r 1  E9 01        	sbc     #$01
@@ -987,7 +985,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000314r 1               ;
 000314r 1               ; return height_table[dist];
 000314r 1               ;
-000314r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 416
+000314r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 410
 000314r 1  20 rr rr     L0002:	jsr     ldax0sp
 000317r 1  85 rr        	sta     ptr1
 000319r 1  8A           	txa
@@ -1000,7 +998,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000325r 1               ;
 000325r 1               ; }
 000325r 1               ;
-000325r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 417
+000325r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 411
 000325r 1  4C rr rr     	jmp     incsp2
 000328r 1               
 000328r 1               	.dbg	line
@@ -1024,7 +1022,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000328r 1               ;
 000328r 1               ; for (row = 0; row < MAZE_H; ++row) {
 000328r 1               ;
-000328r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 240
+000328r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 239
 000328r 1  20 rr rr     	jsr     decsp3
 00032Br 1  A9 00        	lda     #$00
 00032Dr 1  A0 02        	ldy     #$02
@@ -1035,7 +1033,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000338r 1               ;
 000338r 1               ; for (byte = 0; byte < MINI_BYTES; ++byte) {
 000338r 1               ;
-000338r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 241
+000338r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 240
 000338r 1  A9 00        	lda     #$00
 00033Ar 1  A8           	tay
 00033Br 1  91 rr        L0012:	sta     (c_sp),y
@@ -1044,7 +1042,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000341r 1               ;
 000341r 1               ; minimap_bits[row][byte] = 0;
 000341r 1               ;
-000341r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 242
+000341r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 241
 000341r 1  A0 02        	ldy     #$02
 000343r 1  A2 00        	ldx     #$00
 000345r 1  B1 rr        	lda     (c_sp),y
@@ -1069,7 +1067,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000367r 1               ;
 000367r 1               ; for (byte = 0; byte < MINI_BYTES; ++byte) {
 000367r 1               ;
-000367r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 241
+000367r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 240
 000367r 1  18           	clc
 000368r 1  A9 01        	lda     #$01
 00036Ar 1  71 rr        	adc     (c_sp),y
@@ -1077,7 +1075,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 00036Fr 1               ;
 00036Fr 1               ; for (col = 0; col < MAZE_W; ++col) {
 00036Fr 1               ;
-00036Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 244
+00036Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 243
 00036Fr 1  98           L0015:	tya
 000370r 1  C8           	iny
 000371r 1  91 rr        L0013:	sta     (c_sp),y
@@ -1086,7 +1084,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000377r 1               ;
 000377r 1               ; if (maze_solid(col, row)) {
 000377r 1               ;
-000377r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 245
+000377r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 244
 000377r 1  B1 rr        	lda     (c_sp),y
 000379r 1  20 rr rr     	jsr     pusha
 00037Cr 1  A0 03        	ldy     #$03
@@ -1097,7 +1095,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000386r 1               ;
 000386r 1               ; minimap_bits[row][col >> 2] |=
 000386r 1               ;
-000386r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 246
+000386r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 245
 000386r 1  A0 02        	ldy     #$02
 000388r 1  A2 00        	ldx     #$00
 00038Ar 1  B1 rr        	lda     (c_sp),y
@@ -1120,7 +1118,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0003A6r 1               ;
 0003A6r 1               ; (unsigned char)(0x02 << (6 - ((col & 3) << 1)));
 0003A6r 1               ;
-0003A6r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 247
+0003A6r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 246
 0003A6r 1  20 rr rr     L0011:	jsr     pushax
 0003A9r 1  85 rr        	sta     ptr1
 0003ABr 1  86 rr        	stx     ptr1+1
@@ -1145,7 +1143,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0003D7r 1               ;
 0003D7r 1               ; for (col = 0; col < MAZE_W; ++col) {
 0003D7r 1               ;
-0003D7r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 244
+0003D7r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 243
 0003D7r 1  A0 01        L000C:	ldy     #$01
 0003D9r 1  18           	clc
 0003DAr 1  98           	tya
@@ -1154,7 +1152,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0003E0r 1               ;
 0003E0r 1               ; for (row = 0; row < MAZE_H; ++row) {
 0003E0r 1               ;
-0003E0r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 240
+0003E0r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 239
 0003E0r 1  C8           L0004:	iny
 0003E1r 1  18           	clc
 0003E2r 1  A9 01        	lda     #$01
@@ -1163,7 +1161,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0003E9r 1               ;
 0003E9r 1               ; }
 0003E9r 1               ;
-0003E9r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 251
+0003E9r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 250
 0003E9r 1  4C rr rr     L0003:	jmp     incsp3
 0003ECr 1               
 0003ECr 1               	.dbg	line
@@ -1187,7 +1185,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0003ECr 1               ;
 0003ECr 1               ; dest = view_buffer;
 0003ECr 1               ;
-0003ECr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 260
+0003ECr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 259
 0003ECr 1  20 rr rr     	jsr     decsp4
 0003EFr 1  A9 rr        	lda     #<(_view_buffer)
 0003F1r 1  A2 rr        	ldx     #>(_view_buffer)
@@ -1196,7 +1194,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 0003F8r 1               ;
 0003F8r 1               ; for (row = 0; row < MAZE_H; ++row) {
 0003F8r 1               ;
-0003F8r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 261
+0003F8r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 260
 0003F8r 1  A9 00        	lda     #$00
 0003FAr 1  A0 01        	ldy     #$01
 0003FCr 1  91 rr        L000B:	sta     (c_sp),y
@@ -1205,7 +1203,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000402r 1               ;
 000402r 1               ; for (byte = 0; byte < MINI_BYTES; ++byte) {
 000402r 1               ;
-000402r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 262
+000402r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 261
 000402r 1  A9 00        	lda     #$00
 000404r 1  88           	dey
 000405r 1  91 rr        L000A:	sta     (c_sp),y
@@ -1214,7 +1212,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 00040Br 1               ;
 00040Br 1               ; dest[byte] = minimap_bits[row][byte];
 00040Br 1               ;
-00040Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 263
+00040Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 262
 00040Br 1  B1 rr        	lda     (c_sp),y
 00040Dr 1  18           	clc
 00040Er 1  A0 02        	ldy     #$02
@@ -1243,7 +1241,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000438r 1               ;
 000438r 1               ; for (byte = 0; byte < MINI_BYTES; ++byte) {
 000438r 1               ;
-000438r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 262
+000438r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 261
 000438r 1  18           	clc
 000439r 1  A9 01        	lda     #$01
 00043Br 1  71 rr        	adc     (c_sp),y
@@ -1251,7 +1249,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000440r 1               ;
 000440r 1               ; dest += VIEW_STRIDE;
 000440r 1               ;
-000440r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 265
+000440r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 264
 000440r 1  A0 02        L0007:	ldy     #$02
 000442r 1  A2 00        	ldx     #$00
 000444r 1  A9 28        	lda     #$28
@@ -1259,7 +1257,7 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000449r 1               ;
 000449r 1               ; for (row = 0; row < MAZE_H; ++row) {
 000449r 1               ;
-000449r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 261
+000449r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 260
 000449r 1  A0 01        	ldy     #$01
 00044Br 1  18           	clc
 00044Cr 1  98           	tya
@@ -1268,14 +1266,14 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000452r 1               ;
 000452r 1               ; }
 000452r 1               ;
-000452r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 267
+000452r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 266
 000452r 1  4C rr rr     L0003:	jmp     incsp4
 000455r 1               
 000455r 1               	.dbg	line
 000455r 1               .endproc
 000455r 1               
 000455r 1               ; ---------------------------------------------------------------
-000455r 1               ; void __near__ minimap_update (unsigned int px, unsigned int py, unsigned int angle, unsigned int pursuer_x, unsigned int pursuer_y)
+000455r 1               ; void __near__ minimap_update (unsigned int px, unsigned int py, unsigned int angle)
 000455r 1               ; ---------------------------------------------------------------
 000455r 1               
 000455r 1               .segment	"CODE"
@@ -1283,11 +1281,9 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000455r 1               .proc	_minimap_update: near
 000455r 1               
 000455r 1               	.dbg	func, "minimap_update", "00", static, "_minimap_update"
-000455r 1               	.dbg	sym, "px", "00", auto, 8
-000455r 1               	.dbg	sym, "py", "00", auto, 6
-000455r 1               	.dbg	sym, "angle", "00", auto, 4
-000455r 1               	.dbg	sym, "pursuer_x", "00", auto, 2
-000455r 1               	.dbg	sym, "pursuer_y", "00", auto, 0
+000455r 1               	.dbg	sym, "px", "00", auto, 4
+000455r 1               	.dbg	sym, "py", "00", auto, 2
+000455r 1               	.dbg	sym, "angle", "00", auto, 0
 000455r 1               	.dbg	sym, "col", "00", auto, -1
 000455r 1               	.dbg	sym, "row", "00", auto, -2
 000455r 1               	.dbg	sym, "facing", "00", auto, -3
@@ -1297,1531 +1293,1507 @@ Current file: C:\Users\Alex\Chased3D\debug\view3d.s
 000455r 1               ;
 000455r 1               ; {
 000455r 1               ;
-000455r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 294
+000455r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 292
 000455r 1  20 rr rr     	jsr     pushax
 000458r 1               ;
 000458r 1               ; minimap_restore_row(marker_row);
 000458r 1               ;
-000458r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 299
+000458r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 297
 000458r 1  20 rr rr     	jsr     decsp3
 00045Br 1  AD rr rr     	lda     _marker_row
 00045Er 1  20 rr rr     	jsr     _minimap_restore_row
 000461r 1               ;
 000461r 1               ; minimap_restore_row(nose_row);
 000461r 1               ;
-000461r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 300
+000461r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 298
 000461r 1  AD rr rr     	lda     _nose_row
 000464r 1  20 rr rr     	jsr     _minimap_restore_row
 000467r 1               ;
-000467r 1               ; minimap_restore_row(pursuer_row);
+000467r 1               ; col = (unsigned char)(px >> 8);
 000467r 1               ;
-000467r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 301
-000467r 1  AD rr rr     	lda     _pursuer_row
-00046Ar 1  20 rr rr     	jsr     _minimap_restore_row
-00046Dr 1               ;
-00046Dr 1               ; col = (unsigned char)(px >> 8);
-00046Dr 1               ;
-00046Dr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 303
-00046Dr 1  A0 0C        	ldy     #$0C
-00046Fr 1  B1 rr        	lda     (c_sp),y
-000471r 1  A0 02        	ldy     #$02
-000473r 1  91 rr        	sta     (c_sp),y
-000475r 1               ;
-000475r 1               ; row = (unsigned char)(py >> 8);
-000475r 1               ;
-000475r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 304
-000475r 1  A0 0A        	ldy     #$0A
-000477r 1  B1 rr        	lda     (c_sp),y
-000479r 1  A0 01        	ldy     #$01
-00047Br 1  91 rr        	sta     (c_sp),y
-00047Dr 1               ;
-00047Dr 1               ; facing = (unsigned char)(((((unsigned int)(angle >> 8)) + 16) >> 5) & 7);
-00047Dr 1               ;
-00047Dr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 305
-00047Dr 1  A0 08        	ldy     #$08
-00047Fr 1  A2 00        	ldx     #$00
-000481r 1  B1 rr        	lda     (c_sp),y
-000483r 1  A0 10        	ldy     #$10
-000485r 1  20 rr rr     	jsr     incaxy
-000488r 1  20 rr rr     	jsr     shrax4
-00048Br 1  20 rr rr     	jsr     shrax1
-00048Er 1  29 07        	and     #$07
-000490r 1  A0 00        	ldy     #$00
-000492r 1  91 rr        	sta     (c_sp),y
-000494r 1               ;
-000494r 1               ; nose_row = (unsigned char)(row + dir_dy[facing]);
-000494r 1               ;
-000494r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 307
-000494r 1  A9 rr        	lda     #<(_dir_dy)
-000496r 1  A2 rr        	ldx     #>(_dir_dy)
-000498r 1  18           	clc
-000499r 1  71 rr        	adc     (c_sp),y
-00049Br 1  90 01        	bcc     L0006
-00049Dr 1  E8           	inx
-00049Er 1  20 rr rr     L0006:	jsr     ldaidx
-0004A1r 1  18           	clc
-0004A2r 1  C8           	iny
-0004A3r 1  71 rr        	adc     (c_sp),y
-0004A5r 1  8D rr rr     	sta     _nose_row
-0004A8r 1               ;
-0004A8r 1               ; minimap_plot((unsigned char)(col + dir_dx[facing]), nose_row, 0x01);
-0004A8r 1               ;
-0004A8r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 308
-0004A8r 1  A9 rr        	lda     #<(_dir_dx)
-0004AAr 1  A2 rr        	ldx     #>(_dir_dx)
-0004ACr 1  18           	clc
-0004ADr 1  88           	dey
-0004AEr 1  71 rr        	adc     (c_sp),y
-0004B0r 1  90 01        	bcc     L0007
-0004B2r 1  E8           	inx
-0004B3r 1  20 rr rr     L0007:	jsr     ldaidx
-0004B6r 1  18           	clc
-0004B7r 1  A0 02        	ldy     #$02
-0004B9r 1  71 rr        	adc     (c_sp),y
+000467r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 300
+000467r 1  A0 08        	ldy     #$08
+000469r 1  B1 rr        	lda     (c_sp),y
+00046Br 1  A0 02        	ldy     #$02
+00046Dr 1  91 rr        	sta     (c_sp),y
+00046Fr 1               ;
+00046Fr 1               ; row = (unsigned char)(py >> 8);
+00046Fr 1               ;
+00046Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 301
+00046Fr 1  A0 06        	ldy     #$06
+000471r 1  B1 rr        	lda     (c_sp),y
+000473r 1  A0 01        	ldy     #$01
+000475r 1  91 rr        	sta     (c_sp),y
+000477r 1               ;
+000477r 1               ; facing = (unsigned char)(((((unsigned int)(angle >> 8)) + 16) >> 5) & 7);
+000477r 1               ;
+000477r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 302
+000477r 1  A0 04        	ldy     #$04
+000479r 1  A2 00        	ldx     #$00
+00047Br 1  B1 rr        	lda     (c_sp),y
+00047Dr 1  A0 10        	ldy     #$10
+00047Fr 1  20 rr rr     	jsr     incaxy
+000482r 1  20 rr rr     	jsr     shrax4
+000485r 1  20 rr rr     	jsr     shrax1
+000488r 1  29 07        	and     #$07
+00048Ar 1  A0 00        	ldy     #$00
+00048Cr 1  91 rr        	sta     (c_sp),y
+00048Er 1               ;
+00048Er 1               ; nose_row = (unsigned char)(row + dir_dy[facing]);
+00048Er 1               ;
+00048Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 304
+00048Er 1  A9 rr        	lda     #<(_dir_dy)
+000490r 1  A2 rr        	ldx     #>(_dir_dy)
+000492r 1  18           	clc
+000493r 1  71 rr        	adc     (c_sp),y
+000495r 1  90 01        	bcc     L0006
+000497r 1  E8           	inx
+000498r 1  20 rr rr     L0006:	jsr     ldaidx
+00049Br 1  18           	clc
+00049Cr 1  C8           	iny
+00049Dr 1  71 rr        	adc     (c_sp),y
+00049Fr 1  8D rr rr     	sta     _nose_row
+0004A2r 1               ;
+0004A2r 1               ; minimap_plot((unsigned char)(col + dir_dx[facing]), nose_row, 0x01);
+0004A2r 1               ;
+0004A2r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 305
+0004A2r 1  A9 rr        	lda     #<(_dir_dx)
+0004A4r 1  A2 rr        	ldx     #>(_dir_dx)
+0004A6r 1  18           	clc
+0004A7r 1  88           	dey
+0004A8r 1  71 rr        	adc     (c_sp),y
+0004AAr 1  90 01        	bcc     L0007
+0004ACr 1  E8           	inx
+0004ADr 1  20 rr rr     L0007:	jsr     ldaidx
+0004B0r 1  18           	clc
+0004B1r 1  A0 02        	ldy     #$02
+0004B3r 1  71 rr        	adc     (c_sp),y
+0004B5r 1  20 rr rr     	jsr     pusha
+0004B8r 1  AD rr rr     	lda     _nose_row
 0004BBr 1  20 rr rr     	jsr     pusha
-0004BEr 1  AD rr rr     	lda     _nose_row
-0004C1r 1  20 rr rr     	jsr     pusha
-0004C4r 1  A9 01        	lda     #$01
-0004C6r 1  20 rr rr     	jsr     _minimap_plot
-0004C9r 1               ;
-0004C9r 1               ; minimap_plot(col, row, 0x03);
-0004C9r 1               ;
-0004C9r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 309
-0004C9r 1  A0 02        	ldy     #$02
-0004CBr 1  B1 rr        	lda     (c_sp),y
-0004CDr 1  20 rr rr     	jsr     pusha
-0004D0r 1  A0 02        	ldy     #$02
-0004D2r 1  B1 rr        	lda     (c_sp),y
-0004D4r 1  20 rr rr     	jsr     pusha
-0004D7r 1  A9 03        	lda     #$03
-0004D9r 1  20 rr rr     	jsr     _minimap_plot
-0004DCr 1               ;
-0004DCr 1               ; marker_row = row;
-0004DCr 1               ;
-0004DCr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 310
-0004DCr 1  A0 01        	ldy     #$01
-0004DEr 1  B1 rr        	lda     (c_sp),y
-0004E0r 1  8D rr rr     	sta     _marker_row
-0004E3r 1               ;
-0004E3r 1               ; pursuer_row = (unsigned char)(pursuer_y >> 8);
-0004E3r 1               ;
-0004E3r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 312
-0004E3r 1  A0 04        	ldy     #$04
-0004E5r 1  B1 rr        	lda     (c_sp),y
-0004E7r 1  8D rr rr     	sta     _pursuer_row
-0004EAr 1               ;
-0004EAr 1               ; minimap_plot((unsigned char)(pursuer_x >> 8), pursuer_row, 0x01);
-0004EAr 1               ;
-0004EAr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 313
-0004EAr 1  A0 06        	ldy     #$06
-0004ECr 1  B1 rr        	lda     (c_sp),y
-0004EEr 1  20 rr rr     	jsr     pusha
-0004F1r 1  AD rr rr     	lda     _pursuer_row
-0004F4r 1  20 rr rr     	jsr     pusha
-0004F7r 1  A9 01        	lda     #$01
-0004F9r 1  20 rr rr     	jsr     _minimap_plot
-0004FCr 1               ;
-0004FCr 1               ; }
-0004FCr 1               ;
-0004FCr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 314
-0004FCr 1  A0 0D        	ldy     #$0D
-0004FEr 1  4C rr rr     	jmp     addysp
-000501r 1               
-000501r 1               	.dbg	line
-000501r 1               .endproc
-000501r 1               
-000501r 1               ; ---------------------------------------------------------------
-000501r 1               ; void __near__ hud_set_fps (unsigned char fps)
-000501r 1               ; ---------------------------------------------------------------
-000501r 1               
-000501r 1               .segment	"CODE"
-000501r 1               
-000501r 1               .proc	_hud_set_fps: near
-000501r 1               
-000501r 1               	.dbg	func, "hud_set_fps", "00", static, "_hud_set_fps"
-000501r 1               	.dbg	sym, "fps", "00", auto, 0
-000501r 1               
-000501r 1               .segment	"CODE"
-000501r 1               
-000501r 1               ;
-000501r 1               ; {
-000501r 1               ;
-000501r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 325
-000501r 1  20 rr rr     	jsr     pusha
-000504r 1               ;
-000504r 1               ; if (fps > 99) fps = 99;
-000504r 1               ;
-000504r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 326
-000504r 1  A0 00        	ldy     #$00
-000506r 1  B1 rr        	lda     (c_sp),y
-000508r 1  C9 64        	cmp     #$64
-00050Ar 1  90 04        	bcc     L0003
-00050Cr 1  A9 63        	lda     #$63
-00050Er 1  91 rr        	sta     (c_sp),y
-000510r 1               ;
-000510r 1               ; hud_line[0] = HUD_CHAR('F');
-000510r 1               ;
-000510r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 327
-000510r 1  A9 66        L0003:	lda     #$66
-000512r 1  8D rr rr     	sta     _hud_line
-000515r 1               ;
-000515r 1               ; hud_line[1] = HUD_CHAR('P');
-000515r 1               ;
-000515r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 328
-000515r 1  A9 70        	lda     #$70
-000517r 1  8D rr rr     	sta     _hud_line+1
-00051Ar 1               ;
-00051Ar 1               ; hud_line[2] = HUD_CHAR('S');
-00051Ar 1               ;
-00051Ar 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 329
-00051Ar 1  A9 73        	lda     #$73
-00051Cr 1  8D rr rr     	sta     _hud_line+2
-00051Fr 1               ;
-00051Fr 1               ; hud_line[4] = HUD_DIGIT(fps / 10);
-00051Fr 1               ;
-00051Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 330
-00051Fr 1  B1 rr        	lda     (c_sp),y
-000521r 1  20 rr rr     	jsr     pusha0
-000524r 1  A9 0A        	lda     #$0A
-000526r 1  20 rr rr     	jsr     tosudiva0
-000529r 1  A0 10        	ldy     #$10
-00052Br 1  20 rr rr     	jsr     incaxy
-00052Er 1  09 80        	ora     #$80
-000530r 1  8D rr rr     	sta     _hud_line+4
-000533r 1               ;
-000533r 1               ; hud_line[5] = HUD_DIGIT(fps % 10);
-000533r 1               ;
-000533r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 331
-000533r 1  A2 00        	ldx     #$00
-000535r 1  A1 rr        	lda     (c_sp,x)
-000537r 1  20 rr rr     	jsr     pusha0
-00053Ar 1  A9 0A        	lda     #$0A
-00053Cr 1  20 rr rr     	jsr     tosumoda0
-00053Fr 1  A0 10        	ldy     #$10
-000541r 1  20 rr rr     	jsr     incaxy
-000544r 1  09 80        	ora     #$80
-000546r 1  8D rr rr     	sta     _hud_line+5
-000549r 1               ;
-000549r 1               ; }
-000549r 1               ;
-000549r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 332
-000549r 1  4C rr rr     	jmp     incsp1
-00054Cr 1               
-00054Cr 1               	.dbg	line
-00054Cr 1               .endproc
-00054Cr 1               
-00054Cr 1               ; ---------------------------------------------------------------
-00054Cr 1               ; void __near__ hud_set_targets (unsigned char remaining)
-00054Cr 1               ; ---------------------------------------------------------------
-00054Cr 1               
-00054Cr 1               .segment	"CODE"
-00054Cr 1               
-00054Cr 1               .proc	_hud_set_targets: near
-00054Cr 1               
-00054Cr 1               	.dbg	func, "hud_set_targets", "00", static, "_hud_set_targets"
-00054Cr 1               	.dbg	sym, "remaining", "00", auto, 0
-00054Cr 1               
-00054Cr 1               .segment	"CODE"
-00054Cr 1               
-00054Cr 1               ;
-00054Cr 1               ; {
-00054Cr 1               ;
-00054Cr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 335
-00054Cr 1  20 rr rr     	jsr     pusha
-00054Fr 1               ;
-00054Fr 1               ; if (remaining > 99) remaining = 99;
-00054Fr 1               ;
-00054Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 336
-00054Fr 1  A0 00        	ldy     #$00
-000551r 1  B1 rr        	lda     (c_sp),y
-000553r 1  C9 64        	cmp     #$64
-000555r 1  90 04        	bcc     L0003
-000557r 1  A9 63        	lda     #$63
-000559r 1  91 rr        	sta     (c_sp),y
-00055Br 1               ;
-00055Br 1               ; hud_line[10] = HUD_CHAR('T');
-00055Br 1               ;
-00055Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 337
-00055Br 1  A9 74        L0003:	lda     #$74
-00055Dr 1  8D rr rr     	sta     _hud_line+10
-000560r 1               ;
-000560r 1               ; hud_line[11] = HUD_CHAR('G');
-000560r 1               ;
-000560r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 338
-000560r 1  A9 67        	lda     #$67
-000562r 1  8D rr rr     	sta     _hud_line+11
-000565r 1               ;
-000565r 1               ; hud_line[12] = HUD_CHAR('T');
-000565r 1               ;
-000565r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 339
-000565r 1  A9 74        	lda     #$74
-000567r 1  8D rr rr     	sta     _hud_line+12
-00056Ar 1               ;
-00056Ar 1               ; hud_line[14] = HUD_DIGIT(remaining / 10);
-00056Ar 1               ;
-00056Ar 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 340
-00056Ar 1  B1 rr        	lda     (c_sp),y
-00056Cr 1  20 rr rr     	jsr     pusha0
-00056Fr 1  A9 0A        	lda     #$0A
-000571r 1  20 rr rr     	jsr     tosudiva0
-000574r 1  A0 10        	ldy     #$10
-000576r 1  20 rr rr     	jsr     incaxy
-000579r 1  09 80        	ora     #$80
-00057Br 1  8D rr rr     	sta     _hud_line+14
+0004BEr 1  A9 01        	lda     #$01
+0004C0r 1  20 rr rr     	jsr     _minimap_plot
+0004C3r 1               ;
+0004C3r 1               ; minimap_plot(col, row, 0x03);
+0004C3r 1               ;
+0004C3r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 306
+0004C3r 1  A0 02        	ldy     #$02
+0004C5r 1  B1 rr        	lda     (c_sp),y
+0004C7r 1  20 rr rr     	jsr     pusha
+0004CAr 1  A0 02        	ldy     #$02
+0004CCr 1  B1 rr        	lda     (c_sp),y
+0004CEr 1  20 rr rr     	jsr     pusha
+0004D1r 1  A9 03        	lda     #$03
+0004D3r 1  20 rr rr     	jsr     _minimap_plot
+0004D6r 1               ;
+0004D6r 1               ; marker_row = row;
+0004D6r 1               ;
+0004D6r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 307
+0004D6r 1  A0 01        	ldy     #$01
+0004D8r 1  B1 rr        	lda     (c_sp),y
+0004DAr 1  8D rr rr     	sta     _marker_row
+0004DDr 1               ;
+0004DDr 1               ; }
+0004DDr 1               ;
+0004DDr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 308
+0004DDr 1  A0 09        	ldy     #$09
+0004DFr 1  4C rr rr     	jmp     addysp
+0004E2r 1               
+0004E2r 1               	.dbg	line
+0004E2r 1               .endproc
+0004E2r 1               
+0004E2r 1               ; ---------------------------------------------------------------
+0004E2r 1               ; void __near__ hud_set_fps (unsigned char fps)
+0004E2r 1               ; ---------------------------------------------------------------
+0004E2r 1               
+0004E2r 1               .segment	"CODE"
+0004E2r 1               
+0004E2r 1               .proc	_hud_set_fps: near
+0004E2r 1               
+0004E2r 1               	.dbg	func, "hud_set_fps", "00", static, "_hud_set_fps"
+0004E2r 1               	.dbg	sym, "fps", "00", auto, 0
+0004E2r 1               
+0004E2r 1               .segment	"CODE"
+0004E2r 1               
+0004E2r 1               ;
+0004E2r 1               ; {
+0004E2r 1               ;
+0004E2r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 319
+0004E2r 1  20 rr rr     	jsr     pusha
+0004E5r 1               ;
+0004E5r 1               ; if (fps > 99) fps = 99;
+0004E5r 1               ;
+0004E5r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 320
+0004E5r 1  A0 00        	ldy     #$00
+0004E7r 1  B1 rr        	lda     (c_sp),y
+0004E9r 1  C9 64        	cmp     #$64
+0004EBr 1  90 04        	bcc     L0003
+0004EDr 1  A9 63        	lda     #$63
+0004EFr 1  91 rr        	sta     (c_sp),y
+0004F1r 1               ;
+0004F1r 1               ; hud_line[0] = HUD_CHAR('F');
+0004F1r 1               ;
+0004F1r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 321
+0004F1r 1  A9 66        L0003:	lda     #$66
+0004F3r 1  8D rr rr     	sta     _hud_line
+0004F6r 1               ;
+0004F6r 1               ; hud_line[1] = HUD_CHAR('P');
+0004F6r 1               ;
+0004F6r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 322
+0004F6r 1  A9 70        	lda     #$70
+0004F8r 1  8D rr rr     	sta     _hud_line+1
+0004FBr 1               ;
+0004FBr 1               ; hud_line[2] = HUD_CHAR('S');
+0004FBr 1               ;
+0004FBr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 323
+0004FBr 1  A9 73        	lda     #$73
+0004FDr 1  8D rr rr     	sta     _hud_line+2
+000500r 1               ;
+000500r 1               ; hud_line[4] = HUD_DIGIT(fps / 10);
+000500r 1               ;
+000500r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 324
+000500r 1  B1 rr        	lda     (c_sp),y
+000502r 1  20 rr rr     	jsr     pusha0
+000505r 1  A9 0A        	lda     #$0A
+000507r 1  20 rr rr     	jsr     tosudiva0
+00050Ar 1  A0 10        	ldy     #$10
+00050Cr 1  20 rr rr     	jsr     incaxy
+00050Fr 1  09 80        	ora     #$80
+000511r 1  8D rr rr     	sta     _hud_line+4
+000514r 1               ;
+000514r 1               ; hud_line[5] = HUD_DIGIT(fps % 10);
+000514r 1               ;
+000514r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 325
+000514r 1  A2 00        	ldx     #$00
+000516r 1  A1 rr        	lda     (c_sp,x)
+000518r 1  20 rr rr     	jsr     pusha0
+00051Br 1  A9 0A        	lda     #$0A
+00051Dr 1  20 rr rr     	jsr     tosumoda0
+000520r 1  A0 10        	ldy     #$10
+000522r 1  20 rr rr     	jsr     incaxy
+000525r 1  09 80        	ora     #$80
+000527r 1  8D rr rr     	sta     _hud_line+5
+00052Ar 1               ;
+00052Ar 1               ; }
+00052Ar 1               ;
+00052Ar 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 326
+00052Ar 1  4C rr rr     	jmp     incsp1
+00052Dr 1               
+00052Dr 1               	.dbg	line
+00052Dr 1               .endproc
+00052Dr 1               
+00052Dr 1               ; ---------------------------------------------------------------
+00052Dr 1               ; void __near__ hud_set_targets (unsigned char remaining)
+00052Dr 1               ; ---------------------------------------------------------------
+00052Dr 1               
+00052Dr 1               .segment	"CODE"
+00052Dr 1               
+00052Dr 1               .proc	_hud_set_targets: near
+00052Dr 1               
+00052Dr 1               	.dbg	func, "hud_set_targets", "00", static, "_hud_set_targets"
+00052Dr 1               	.dbg	sym, "remaining", "00", auto, 0
+00052Dr 1               
+00052Dr 1               .segment	"CODE"
+00052Dr 1               
+00052Dr 1               ;
+00052Dr 1               ; {
+00052Dr 1               ;
+00052Dr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 329
+00052Dr 1  20 rr rr     	jsr     pusha
+000530r 1               ;
+000530r 1               ; if (remaining > 99) remaining = 99;
+000530r 1               ;
+000530r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 330
+000530r 1  A0 00        	ldy     #$00
+000532r 1  B1 rr        	lda     (c_sp),y
+000534r 1  C9 64        	cmp     #$64
+000536r 1  90 04        	bcc     L0003
+000538r 1  A9 63        	lda     #$63
+00053Ar 1  91 rr        	sta     (c_sp),y
+00053Cr 1               ;
+00053Cr 1               ; hud_line[10] = HUD_CHAR('T');
+00053Cr 1               ;
+00053Cr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 331
+00053Cr 1  A9 74        L0003:	lda     #$74
+00053Er 1  8D rr rr     	sta     _hud_line+10
+000541r 1               ;
+000541r 1               ; hud_line[11] = HUD_CHAR('G');
+000541r 1               ;
+000541r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 332
+000541r 1  A9 67        	lda     #$67
+000543r 1  8D rr rr     	sta     _hud_line+11
+000546r 1               ;
+000546r 1               ; hud_line[12] = HUD_CHAR('T');
+000546r 1               ;
+000546r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 333
+000546r 1  A9 74        	lda     #$74
+000548r 1  8D rr rr     	sta     _hud_line+12
+00054Br 1               ;
+00054Br 1               ; hud_line[14] = HUD_DIGIT(remaining / 10);
+00054Br 1               ;
+00054Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 334
+00054Br 1  B1 rr        	lda     (c_sp),y
+00054Dr 1  20 rr rr     	jsr     pusha0
+000550r 1  A9 0A        	lda     #$0A
+000552r 1  20 rr rr     	jsr     tosudiva0
+000555r 1  A0 10        	ldy     #$10
+000557r 1  20 rr rr     	jsr     incaxy
+00055Ar 1  09 80        	ora     #$80
+00055Cr 1  8D rr rr     	sta     _hud_line+14
+00055Fr 1               ;
+00055Fr 1               ; hud_line[15] = HUD_DIGIT(remaining % 10);
+00055Fr 1               ;
+00055Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 335
+00055Fr 1  A2 00        	ldx     #$00
+000561r 1  A1 rr        	lda     (c_sp,x)
+000563r 1  20 rr rr     	jsr     pusha0
+000566r 1  A9 0A        	lda     #$0A
+000568r 1  20 rr rr     	jsr     tosumoda0
+00056Br 1  A0 10        	ldy     #$10
+00056Dr 1  20 rr rr     	jsr     incaxy
+000570r 1  09 80        	ora     #$80
+000572r 1  8D rr rr     	sta     _hud_line+15
+000575r 1               ;
+000575r 1               ; }
+000575r 1               ;
+000575r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 336
+000575r 1  4C rr rr     	jmp     incsp1
+000578r 1               
+000578r 1               	.dbg	line
+000578r 1               .endproc
+000578r 1               
+000578r 1               ; ---------------------------------------------------------------
+000578r 1               ; void __near__ hud_set_game (unsigned char lives, unsigned char level, unsigned int score, unsigned int high_score)
+000578r 1               ; ---------------------------------------------------------------
+000578r 1               
+000578r 1               .segment	"CODE"
+000578r 1               
+000578r 1               .proc	_hud_set_game: near
+000578r 1               
+000578r 1               	.dbg	func, "hud_set_game", "00", static, "_hud_set_game"
+000578r 1               	.dbg	sym, "lives", "00", auto, 5
+000578r 1               	.dbg	sym, "level", "00", auto, 4
+000578r 1               	.dbg	sym, "score", "00", auto, 2
+000578r 1               	.dbg	sym, "high_score", "00", auto, 0
+000578r 1               
+000578r 1               .segment	"CODE"
+000578r 1               
+000578r 1               ;
+000578r 1               ; {
+000578r 1               ;
+000578r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 355
+000578r 1  20 rr rr     	jsr     pushax
+00057Br 1               ;
+00057Br 1               ; }
+00057Br 1               ;
+00057Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 377
+00057Br 1  4C rr rr     	jmp     incsp6
+00057Er 1               
+00057Er 1               	.dbg	line
+00057Er 1               .endproc
+00057Er 1               
+00057Er 1               ; ---------------------------------------------------------------
+00057Er 1               ; void __near__ hud_set_decoy (unsigned char progress, unsigned char maximum)
+00057Er 1               ; ---------------------------------------------------------------
+00057Er 1               
+00057Er 1               .segment	"CODE"
+00057Er 1               
+00057Er 1               .proc	_hud_set_decoy: near
+00057Er 1               
+00057Er 1               	.dbg	func, "hud_set_decoy", "00", static, "_hud_set_decoy"
+00057Er 1               	.dbg	sym, "progress", "00", auto, 1
+00057Er 1               	.dbg	sym, "maximum", "00", auto, 0
+00057Er 1               	.dbg	sym, "filled", "00", auto, -1
+00057Er 1               	.dbg	sym, "col", "00", auto, -2
+00057Er 1               	.dbg	sym, "row", "00", auto, -3
+00057Er 1               	.dbg	sym, "value", "00", auto, -4
+00057Er 1               	.dbg	sym, "shift", "00", auto, -5
+00057Er 1               	.dbg	sym, "dest", "00", auto, -7
+00057Er 1               
+00057Er 1               .segment	"CODE"
+00057Er 1               
 00057Er 1               ;
-00057Er 1               ; hud_line[15] = HUD_DIGIT(remaining % 10);
+00057Er 1               ; {
 00057Er 1               ;
-00057Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 341
-00057Er 1  A2 00        	ldx     #$00
-000580r 1  A1 rr        	lda     (c_sp,x)
-000582r 1  20 rr rr     	jsr     pusha0
-000585r 1  A9 0A        	lda     #$0A
-000587r 1  20 rr rr     	jsr     tosumoda0
-00058Ar 1  A0 10        	ldy     #$10
-00058Cr 1  20 rr rr     	jsr     incaxy
-00058Fr 1  09 80        	ora     #$80
-000591r 1  8D rr rr     	sta     _hud_line+15
-000594r 1               ;
-000594r 1               ; }
-000594r 1               ;
-000594r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 342
-000594r 1  4C rr rr     	jmp     incsp1
-000597r 1               
-000597r 1               	.dbg	line
-000597r 1               .endproc
-000597r 1               
-000597r 1               ; ---------------------------------------------------------------
-000597r 1               ; void __near__ hud_set_game (unsigned char lives, unsigned char level, unsigned int score, unsigned int high_score)
-000597r 1               ; ---------------------------------------------------------------
-000597r 1               
-000597r 1               .segment	"CODE"
-000597r 1               
-000597r 1               .proc	_hud_set_game: near
-000597r 1               
-000597r 1               	.dbg	func, "hud_set_game", "00", static, "_hud_set_game"
-000597r 1               	.dbg	sym, "lives", "00", auto, 5
-000597r 1               	.dbg	sym, "level", "00", auto, 4
-000597r 1               	.dbg	sym, "score", "00", auto, 2
-000597r 1               	.dbg	sym, "high_score", "00", auto, 0
-000597r 1               
-000597r 1               .segment	"CODE"
-000597r 1               
-000597r 1               ;
-000597r 1               ; {
-000597r 1               ;
-000597r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 361
-000597r 1  20 rr rr     	jsr     pushax
-00059Ar 1               ;
-00059Ar 1               ; }
-00059Ar 1               ;
-00059Ar 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 383
-00059Ar 1  4C rr rr     	jmp     incsp6
-00059Dr 1               
-00059Dr 1               	.dbg	line
-00059Dr 1               .endproc
-00059Dr 1               
-00059Dr 1               ; ---------------------------------------------------------------
-00059Dr 1               ; void __near__ hud_set_decoy (unsigned char progress, unsigned char maximum)
-00059Dr 1               ; ---------------------------------------------------------------
-00059Dr 1               
-00059Dr 1               .segment	"CODE"
-00059Dr 1               
-00059Dr 1               .proc	_hud_set_decoy: near
-00059Dr 1               
-00059Dr 1               	.dbg	func, "hud_set_decoy", "00", static, "_hud_set_decoy"
-00059Dr 1               	.dbg	sym, "progress", "00", auto, 1
-00059Dr 1               	.dbg	sym, "maximum", "00", auto, 0
-00059Dr 1               	.dbg	sym, "filled", "00", auto, -1
-00059Dr 1               	.dbg	sym, "col", "00", auto, -2
-00059Dr 1               	.dbg	sym, "row", "00", auto, -3
-00059Dr 1               	.dbg	sym, "value", "00", auto, -4
-00059Dr 1               	.dbg	sym, "shift", "00", auto, -5
-00059Dr 1               	.dbg	sym, "dest", "00", auto, -7
-00059Dr 1               
-00059Dr 1               .segment	"CODE"
-00059Dr 1               
-00059Dr 1               ;
-00059Dr 1               ; {
-00059Dr 1               ;
-00059Dr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 386
-00059Dr 1  20 rr rr     	jsr     pusha
-0005A0r 1               ;
-0005A0r 1               ; filled = maximum == 0 ? DECOY_BAR_INNER_WIDTH
-0005A0r 1               ;
-0005A0r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 394
-0005A0r 1  20 rr rr     	jsr     decsp7
-0005A3r 1  A0 07        	ldy     #$07
-0005A5r 1  B1 rr        	lda     (c_sp),y
-0005A7r 1  D0 05        	bne     L0002
-0005A9r 1               ;
-0005A9r 1               ; : (unsigned char)(((unsigned int)progress * DECOY_BAR_INNER_WIDTH) / maximum);
-0005A9r 1               ;
-0005A9r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 395
-0005A9r 1  A9 12        	lda     #$12
-0005ABr 1  4C rr rr     	jmp     L0018
-0005AEr 1  C8           L0002:	iny
-0005AFr 1  B1 rr        	lda     (c_sp),y
-0005B1r 1  20 rr rr     	jsr     pusha0
-0005B4r 1  A9 12        	lda     #$12
-0005B6r 1  20 rr rr     	jsr     tosumula0
-0005B9r 1  20 rr rr     	jsr     pushax
-0005BCr 1  A0 09        	ldy     #$09
-0005BEr 1  B1 rr        	lda     (c_sp),y
-0005C0r 1  20 rr rr     	jsr     tosudiva0
-0005C3r 1  A0 06        L0018:	ldy     #$06
-0005C5r 1  91 rr        	sta     (c_sp),y
-0005C7r 1               ;
-0005C7r 1               ; if (filled > DECOY_BAR_INNER_WIDTH) filled = DECOY_BAR_INNER_WIDTH;
-0005C7r 1               ;
-0005C7r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 396
-0005C7r 1  C9 13        	cmp     #$13
-0005C9r 1  A9 00        	lda     #$00
-0005CBr 1  90 06        	bcc     L001A
-0005CDr 1  A9 12        	lda     #$12
-0005CFr 1  91 rr        	sta     (c_sp),y
-0005D1r 1               ;
-0005D1r 1               ; for (row = 0; row < DECOY_BAR_HEIGHT; ++row) {
-0005D1r 1               ;
-0005D1r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 398
-0005D1r 1  A9 00        	lda     #$00
-0005D3r 1  A0 04        L001A:	ldy     #$04
-0005D5r 1  91 rr        L0016:	sta     (c_sp),y
-0005D7r 1  C9 06        	cmp     #$06
-0005D9r 1  90 03 4C rr  	jcs     L0006
-0005DDr 1  rr           
-0005DEr 1               ;
-0005DEr 1               ; dest = view_buffer + (unsigned int)(DECOY_BAR_TOP + row) * VIEW_STRIDE;
-0005DEr 1               ;
-0005DEr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 399
-0005DEr 1  A2 00        	ldx     #$00
-0005E0r 1  B1 rr        	lda     (c_sp),y
-0005E2r 1  A0 3D        	ldy     #$3D
-0005E4r 1  20 rr rr     	jsr     incaxy
-0005E7r 1  20 rr rr     	jsr     pushax
-0005EAr 1  A9 28        	lda     #$28
-0005ECr 1  20 rr rr     	jsr     tosumula0
-0005EFr 1  18           	clc
-0005F0r 1  69 rr        	adc     #<(_view_buffer)
-0005F2r 1  A8           	tay
-0005F3r 1  8A           	txa
-0005F4r 1  69 rr        	adc     #>(_view_buffer)
-0005F6r 1  AA           	tax
-0005F7r 1  98           	tya
-0005F8r 1  20 rr rr     	jsr     stax0sp
+00057Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 380
+00057Er 1  20 rr rr     	jsr     pusha
+000581r 1               ;
+000581r 1               ; filled = maximum == 0 ? DECOY_BAR_INNER_WIDTH
+000581r 1               ;
+000581r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 388
+000581r 1  20 rr rr     	jsr     decsp7
+000584r 1  A0 07        	ldy     #$07
+000586r 1  B1 rr        	lda     (c_sp),y
+000588r 1  D0 05        	bne     L0002
+00058Ar 1               ;
+00058Ar 1               ; : (unsigned char)(((unsigned int)progress * DECOY_BAR_INNER_WIDTH) / maximum);
+00058Ar 1               ;
+00058Ar 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 389
+00058Ar 1  A9 12        	lda     #$12
+00058Cr 1  4C rr rr     	jmp     L0018
+00058Fr 1  C8           L0002:	iny
+000590r 1  B1 rr        	lda     (c_sp),y
+000592r 1  20 rr rr     	jsr     pusha0
+000595r 1  A9 12        	lda     #$12
+000597r 1  20 rr rr     	jsr     tosumula0
+00059Ar 1  20 rr rr     	jsr     pushax
+00059Dr 1  A0 09        	ldy     #$09
+00059Fr 1  B1 rr        	lda     (c_sp),y
+0005A1r 1  20 rr rr     	jsr     tosudiva0
+0005A4r 1  A0 06        L0018:	ldy     #$06
+0005A6r 1  91 rr        	sta     (c_sp),y
+0005A8r 1               ;
+0005A8r 1               ; if (filled > DECOY_BAR_INNER_WIDTH) filled = DECOY_BAR_INNER_WIDTH;
+0005A8r 1               ;
+0005A8r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 390
+0005A8r 1  C9 13        	cmp     #$13
+0005AAr 1  A9 00        	lda     #$00
+0005ACr 1  90 06        	bcc     L001A
+0005AEr 1  A9 12        	lda     #$12
+0005B0r 1  91 rr        	sta     (c_sp),y
+0005B2r 1               ;
+0005B2r 1               ; for (row = 0; row < DECOY_BAR_HEIGHT; ++row) {
+0005B2r 1               ;
+0005B2r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 392
+0005B2r 1  A9 00        	lda     #$00
+0005B4r 1  A0 04        L001A:	ldy     #$04
+0005B6r 1  91 rr        L0016:	sta     (c_sp),y
+0005B8r 1  C9 06        	cmp     #$06
+0005BAr 1  90 03 4C rr  	jcs     L0006
+0005BEr 1  rr           
+0005BFr 1               ;
+0005BFr 1               ; dest = view_buffer + (unsigned int)(DECOY_BAR_TOP + row) * VIEW_STRIDE;
+0005BFr 1               ;
+0005BFr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 393
+0005BFr 1  A2 00        	ldx     #$00
+0005C1r 1  B1 rr        	lda     (c_sp),y
+0005C3r 1  A0 3D        	ldy     #$3D
+0005C5r 1  20 rr rr     	jsr     incaxy
+0005C8r 1  20 rr rr     	jsr     pushax
+0005CBr 1  A9 28        	lda     #$28
+0005CDr 1  20 rr rr     	jsr     tosumula0
+0005D0r 1  18           	clc
+0005D1r 1  69 rr        	adc     #<(_view_buffer)
+0005D3r 1  A8           	tay
+0005D4r 1  8A           	txa
+0005D5r 1  69 rr        	adc     #>(_view_buffer)
+0005D7r 1  AA           	tax
+0005D8r 1  98           	tya
+0005D9r 1  20 rr rr     	jsr     stax0sp
+0005DCr 1               ;
+0005DCr 1               ; for (col = 0; col < MAZE_W; ++col) {
+0005DCr 1               ;
+0005DCr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 394
+0005DCr 1  A9 00        	lda     #$00
+0005DEr 1  A0 05        	ldy     #$05
+0005E0r 1  91 rr        L0015:	sta     (c_sp),y
+0005E2r 1  C9 14        	cmp     #$14
+0005E4r 1  90 03 4C rr  	jcs     L0007
+0005E8r 1  rr           
+0005E9r 1               ;
+0005E9r 1               ; if (row == 0 || row == DECOY_BAR_HEIGHT - 1 || col == 0 || col == MAZE_W - 1)
+0005E9r 1               ;
+0005E9r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 395
+0005E9r 1  88           	dey
+0005EAr 1  B1 rr        	lda     (c_sp),y
+0005ECr 1  F0 0D        	beq     L001B
+0005EEr 1  C9 05        	cmp     #$05
+0005F0r 1  F0 09        	beq     L001B
+0005F2r 1  C8           	iny
+0005F3r 1  B1 rr        	lda     (c_sp),y
+0005F5r 1  F0 04        	beq     L001B
+0005F7r 1  C9 13        	cmp     #$13
+0005F9r 1  D0 05        	bne     L001D
 0005FBr 1               ;
-0005FBr 1               ; for (col = 0; col < MAZE_W; ++col) {
+0005FBr 1               ; value = 2;
 0005FBr 1               ;
-0005FBr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 400
-0005FBr 1  A9 00        	lda     #$00
-0005FDr 1  A0 05        	ldy     #$05
-0005FFr 1  91 rr        L0015:	sta     (c_sp),y
-000601r 1  C9 14        	cmp     #$14
-000603r 1  90 03 4C rr  	jcs     L0007
-000607r 1  rr           
-000608r 1               ;
-000608r 1               ; if (row == 0 || row == DECOY_BAR_HEIGHT - 1 || col == 0 || col == MAZE_W - 1)
-000608r 1               ;
-000608r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 401
-000608r 1  88           	dey
-000609r 1  B1 rr        	lda     (c_sp),y
-00060Br 1  F0 0D        	beq     L001B
-00060Dr 1  C9 05        	cmp     #$05
-00060Fr 1  F0 09        	beq     L001B
-000611r 1  C8           	iny
-000612r 1  B1 rr        	lda     (c_sp),y
-000614r 1  F0 04        	beq     L001B
-000616r 1  C9 13        	cmp     #$13
-000618r 1  D0 05        	bne     L001D
-00061Ar 1               ;
-00061Ar 1               ; value = 2;
-00061Ar 1               ;
-00061Ar 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 402
-00061Ar 1  A9 02        L001B:	lda     #$02
-00061Cr 1               ;
-00061Cr 1               ; else
-00061Cr 1               ;
-00061Cr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 403
-00061Cr 1  4C rr rr     	jmp     L0020
-00061Fr 1               ;
-00061Fr 1               ; value = col <= filled ? 3 : 0;
-00061Fr 1               ;
-00061Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 404
-00061Fr 1  B1 rr        L001D:	lda     (c_sp),y
-000621r 1  C8           	iny
-000622r 1  D1 rr        	cmp     (c_sp),y
-000624r 1  F0 02        	beq     L001E
-000626r 1  B0 05        	bcs     L001F
-000628r 1  A9 03        L001E:	lda     #$03
-00062Ar 1  4C rr rr     	jmp     L0020
-00062Dr 1  A9 00        L001F:	lda     #$00
-00062Fr 1  A0 03        L0020:	ldy     #$03
-000631r 1  91 rr        	sta     (c_sp),y
-000633r 1               ;
-000633r 1               ; shift = (unsigned char)(6 - ((col & 3) << 1));
-000633r 1               ;
-000633r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 405
-000633r 1  A9 06        	lda     #$06
-000635r 1  20 rr rr     	jsr     pusha0
-000638r 1  A0 07        	ldy     #$07
-00063Ar 1  B1 rr        	lda     (c_sp),y
-00063Cr 1  29 03        	and     #$03
-00063Er 1  0A           	asl     a
-00063Fr 1  90 02        	bcc     L0013
-000641r 1  A2 01        	ldx     #$01
-000643r 1  20 rr rr     L0013:	jsr     tossubax
-000646r 1  A0 02        	ldy     #$02
-000648r 1  91 rr        	sta     (c_sp),y
-00064Ar 1               ;
-00064Ar 1               ; dest[col >> 2] = (unsigned char)(
-00064Ar 1               ;
-00064Ar 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 406
-00064Ar 1  A2 00        	ldx     #$00
-00064Cr 1  A0 05        	ldy     #$05
-00064Er 1  B1 rr        	lda     (c_sp),y
-000650r 1  4A           	lsr     a
-000651r 1  4A           	lsr     a
-000652r 1  18           	clc
-000653r 1  A0 00        	ldy     #$00
-000655r 1  71 rr        	adc     (c_sp),y
-000657r 1  85 rr        	sta     ptr2
-000659r 1  8A           	txa
-00065Ar 1  C8           	iny
-00065Br 1  71 rr        	adc     (c_sp),y
-00065Dr 1  85 rr        	sta     ptr2+1
-00065Fr 1               ;
-00065Fr 1               ; (dest[col >> 2] & ~(0x03 << shift)) | (value << shift));
-00065Fr 1               ;
-00065Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 407
-00065Fr 1  A0 05        	ldy     #$05
-000661r 1  B1 rr        	lda     (c_sp),y
-000663r 1  4A           	lsr     a
-000664r 1  4A           	lsr     a
-000665r 1  18           	clc
-000666r 1  A0 00        	ldy     #$00
-000668r 1  71 rr        	adc     (c_sp),y
-00066Ar 1  85 rr        	sta     ptr1
-00066Cr 1  8A           	txa
-00066Dr 1  C8           	iny
-00066Er 1  71 rr        	adc     (c_sp),y
-000670r 1  85 rr        	sta     ptr1+1
-000672r 1  A1 rr        	lda     (ptr1,x)
-000674r 1  85 rr        	sta     ptr1
-000676r 1  C8           	iny
-000677r 1  B1 rr        	lda     (c_sp),y
-000679r 1  A8           	tay
-00067Ar 1  A9 03        	lda     #$03
-00067Cr 1  20 rr rr     	jsr     aslaxy
-00067Fr 1  49 FF        	eor     #$FF
-000681r 1  25 rr        	and     ptr1
-000683r 1  85 rr        	sta     sreg
-000685r 1  A2 00        	ldx     #$00
-000687r 1  A0 03        	ldy     #$03
-000689r 1  B1 rr        	lda     (c_sp),y
-00068Br 1  85 rr        	sta     ptr1
-00068Dr 1  88           	dey
-00068Er 1  B1 rr        	lda     (c_sp),y
-000690r 1  A8           	tay
-000691r 1  A5 rr        	lda     ptr1
-000693r 1  20 rr rr     	jsr     aslaxy
-000696r 1  05 rr        	ora     sreg
+0005FBr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 396
+0005FBr 1  A9 02        L001B:	lda     #$02
+0005FDr 1               ;
+0005FDr 1               ; else
+0005FDr 1               ;
+0005FDr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 397
+0005FDr 1  4C rr rr     	jmp     L0020
+000600r 1               ;
+000600r 1               ; value = col <= filled ? 3 : 0;
+000600r 1               ;
+000600r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 398
+000600r 1  B1 rr        L001D:	lda     (c_sp),y
+000602r 1  C8           	iny
+000603r 1  D1 rr        	cmp     (c_sp),y
+000605r 1  F0 02        	beq     L001E
+000607r 1  B0 05        	bcs     L001F
+000609r 1  A9 03        L001E:	lda     #$03
+00060Br 1  4C rr rr     	jmp     L0020
+00060Er 1  A9 00        L001F:	lda     #$00
+000610r 1  A0 03        L0020:	ldy     #$03
+000612r 1  91 rr        	sta     (c_sp),y
+000614r 1               ;
+000614r 1               ; shift = (unsigned char)(6 - ((col & 3) << 1));
+000614r 1               ;
+000614r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 399
+000614r 1  A9 06        	lda     #$06
+000616r 1  20 rr rr     	jsr     pusha0
+000619r 1  A0 07        	ldy     #$07
+00061Br 1  B1 rr        	lda     (c_sp),y
+00061Dr 1  29 03        	and     #$03
+00061Fr 1  0A           	asl     a
+000620r 1  90 02        	bcc     L0013
+000622r 1  A2 01        	ldx     #$01
+000624r 1  20 rr rr     L0013:	jsr     tossubax
+000627r 1  A0 02        	ldy     #$02
+000629r 1  91 rr        	sta     (c_sp),y
+00062Br 1               ;
+00062Br 1               ; dest[col >> 2] = (unsigned char)(
+00062Br 1               ;
+00062Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 400
+00062Br 1  A2 00        	ldx     #$00
+00062Dr 1  A0 05        	ldy     #$05
+00062Fr 1  B1 rr        	lda     (c_sp),y
+000631r 1  4A           	lsr     a
+000632r 1  4A           	lsr     a
+000633r 1  18           	clc
+000634r 1  A0 00        	ldy     #$00
+000636r 1  71 rr        	adc     (c_sp),y
+000638r 1  85 rr        	sta     ptr2
+00063Ar 1  8A           	txa
+00063Br 1  C8           	iny
+00063Cr 1  71 rr        	adc     (c_sp),y
+00063Er 1  85 rr        	sta     ptr2+1
+000640r 1               ;
+000640r 1               ; (dest[col >> 2] & ~(0x03 << shift)) | (value << shift));
+000640r 1               ;
+000640r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 401
+000640r 1  A0 05        	ldy     #$05
+000642r 1  B1 rr        	lda     (c_sp),y
+000644r 1  4A           	lsr     a
+000645r 1  4A           	lsr     a
+000646r 1  18           	clc
+000647r 1  A0 00        	ldy     #$00
+000649r 1  71 rr        	adc     (c_sp),y
+00064Br 1  85 rr        	sta     ptr1
+00064Dr 1  8A           	txa
+00064Er 1  C8           	iny
+00064Fr 1  71 rr        	adc     (c_sp),y
+000651r 1  85 rr        	sta     ptr1+1
+000653r 1  A1 rr        	lda     (ptr1,x)
+000655r 1  85 rr        	sta     ptr1
+000657r 1  C8           	iny
+000658r 1  B1 rr        	lda     (c_sp),y
+00065Ar 1  A8           	tay
+00065Br 1  A9 03        	lda     #$03
+00065Dr 1  20 rr rr     	jsr     aslaxy
+000660r 1  49 FF        	eor     #$FF
+000662r 1  25 rr        	and     ptr1
+000664r 1  85 rr        	sta     sreg
+000666r 1  A2 00        	ldx     #$00
+000668r 1  A0 03        	ldy     #$03
+00066Ar 1  B1 rr        	lda     (c_sp),y
+00066Cr 1  85 rr        	sta     ptr1
+00066Er 1  88           	dey
+00066Fr 1  B1 rr        	lda     (c_sp),y
+000671r 1  A8           	tay
+000672r 1  A5 rr        	lda     ptr1
+000674r 1  20 rr rr     	jsr     aslaxy
+000677r 1  05 rr        	ora     sreg
+000679r 1  A0 00        	ldy     #$00
+00067Br 1  91 rr        	sta     (ptr2),y
+00067Dr 1               ;
+00067Dr 1               ; for (col = 0; col < MAZE_W; ++col) {
+00067Dr 1               ;
+00067Dr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 394
+00067Dr 1  A0 05        	ldy     #$05
+00067Fr 1  18           	clc
+000680r 1  A9 01        	lda     #$01
+000682r 1  71 rr        	adc     (c_sp),y
+000684r 1  4C rr rr     	jmp     L0015
+000687r 1               ;
+000687r 1               ; for (row = 0; row < DECOY_BAR_HEIGHT; ++row) {
+000687r 1               ;
+000687r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 392
+000687r 1  88           L0007:	dey
+000688r 1  18           	clc
+000689r 1  A9 01        	lda     #$01
+00068Br 1  71 rr        	adc     (c_sp),y
+00068Dr 1  4C rr rr     	jmp     L0016
+000690r 1               ;
+000690r 1               ; }
+000690r 1               ;
+000690r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 404
+000690r 1  A0 09        L0006:	ldy     #$09
+000692r 1  4C rr rr     	jmp     addysp
+000695r 1               
+000695r 1               	.dbg	line
+000695r 1               .endproc
+000695r 1               
+000695r 1               ; ---------------------------------------------------------------
+000695r 1               ; void __near__ draw_open_byte (unsigned char x)
+000695r 1               ; ---------------------------------------------------------------
+000695r 1               
+000695r 1               .segment	"CODE"
+000695r 1               
+000695r 1               .proc	_draw_open_byte: near
+000695r 1               
+000695r 1               	.dbg	func, "draw_open_byte", "00", static, "_draw_open_byte"
+000695r 1               	.dbg	sym, "x", "00", auto, 0
+000695r 1               
+000695r 1               .segment	"CODE"
+000695r 1               
+000695r 1               ;
+000695r 1               ; {
+000695r 1               ;
+000695r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 98
+000695r 1  20 rr rr     	jsr     pusha
+000698r 1               ;
+000698r 1               ; col3d_x = x;
+000698r 1               ;
+000698r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 99
 000698r 1  A0 00        	ldy     #$00
-00069Ar 1  91 rr        	sta     (ptr2),y
-00069Cr 1               ;
-00069Cr 1               ; for (col = 0; col < MAZE_W; ++col) {
-00069Cr 1               ;
-00069Cr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 400
-00069Cr 1  A0 05        	ldy     #$05
-00069Er 1  18           	clc
-00069Fr 1  A9 01        	lda     #$01
-0006A1r 1  71 rr        	adc     (c_sp),y
-0006A3r 1  4C rr rr     	jmp     L0015
-0006A6r 1               ;
-0006A6r 1               ; for (row = 0; row < DECOY_BAR_HEIGHT; ++row) {
-0006A6r 1               ;
-0006A6r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 398
-0006A6r 1  88           L0007:	dey
-0006A7r 1  18           	clc
-0006A8r 1  A9 01        	lda     #$01
-0006AAr 1  71 rr        	adc     (c_sp),y
-0006ACr 1  4C rr rr     	jmp     L0016
-0006AFr 1               ;
-0006AFr 1               ; }
-0006AFr 1               ;
-0006AFr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 410
-0006AFr 1  A0 09        L0006:	ldy     #$09
-0006B1r 1  4C rr rr     	jmp     addysp
-0006B4r 1               
-0006B4r 1               	.dbg	line
-0006B4r 1               .endproc
-0006B4r 1               
-0006B4r 1               ; ---------------------------------------------------------------
-0006B4r 1               ; void __near__ draw_open_byte (unsigned char x)
-0006B4r 1               ; ---------------------------------------------------------------
-0006B4r 1               
-0006B4r 1               .segment	"CODE"
-0006B4r 1               
-0006B4r 1               .proc	_draw_open_byte: near
-0006B4r 1               
-0006B4r 1               	.dbg	func, "draw_open_byte", "00", static, "_draw_open_byte"
-0006B4r 1               	.dbg	sym, "x", "00", auto, 0
-0006B4r 1               
-0006B4r 1               .segment	"CODE"
-0006B4r 1               
-0006B4r 1               ;
-0006B4r 1               ; {
-0006B4r 1               ;
-0006B4r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 99
-0006B4r 1  20 rr rr     	jsr     pusha
-0006B7r 1               ;
-0006B7r 1               ; col3d_x = x;
-0006B7r 1               ;
-0006B7r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 100
-0006B7r 1  A0 00        	ldy     #$00
-0006B9r 1  B1 rr        	lda     (c_sp),y
-0006BBr 1  8D rr rr     	sta     _col3d_x
-0006BEr 1               ;
-0006BEr 1               ; col3d_row = HORIZON;
-0006BEr 1               ;
-0006BEr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 101
-0006BEr 1  A9 2E        	lda     #$2E
-0006C0r 1  8D rr rr     	sta     _col3d_row
-0006C3r 1               ;
-0006C3r 1               ; col3d_color = PIX_FLOOR;
-0006C3r 1               ;
-0006C3r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 102
-0006C3r 1  A9 55        	lda     #$55
-0006C5r 1  8D rr rr     	sta     _col3d_color
-0006C8r 1               ;
-0006C8r 1               ; col3d_fill_down();
-0006C8r 1               ;
-0006C8r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 103
-0006C8r 1  20 rr rr     	jsr     _col3d_fill_down
-0006CBr 1               ;
-0006CBr 1               ; col3d_row = HORIZON - 1;
-0006CBr 1               ;
-0006CBr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 104
-0006CBr 1  A9 2D        	lda     #$2D
-0006CDr 1  8D rr rr     	sta     _col3d_row
+00069Ar 1  B1 rr        	lda     (c_sp),y
+00069Cr 1  8D rr rr     	sta     _col3d_x
+00069Fr 1               ;
+00069Fr 1               ; col3d_row = HORIZON;
+00069Fr 1               ;
+00069Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 100
+00069Fr 1  A9 2E        	lda     #$2E
+0006A1r 1  8D rr rr     	sta     _col3d_row
+0006A4r 1               ;
+0006A4r 1               ; col3d_color = PIX_FLOOR;
+0006A4r 1               ;
+0006A4r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 101
+0006A4r 1  A9 55        	lda     #$55
+0006A6r 1  8D rr rr     	sta     _col3d_color
+0006A9r 1               ;
+0006A9r 1               ; col3d_fill_down();
+0006A9r 1               ;
+0006A9r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 102
+0006A9r 1  20 rr rr     	jsr     _col3d_fill_down
+0006ACr 1               ;
+0006ACr 1               ; col3d_row = HORIZON - 1;
+0006ACr 1               ;
+0006ACr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 103
+0006ACr 1  A9 2D        	lda     #$2D
+0006AEr 1  8D rr rr     	sta     _col3d_row
+0006B1r 1               ;
+0006B1r 1               ; col3d_color = PIX_CEILING;
+0006B1r 1               ;
+0006B1r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 104
+0006B1r 1  A9 00        	lda     #$00
+0006B3r 1  8D rr rr     	sta     _col3d_color
+0006B6r 1               ;
+0006B6r 1               ; col3d_fill_up();
+0006B6r 1               ;
+0006B6r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 105
+0006B6r 1  20 rr rr     	jsr     _col3d_fill_up
+0006B9r 1               ;
+0006B9r 1               ; }
+0006B9r 1               ;
+0006B9r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 106
+0006B9r 1  4C rr rr     	jmp     incsp1
+0006BCr 1               
+0006BCr 1               	.dbg	line
+0006BCr 1               .endproc
+0006BCr 1               
+0006BCr 1               ; ---------------------------------------------------------------
+0006BCr 1               ; void __near__ draw_open_column (unsigned char col)
+0006BCr 1               ; ---------------------------------------------------------------
+0006BCr 1               
+0006BCr 1               .segment	"CODE"
+0006BCr 1               
+0006BCr 1               .proc	_draw_open_column: near
+0006BCr 1               
+0006BCr 1               	.dbg	func, "draw_open_column", "00", static, "_draw_open_column"
+0006BCr 1               	.dbg	sym, "col", "00", auto, 0
+0006BCr 1               	.dbg	sym, "x", "00", auto, -1
+0006BCr 1               
+0006BCr 1               .segment	"CODE"
+0006BCr 1               
+0006BCr 1               ;
+0006BCr 1               ; {
+0006BCr 1               ;
+0006BCr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 109
+0006BCr 1  20 rr rr     	jsr     pusha
+0006BFr 1               ;
+0006BFr 1               ; x = (unsigned char)(MINI_BYTES + (col << 1));
+0006BFr 1               ;
+0006BFr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 112
+0006BFr 1  20 rr rr     	jsr     decsp1
+0006C2r 1  A0 01        	ldy     #$01
+0006C4r 1  B1 rr        	lda     (c_sp),y
+0006C6r 1  0A           	asl     a
+0006C7r 1  18           	clc
+0006C8r 1  69 05        	adc     #$05
+0006CAr 1  88           	dey
+0006CBr 1  91 rr        	sta     (c_sp),y
+0006CDr 1               ;
+0006CDr 1               ; draw_open_byte(x);
+0006CDr 1               ;
+0006CDr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 113
+0006CDr 1  20 rr rr     	jsr     _draw_open_byte
 0006D0r 1               ;
-0006D0r 1               ; col3d_color = PIX_CEILING;
+0006D0r 1               ; if (x + 1 < VIEW_STRIDE) draw_open_byte(x + 1);
 0006D0r 1               ;
-0006D0r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 105
-0006D0r 1  A9 00        	lda     #$00
-0006D2r 1  8D rr rr     	sta     _col3d_color
-0006D5r 1               ;
-0006D5r 1               ; col3d_fill_up();
-0006D5r 1               ;
-0006D5r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 106
-0006D5r 1  20 rr rr     	jsr     _col3d_fill_up
-0006D8r 1               ;
-0006D8r 1               ; }
-0006D8r 1               ;
-0006D8r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 107
-0006D8r 1  4C rr rr     	jmp     incsp1
-0006DBr 1               
-0006DBr 1               	.dbg	line
-0006DBr 1               .endproc
-0006DBr 1               
-0006DBr 1               ; ---------------------------------------------------------------
-0006DBr 1               ; void __near__ draw_open_column (unsigned char col)
-0006DBr 1               ; ---------------------------------------------------------------
-0006DBr 1               
-0006DBr 1               .segment	"CODE"
-0006DBr 1               
-0006DBr 1               .proc	_draw_open_column: near
-0006DBr 1               
-0006DBr 1               	.dbg	func, "draw_open_column", "00", static, "_draw_open_column"
-0006DBr 1               	.dbg	sym, "col", "00", auto, 0
-0006DBr 1               	.dbg	sym, "x", "00", auto, -1
-0006DBr 1               
-0006DBr 1               .segment	"CODE"
-0006DBr 1               
-0006DBr 1               ;
-0006DBr 1               ; {
-0006DBr 1               ;
-0006DBr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 110
-0006DBr 1  20 rr rr     	jsr     pusha
-0006DEr 1               ;
-0006DEr 1               ; x = (unsigned char)(MINI_BYTES + (col << 1));
-0006DEr 1               ;
-0006DEr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 113
-0006DEr 1  20 rr rr     	jsr     decsp1
-0006E1r 1  A0 01        	ldy     #$01
-0006E3r 1  B1 rr        	lda     (c_sp),y
-0006E5r 1  0A           	asl     a
+0006D0r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 114
+0006D0r 1  A0 00        	ldy     #$00
+0006D2r 1  A2 00        	ldx     #$00
+0006D4r 1  B1 rr        	lda     (c_sp),y
+0006D6r 1  20 rr rr     	jsr     incax1
+0006D9r 1  C9 28        	cmp     #$28
+0006DBr 1  8A           	txa
+0006DCr 1  E9 00        	sbc     #$00
+0006DEr 1  50 02        	bvc     L0003
+0006E0r 1  49 80        	eor     #$80
+0006E2r 1  10 08        L0003:	bpl     L0002
+0006E4r 1  B1 rr        	lda     (c_sp),y
 0006E6r 1  18           	clc
-0006E7r 1  69 05        	adc     #$05
-0006E9r 1  88           	dey
-0006EAr 1  91 rr        	sta     (c_sp),y
+0006E7r 1  69 01        	adc     #$01
+0006E9r 1  20 rr rr     	jsr     _draw_open_byte
 0006ECr 1               ;
-0006ECr 1               ; draw_open_byte(x);
+0006ECr 1               ; }
 0006ECr 1               ;
-0006ECr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 114
-0006ECr 1  20 rr rr     	jsr     _draw_open_byte
+0006ECr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 115
+0006ECr 1  4C rr rr     L0002:	jmp     incsp2
+0006EFr 1               
+0006EFr 1               	.dbg	line
+0006EFr 1               .endproc
+0006EFr 1               
+0006EFr 1               ; ---------------------------------------------------------------
+0006EFr 1               ; void __near__ draw_wall_byte (unsigned char x, unsigned char top, unsigned char bottom, unsigned char wall)
+0006EFr 1               ; ---------------------------------------------------------------
+0006EFr 1               
+0006EFr 1               .segment	"CODE"
+0006EFr 1               
+0006EFr 1               .proc	_draw_wall_byte: near
+0006EFr 1               
+0006EFr 1               	.dbg	func, "draw_wall_byte", "00", static, "_draw_wall_byte"
+0006EFr 1               	.dbg	sym, "x", "00", auto, 3
+0006EFr 1               	.dbg	sym, "top", "00", auto, 2
+0006EFr 1               	.dbg	sym, "bottom", "00", auto, 1
+0006EFr 1               	.dbg	sym, "wall", "00", auto, 0
+0006EFr 1               
+0006EFr 1               .segment	"CODE"
+0006EFr 1               
 0006EFr 1               ;
-0006EFr 1               ; if (x + 1 < VIEW_STRIDE) draw_open_byte(x + 1);
+0006EFr 1               ; {
 0006EFr 1               ;
-0006EFr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 115
-0006EFr 1  A0 00        	ldy     #$00
-0006F1r 1  A2 00        	ldx     #$00
-0006F3r 1  B1 rr        	lda     (c_sp),y
-0006F5r 1  20 rr rr     	jsr     incax1
-0006F8r 1  C9 28        	cmp     #$28
-0006FAr 1  8A           	txa
-0006FBr 1  E9 00        	sbc     #$00
-0006FDr 1  50 02        	bvc     L0003
-0006FFr 1  49 80        	eor     #$80
-000701r 1  10 08        L0003:	bpl     L0002
-000703r 1  B1 rr        	lda     (c_sp),y
-000705r 1  18           	clc
-000706r 1  69 01        	adc     #$01
-000708r 1  20 rr rr     	jsr     _draw_open_byte
-00070Br 1               ;
-00070Br 1               ; }
-00070Br 1               ;
-00070Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 116
-00070Br 1  4C rr rr     L0002:	jmp     incsp2
-00070Er 1               
-00070Er 1               	.dbg	line
-00070Er 1               .endproc
-00070Er 1               
-00070Er 1               ; ---------------------------------------------------------------
-00070Er 1               ; void __near__ draw_wall_byte (unsigned char x, unsigned char top, unsigned char bottom, unsigned char wall)
-00070Er 1               ; ---------------------------------------------------------------
-00070Er 1               
-00070Er 1               .segment	"CODE"
-00070Er 1               
-00070Er 1               .proc	_draw_wall_byte: near
-00070Er 1               
-00070Er 1               	.dbg	func, "draw_wall_byte", "00", static, "_draw_wall_byte"
-00070Er 1               	.dbg	sym, "x", "00", auto, 3
-00070Er 1               	.dbg	sym, "top", "00", auto, 2
-00070Er 1               	.dbg	sym, "bottom", "00", auto, 1
-00070Er 1               	.dbg	sym, "wall", "00", auto, 0
-00070Er 1               
-00070Er 1               .segment	"CODE"
-00070Er 1               
+0006EFr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 119
+0006EFr 1  20 rr rr     	jsr     pusha
+0006F2r 1               ;
+0006F2r 1               ; col3d_x = x;
+0006F2r 1               ;
+0006F2r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 120
+0006F2r 1  A0 03        	ldy     #$03
+0006F4r 1  B1 rr        	lda     (c_sp),y
+0006F6r 1  8D rr rr     	sta     _col3d_x
+0006F9r 1               ;
+0006F9r 1               ; col3d_row = top;
+0006F9r 1               ;
+0006F9r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 121
+0006F9r 1  88           	dey
+0006FAr 1  B1 rr        	lda     (c_sp),y
+0006FCr 1  8D rr rr     	sta     _col3d_row
+0006FFr 1               ;
+0006FFr 1               ; col3d_end = bottom + 1;
+0006FFr 1               ;
+0006FFr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 122
+0006FFr 1  88           	dey
+000700r 1  B1 rr        	lda     (c_sp),y
+000702r 1  18           	clc
+000703r 1  69 01        	adc     #$01
+000705r 1  8D rr rr     	sta     _col3d_end
+000708r 1               ;
+000708r 1               ; col3d_color = wall;
+000708r 1               ;
+000708r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 123
+000708r 1  88           	dey
+000709r 1  B1 rr        	lda     (c_sp),y
+00070Br 1  8D rr rr     	sta     _col3d_color
 00070Er 1               ;
-00070Er 1               ; {
+00070Er 1               ; col3d_fill_span();
 00070Er 1               ;
-00070Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 120
-00070Er 1  20 rr rr     	jsr     pusha
+00070Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 124
+00070Er 1  20 rr rr     	jsr     _col3d_fill_span
 000711r 1               ;
-000711r 1               ; col3d_x = x;
+000711r 1               ; if (bottom < VIEW_ROWS - 1) {
 000711r 1               ;
-000711r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 121
-000711r 1  A0 03        	ldy     #$03
+000711r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 125
+000711r 1  A0 01        	ldy     #$01
 000713r 1  B1 rr        	lda     (c_sp),y
-000715r 1  8D rr rr     	sta     _col3d_x
-000718r 1               ;
-000718r 1               ; col3d_row = top;
-000718r 1               ;
-000718r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 122
-000718r 1  88           	dey
-000719r 1  B1 rr        	lda     (c_sp),y
-00071Br 1  8D rr rr     	sta     _col3d_row
-00071Er 1               ;
-00071Er 1               ; col3d_end = bottom + 1;
-00071Er 1               ;
-00071Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 123
-00071Er 1  88           	dey
-00071Fr 1  B1 rr        	lda     (c_sp),y
-000721r 1  18           	clc
-000722r 1  69 01        	adc     #$01
-000724r 1  8D rr rr     	sta     _col3d_end
+000715r 1  C9 5B        	cmp     #$5B
+000717r 1  B0 0E        	bcs     L0002
+000719r 1               ;
+000719r 1               ; col3d_row = bottom + 1;
+000719r 1               ;
+000719r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 126
+000719r 1  18           	clc
+00071Ar 1  69 01        	adc     #$01
+00071Cr 1  8D rr rr     	sta     _col3d_row
+00071Fr 1               ;
+00071Fr 1               ; col3d_color = PIX_FLOOR;
+00071Fr 1               ;
+00071Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 127
+00071Fr 1  A9 55        	lda     #$55
+000721r 1  8D rr rr     	sta     _col3d_color
+000724r 1               ;
+000724r 1               ; col3d_fill_down();
+000724r 1               ;
+000724r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 128
+000724r 1  20 rr rr     	jsr     _col3d_fill_down
 000727r 1               ;
-000727r 1               ; col3d_color = wall;
+000727r 1               ; if (top > 0) {
 000727r 1               ;
-000727r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 124
-000727r 1  88           	dey
-000728r 1  B1 rr        	lda     (c_sp),y
-00072Ar 1  8D rr rr     	sta     _col3d_color
+000727r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 130
+000727r 1  A0 02        L0002:	ldy     #$02
+000729r 1  B1 rr        	lda     (c_sp),y
+00072Br 1  F0 0E        	beq     L0003
 00072Dr 1               ;
-00072Dr 1               ; col3d_fill_span();
+00072Dr 1               ; col3d_row = top - 1;
 00072Dr 1               ;
-00072Dr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 125
-00072Dr 1  20 rr rr     	jsr     _col3d_fill_span
-000730r 1               ;
-000730r 1               ; if (bottom < VIEW_ROWS - 1) {
-000730r 1               ;
-000730r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 126
-000730r 1  A0 01        	ldy     #$01
-000732r 1  B1 rr        	lda     (c_sp),y
-000734r 1  C9 5B        	cmp     #$5B
-000736r 1  B0 0E        	bcs     L0002
+00072Dr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 131
+00072Dr 1  38           	sec
+00072Er 1  E9 01        	sbc     #$01
+000730r 1  8D rr rr     	sta     _col3d_row
+000733r 1               ;
+000733r 1               ; col3d_color = PIX_CEILING;
+000733r 1               ;
+000733r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 132
+000733r 1  A9 00        	lda     #$00
+000735r 1  8D rr rr     	sta     _col3d_color
 000738r 1               ;
-000738r 1               ; col3d_row = bottom + 1;
+000738r 1               ; col3d_fill_up();
 000738r 1               ;
-000738r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 127
-000738r 1  18           	clc
-000739r 1  69 01        	adc     #$01
-00073Br 1  8D rr rr     	sta     _col3d_row
+000738r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 133
+000738r 1  20 rr rr     	jsr     _col3d_fill_up
+00073Br 1               ;
+00073Br 1               ; }
+00073Br 1               ;
+00073Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 135
+00073Br 1  4C rr rr     L0003:	jmp     incsp4
+00073Er 1               
+00073Er 1               	.dbg	line
+00073Er 1               .endproc
+00073Er 1               
+00073Er 1               ; ---------------------------------------------------------------
+00073Er 1               ; void __near__ draw_wall_column (unsigned char col, unsigned char top, unsigned char bottom, unsigned char wall)
+00073Er 1               ; ---------------------------------------------------------------
+00073Er 1               
+00073Er 1               .segment	"CODE"
+00073Er 1               
+00073Er 1               .proc	_draw_wall_column: near
+00073Er 1               
+00073Er 1               	.dbg	func, "draw_wall_column", "00", static, "_draw_wall_column"
+00073Er 1               	.dbg	sym, "col", "00", auto, 3
+00073Er 1               	.dbg	sym, "top", "00", auto, 2
+00073Er 1               	.dbg	sym, "bottom", "00", auto, 1
+00073Er 1               	.dbg	sym, "wall", "00", auto, 0
+00073Er 1               	.dbg	sym, "x", "00", auto, -1
+00073Er 1               
+00073Er 1               .segment	"CODE"
+00073Er 1               
 00073Er 1               ;
-00073Er 1               ; col3d_color = PIX_FLOOR;
+00073Er 1               ; {
 00073Er 1               ;
-00073Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 128
-00073Er 1  A9 55        	lda     #$55
-000740r 1  8D rr rr     	sta     _col3d_color
-000743r 1               ;
-000743r 1               ; col3d_fill_down();
-000743r 1               ;
-000743r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 129
-000743r 1  20 rr rr     	jsr     _col3d_fill_down
-000746r 1               ;
-000746r 1               ; if (top > 0) {
-000746r 1               ;
-000746r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 131
-000746r 1  A0 02        L0002:	ldy     #$02
-000748r 1  B1 rr        	lda     (c_sp),y
-00074Ar 1  F0 0E        	beq     L0003
-00074Cr 1               ;
-00074Cr 1               ; col3d_row = top - 1;
-00074Cr 1               ;
-00074Cr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 132
-00074Cr 1  38           	sec
-00074Dr 1  E9 01        	sbc     #$01
-00074Fr 1  8D rr rr     	sta     _col3d_row
-000752r 1               ;
-000752r 1               ; col3d_color = PIX_CEILING;
-000752r 1               ;
-000752r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 133
-000752r 1  A9 00        	lda     #$00
-000754r 1  8D rr rr     	sta     _col3d_color
-000757r 1               ;
-000757r 1               ; col3d_fill_up();
-000757r 1               ;
-000757r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 134
-000757r 1  20 rr rr     	jsr     _col3d_fill_up
-00075Ar 1               ;
-00075Ar 1               ; }
-00075Ar 1               ;
-00075Ar 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 136
-00075Ar 1  4C rr rr     L0003:	jmp     incsp4
-00075Dr 1               
-00075Dr 1               	.dbg	line
-00075Dr 1               .endproc
-00075Dr 1               
-00075Dr 1               ; ---------------------------------------------------------------
-00075Dr 1               ; void __near__ draw_wall_column (unsigned char col, unsigned char top, unsigned char bottom, unsigned char wall)
-00075Dr 1               ; ---------------------------------------------------------------
-00075Dr 1               
-00075Dr 1               .segment	"CODE"
-00075Dr 1               
-00075Dr 1               .proc	_draw_wall_column: near
-00075Dr 1               
-00075Dr 1               	.dbg	func, "draw_wall_column", "00", static, "_draw_wall_column"
-00075Dr 1               	.dbg	sym, "col", "00", auto, 3
-00075Dr 1               	.dbg	sym, "top", "00", auto, 2
-00075Dr 1               	.dbg	sym, "bottom", "00", auto, 1
-00075Dr 1               	.dbg	sym, "wall", "00", auto, 0
-00075Dr 1               	.dbg	sym, "x", "00", auto, -1
-00075Dr 1               
-00075Dr 1               .segment	"CODE"
-00075Dr 1               
-00075Dr 1               ;
-00075Dr 1               ; {
-00075Dr 1               ;
-00075Dr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 140
-00075Dr 1  20 rr rr     	jsr     pusha
-000760r 1               ;
-000760r 1               ; x = (unsigned char)(MINI_BYTES + (col << 1));
-000760r 1               ;
-000760r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 143
-000760r 1  20 rr rr     	jsr     decsp1
-000763r 1  A0 04        	ldy     #$04
-000765r 1  B1 rr        	lda     (c_sp),y
-000767r 1  0A           	asl     a
-000768r 1  18           	clc
-000769r 1  69 05        	adc     #$05
-00076Br 1  A0 00        	ldy     #$00
-00076Dr 1  91 rr        	sta     (c_sp),y
-00076Fr 1               ;
-00076Fr 1               ; draw_wall_byte(x, top, bottom, wall);
-00076Fr 1               ;
-00076Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 144
-00076Fr 1  20 rr rr     	jsr     pusha
-000772r 1  A0 04        	ldy     #$04
-000774r 1  B1 rr        	lda     (c_sp),y
-000776r 1  20 rr rr     	jsr     pusha
-000779r 1  A0 04        	ldy     #$04
-00077Br 1  B1 rr        	lda     (c_sp),y
-00077Dr 1  20 rr rr     	jsr     pusha
-000780r 1  A0 04        	ldy     #$04
-000782r 1  B1 rr        	lda     (c_sp),y
-000784r 1  20 rr rr     	jsr     _draw_wall_byte
-000787r 1               ;
-000787r 1               ; if (x + 1 < VIEW_STRIDE) draw_wall_byte(x + 1, top, bottom, wall);
-000787r 1               ;
-000787r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 145
-000787r 1  A0 00        	ldy     #$00
-000789r 1  A2 00        	ldx     #$00
-00078Br 1  B1 rr        	lda     (c_sp),y
-00078Dr 1  20 rr rr     	jsr     incax1
-000790r 1  C9 28        	cmp     #$28
-000792r 1  8A           	txa
-000793r 1  E9 00        	sbc     #$00
-000795r 1  50 02        	bvc     L0003
-000797r 1  49 80        	eor     #$80
-000799r 1  10 1D        L0003:	bpl     L0002
-00079Br 1  B1 rr        	lda     (c_sp),y
-00079Dr 1  18           	clc
-00079Er 1  69 01        	adc     #$01
-0007A0r 1  20 rr rr     	jsr     pusha
-0007A3r 1  A0 04        	ldy     #$04
-0007A5r 1  B1 rr        	lda     (c_sp),y
-0007A7r 1  20 rr rr     	jsr     pusha
-0007AAr 1  A0 04        	ldy     #$04
-0007ACr 1  B1 rr        	lda     (c_sp),y
-0007AEr 1  20 rr rr     	jsr     pusha
-0007B1r 1  A0 04        	ldy     #$04
-0007B3r 1  B1 rr        	lda     (c_sp),y
-0007B5r 1  20 rr rr     	jsr     _draw_wall_byte
-0007B8r 1               ;
-0007B8r 1               ; }
-0007B8r 1               ;
-0007B8r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 146
-0007B8r 1  4C rr rr     L0002:	jmp     incsp5
-0007BBr 1               
-0007BBr 1               	.dbg	line
-0007BBr 1               .endproc
-0007BBr 1               
-0007BBr 1               ; ---------------------------------------------------------------
-0007BBr 1               ; void __near__ cast_column (unsigned char col, unsigned int ray_angle, unsigned int px, unsigned int py)
-0007BBr 1               ; ---------------------------------------------------------------
-0007BBr 1               
-0007BBr 1               .segment	"CODE"
-0007BBr 1               
-0007BBr 1               .proc	_cast_column: near
-0007BBr 1               
-0007BBr 1               	.dbg	func, "cast_column", "00", static, "_cast_column"
-0007BBr 1               	.dbg	sym, "col", "00", auto, 6
-0007BBr 1               	.dbg	sym, "ray_angle", "00", auto, 4
-0007BBr 1               	.dbg	sym, "px", "00", auto, 2
-0007BBr 1               	.dbg	sym, "py", "00", auto, 0
-0007BBr 1               
-0007BBr 1               .segment	"CODE"
-0007BBr 1               
-0007BBr 1               ;
-0007BBr 1               ; {
-0007BBr 1               ;
-0007BBr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 150
-0007BBr 1  20 rr rr     	jsr     pushax
+00073Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 139
+00073Er 1  20 rr rr     	jsr     pusha
+000741r 1               ;
+000741r 1               ; x = (unsigned char)(MINI_BYTES + (col << 1));
+000741r 1               ;
+000741r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 142
+000741r 1  20 rr rr     	jsr     decsp1
+000744r 1  A0 04        	ldy     #$04
+000746r 1  B1 rr        	lda     (c_sp),y
+000748r 1  0A           	asl     a
+000749r 1  18           	clc
+00074Ar 1  69 05        	adc     #$05
+00074Cr 1  A0 00        	ldy     #$00
+00074Er 1  91 rr        	sta     (c_sp),y
+000750r 1               ;
+000750r 1               ; draw_wall_byte(x, top, bottom, wall);
+000750r 1               ;
+000750r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 143
+000750r 1  20 rr rr     	jsr     pusha
+000753r 1  A0 04        	ldy     #$04
+000755r 1  B1 rr        	lda     (c_sp),y
+000757r 1  20 rr rr     	jsr     pusha
+00075Ar 1  A0 04        	ldy     #$04
+00075Cr 1  B1 rr        	lda     (c_sp),y
+00075Er 1  20 rr rr     	jsr     pusha
+000761r 1  A0 04        	ldy     #$04
+000763r 1  B1 rr        	lda     (c_sp),y
+000765r 1  20 rr rr     	jsr     _draw_wall_byte
+000768r 1               ;
+000768r 1               ; if (x + 1 < VIEW_STRIDE) draw_wall_byte(x + 1, top, bottom, wall);
+000768r 1               ;
+000768r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 144
+000768r 1  A0 00        	ldy     #$00
+00076Ar 1  A2 00        	ldx     #$00
+00076Cr 1  B1 rr        	lda     (c_sp),y
+00076Er 1  20 rr rr     	jsr     incax1
+000771r 1  C9 28        	cmp     #$28
+000773r 1  8A           	txa
+000774r 1  E9 00        	sbc     #$00
+000776r 1  50 02        	bvc     L0003
+000778r 1  49 80        	eor     #$80
+00077Ar 1  10 1D        L0003:	bpl     L0002
+00077Cr 1  B1 rr        	lda     (c_sp),y
+00077Er 1  18           	clc
+00077Fr 1  69 01        	adc     #$01
+000781r 1  20 rr rr     	jsr     pusha
+000784r 1  A0 04        	ldy     #$04
+000786r 1  B1 rr        	lda     (c_sp),y
+000788r 1  20 rr rr     	jsr     pusha
+00078Br 1  A0 04        	ldy     #$04
+00078Dr 1  B1 rr        	lda     (c_sp),y
+00078Fr 1  20 rr rr     	jsr     pusha
+000792r 1  A0 04        	ldy     #$04
+000794r 1  B1 rr        	lda     (c_sp),y
+000796r 1  20 rr rr     	jsr     _draw_wall_byte
+000799r 1               ;
+000799r 1               ; }
+000799r 1               ;
+000799r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 145
+000799r 1  4C rr rr     L0002:	jmp     incsp5
+00079Cr 1               
+00079Cr 1               	.dbg	line
+00079Cr 1               .endproc
+00079Cr 1               
+00079Cr 1               ; ---------------------------------------------------------------
+00079Cr 1               ; void __near__ cast_column (unsigned char col, unsigned int ray_angle, unsigned int px, unsigned int py)
+00079Cr 1               ; ---------------------------------------------------------------
+00079Cr 1               
+00079Cr 1               .segment	"CODE"
+00079Cr 1               
+00079Cr 1               .proc	_cast_column: near
+00079Cr 1               
+00079Cr 1               	.dbg	func, "cast_column", "00", static, "_cast_column"
+00079Cr 1               	.dbg	sym, "col", "00", auto, 6
+00079Cr 1               	.dbg	sym, "ray_angle", "00", auto, 4
+00079Cr 1               	.dbg	sym, "px", "00", auto, 2
+00079Cr 1               	.dbg	sym, "py", "00", auto, 0
+00079Cr 1               
+00079Cr 1               .segment	"CODE"
+00079Cr 1               
+00079Cr 1               ;
+00079Cr 1               ; {
+00079Cr 1               ;
+00079Cr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 149
+00079Cr 1  20 rr rr     	jsr     pushax
+00079Fr 1               ;
+00079Fr 1               ; ray_setup_angle = ray_angle;
+00079Fr 1               ;
+00079Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 150
+00079Fr 1  A0 05        	ldy     #$05
+0007A1r 1  20 rr rr     	jsr     ldaxysp
+0007A4r 1  8D rr rr     	sta     _ray_setup_angle
+0007A7r 1  8E rr rr     	stx     _ray_setup_angle+1
+0007AAr 1               ;
+0007AAr 1               ; ray_setup_px = px;
+0007AAr 1               ;
+0007AAr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 151
+0007AAr 1  A0 03        	ldy     #$03
+0007ACr 1  20 rr rr     	jsr     ldaxysp
+0007AFr 1  8D rr rr     	sta     _ray_setup_px
+0007B2r 1  8E rr rr     	stx     _ray_setup_px+1
+0007B5r 1               ;
+0007B5r 1               ; ray_setup_py = py;
+0007B5r 1               ;
+0007B5r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 152
+0007B5r 1  20 rr rr     	jsr     ldax0sp
+0007B8r 1  8D rr rr     	sta     _ray_setup_py
+0007BBr 1  8E rr rr     	stx     _ray_setup_py+1
 0007BEr 1               ;
-0007BEr 1               ; ray_setup_angle = ray_angle;
+0007BEr 1               ; ray_setup_and_cast();
 0007BEr 1               ;
-0007BEr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 151
-0007BEr 1  A0 05        	ldy     #$05
-0007C0r 1  20 rr rr     	jsr     ldaxysp
-0007C3r 1  8D rr rr     	sta     _ray_setup_angle
-0007C6r 1  8E rr rr     	stx     _ray_setup_angle+1
-0007C9r 1               ;
-0007C9r 1               ; ray_setup_px = px;
-0007C9r 1               ;
-0007C9r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 152
-0007C9r 1  A0 03        	ldy     #$03
-0007CBr 1  20 rr rr     	jsr     ldaxysp
-0007CEr 1  8D rr rr     	sta     _ray_setup_px
-0007D1r 1  8E rr rr     	stx     _ray_setup_px+1
-0007D4r 1               ;
-0007D4r 1               ; ray_setup_py = py;
-0007D4r 1               ;
-0007D4r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 153
-0007D4r 1  20 rr rr     	jsr     ldax0sp
-0007D7r 1  8D rr rr     	sta     _ray_setup_py
-0007DAr 1  8E rr rr     	stx     _ray_setup_py+1
-0007DDr 1               ;
-0007DDr 1               ; ray_setup_and_cast();
-0007DDr 1               ;
-0007DDr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 154
-0007DDr 1  20 rr rr     	jsr     _ray_setup_and_cast
-0007E0r 1               ;
-0007E0r 1               ; if (!dda_hit) {
-0007E0r 1               ;
-0007E0r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 156
-0007E0r 1  AD rr rr     	lda     _dda_hit
-0007E3r 1  D0 26        	bne     L0002
-0007E5r 1               ;
-0007E5r 1               ; col_dist[col] = 0xFFFFu;
-0007E5r 1               ;
-0007E5r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 157
-0007E5r 1  A0 06        	ldy     #$06
-0007E7r 1  AA           	tax
-0007E8r 1  B1 rr        	lda     (c_sp),y
-0007EAr 1  0A           	asl     a
-0007EBr 1  90 02        	bcc     L000D
-0007EDr 1  E8           	inx
-0007EEr 1  18           	clc
-0007EFr 1  69 rr        L000D:	adc     #<(_col_dist)
-0007F1r 1  85 rr        	sta     ptr1
-0007F3r 1  8A           	txa
-0007F4r 1  69 rr        	adc     #>(_col_dist)
-0007F6r 1  85 rr        	sta     ptr1+1
-0007F8r 1  A9 FF        	lda     #$FF
-0007FAr 1  A0 00        	ldy     #$00
-0007FCr 1  91 rr        	sta     (ptr1),y
-0007FEr 1  C8           	iny
-0007FFr 1  91 rr        	sta     (ptr1),y
-000801r 1               ;
-000801r 1               ; draw_open_column(col);
-000801r 1               ;
-000801r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 158
-000801r 1  A0 06        	ldy     #$06
-000803r 1  B1 rr        	lda     (c_sp),y
-000805r 1  20 rr rr     	jsr     _draw_open_column
-000808r 1               ;
-000808r 1               ; return;
-000808r 1               ;
-000808r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 159
-000808r 1  4C rr rr     	jmp     incsp7
-00080Br 1               ;
-00080Br 1               ; if (dda_side == 0) {
-00080Br 1               ;
-00080Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 162
-00080Br 1  AD rr rr     L0002:	lda     _dda_side
-00080Er 1  D0 18        	bne     L0003
-000810r 1               ;
-000810r 1               ; ray_dist = dda_side_x - dda_delta_x;
-000810r 1               ;
-000810r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 163
-000810r 1  AD rr rr     	lda     _dda_side_x
-000813r 1  38           	sec
-000814r 1  ED rr rr     	sbc     _dda_delta_x
-000817r 1  8D rr rr     	sta     _ray_dist
-00081Ar 1  AD rr rr     	lda     _dda_side_x+1
-00081Dr 1  ED rr rr     	sbc     _dda_delta_x+1
-000820r 1  8D rr rr     	sta     _ray_dist+1
-000823r 1               ;
-000823r 1               ; ray_wall = PIX_WALL_X;
-000823r 1               ;
-000823r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 164
-000823r 1  A9 FF        	lda     #$FF
-000825r 1               ;
-000825r 1               ; } else {
-000825r 1               ;
-000825r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 165
-000825r 1  4C rr rr     	jmp     L000B
-000828r 1               ;
-000828r 1               ; ray_dist = dda_side_y - dda_delta_y;
-000828r 1               ;
-000828r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 166
-000828r 1  AD rr rr     L0003:	lda     _dda_side_y
-00082Br 1  38           	sec
-00082Cr 1  ED rr rr     	sbc     _dda_delta_y
-00082Fr 1  8D rr rr     	sta     _ray_dist
-000832r 1  AD rr rr     	lda     _dda_side_y+1
-000835r 1  ED rr rr     	sbc     _dda_delta_y+1
-000838r 1  8D rr rr     	sta     _ray_dist+1
-00083Br 1               ;
-00083Br 1               ; ray_wall = PIX_WALL_Y;
-00083Br 1               ;
-00083Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 167
-00083Br 1  A9 AA        	lda     #$AA
-00083Dr 1  8D rr rr     L000B:	sta     _ray_wall
-000840r 1               ;
-000840r 1               ; ray_mag = cos_rel[col];
-000840r 1               ;
-000840r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 170
-000840r 1  A0 06        	ldy     #$06
-000842r 1  A2 00        	ldx     #$00
-000844r 1  B1 rr        	lda     (c_sp),y
-000846r 1  0A           	asl     a
-000847r 1  90 02        	bcc     L000E
-000849r 1  E8           	inx
-00084Ar 1  18           	clc
-00084Br 1  69 rr        L000E:	adc     #<(_cos_rel)
-00084Dr 1  A8           	tay
-00084Er 1  8A           	txa
-00084Fr 1  69 rr        	adc     #>(_cos_rel)
-000851r 1  AA           	tax
-000852r 1  98           	tya
-000853r 1  20 rr rr     	jsr     ldaxi
-000856r 1  8D rr rr     	sta     _ray_mag
-000859r 1  8E rr rr     	stx     _ray_mag+1
-00085Cr 1               ;
-00085Cr 1               ; ray_dist = ((ray_dist >> 8) * ray_mag)
-00085Cr 1               ;
-00085Cr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 171
-00085Cr 1  AD rr rr     	lda     _ray_dist+1
-00085Fr 1  20 rr rr     	jsr     pusha0
-000862r 1  AD rr rr     	lda     _ray_mag
-000865r 1  AE rr rr     	ldx     _ray_mag+1
-000868r 1  20 rr rr     	jsr     tosumulax
-00086Br 1               ;
-00086Br 1               ; + (((ray_dist & 0x00FFu) * ray_mag) >> 8);
-00086Br 1               ;
-00086Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 172
-00086Br 1  20 rr rr     	jsr     pushax
-00086Er 1  AD rr rr     	lda     _ray_dist
-000871r 1  20 rr rr     	jsr     pusha0
-000874r 1  AD rr rr     	lda     _ray_mag
-000877r 1  AE rr rr     	ldx     _ray_mag+1
-00087Ar 1  20 rr rr     	jsr     tosumulax
-00087Dr 1  8A           	txa
-00087Er 1  20 rr rr     	jsr     tosadda0
-000881r 1  8D rr rr     	sta     _ray_dist
-000884r 1  8E rr rr     	stx     _ray_dist+1
-000887r 1               ;
-000887r 1               ; col_dist[col] = ray_dist;
-000887r 1               ;
-000887r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 173
-000887r 1  A0 06        	ldy     #$06
-000889r 1  A2 00        	ldx     #$00
-00088Br 1  B1 rr        	lda     (c_sp),y
-00088Dr 1  0A           	asl     a
-00088Er 1  90 02        	bcc     L000F
-000890r 1  E8           	inx
-000891r 1  18           	clc
-000892r 1  69 rr        L000F:	adc     #<(_col_dist)
-000894r 1  85 rr        	sta     ptr1
-000896r 1  8A           	txa
-000897r 1  69 rr        	adc     #>(_col_dist)
-000899r 1  85 rr        	sta     ptr1+1
-00089Br 1  AD rr rr     	lda     _ray_dist
-00089Er 1  A0 00        	ldy     #$00
-0008A0r 1  91 rr        	sta     (ptr1),y
-0008A2r 1  C8           	iny
-0008A3r 1  AD rr rr     	lda     _ray_dist+1
-0008A6r 1  91 rr        	sta     (ptr1),y
-0008A8r 1               ;
-0008A8r 1               ; ray_dist >>= 4;
-0008A8r 1               ;
-0008A8r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 175
-0008A8r 1  AD rr rr     	lda     _ray_dist
-0008ABr 1  AE rr rr     	ldx     _ray_dist+1
-0008AEr 1  20 rr rr     	jsr     shrax4
-0008B1r 1  8D rr rr     	sta     _ray_dist
-0008B4r 1  8E rr rr     	stx     _ray_dist+1
-0008B7r 1               ;
-0008B7r 1               ; if (ray_dist >= HEIGHT_STEPS) ray_dist = HEIGHT_STEPS - 1;
-0008B7r 1               ;
-0008B7r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 176
-0008B7r 1  C9 90        	cmp     #$90
-0008B9r 1  8A           	txa
-0008BAr 1  E9 01        	sbc     #$01
-0008BCr 1  90 0A        	bcc     L0005
-0008BEr 1  A2 01        	ldx     #$01
-0008C0r 1  A9 8F        	lda     #$8F
-0008C2r 1  8D rr rr     	sta     _ray_dist
-0008C5r 1  8E rr rr     	stx     _ray_dist+1
-0008C8r 1               ;
-0008C8r 1               ; ray_height = height_table[ray_dist];
-0008C8r 1               ;
-0008C8r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 177
-0008C8r 1  AD rr rr     L0005:	lda     _ray_dist
-0008CBr 1  85 rr        	sta     ptr1
-0008CDr 1  AD rr rr     	lda     _ray_dist+1
-0008D0r 1  18           	clc
-0008D1r 1  69 rr        	adc     #>(_height_table)
-0008D3r 1  85 rr        	sta     ptr1+1
-0008D5r 1  A0 rr        	ldy     #<(_height_table)
-0008D7r 1  A2 00        	ldx     #$00
-0008D9r 1  B1 rr        	lda     (ptr1),y
-0008DBr 1  8D rr rr     	sta     _ray_height
-0008DEr 1  8E rr rr     	stx     _ray_height+1
-0008E1r 1               ;
-0008E1r 1               ; if (ray_height >= VIEW_ROWS) {
-0008E1r 1               ;
-0008E1r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 179
-0008E1r 1  C9 5C        	cmp     #$5C
-0008E3r 1  8A           	txa
-0008E4r 1  E9 00        	sbc     #$00
-0008E6r 1  90 08        	bcc     L0010
-0008E8r 1               ;
-0008E8r 1               ; ray_top = 0;
-0008E8r 1               ;
-0008E8r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 180
-0008E8r 1  8E rr rr     	stx     _ray_top
-0008EBr 1               ;
-0008EBr 1               ; ray_bottom = VIEW_ROWS - 1;
-0008EBr 1               ;
-0008EBr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 181
-0008EBr 1  A9 5B        	lda     #$5B
-0008EDr 1               ;
-0008EDr 1               ; } else {
-0008EDr 1               ;
-0008EDr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 182
-0008EDr 1  4C rr rr     	jmp     L000C
-0008F0r 1               ;
-0008F0r 1               ; ray_top = (unsigned char)((VIEW_ROWS - ray_height) >> 1);
-0008F0r 1               ;
-0008F0r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 183
-0008F0r 1  A9 5C        L0010:	lda     #$5C
-0008F2r 1  38           	sec
-0008F3r 1  ED rr rr     	sbc     _ray_height
-0008F6r 1  48           	pha
-0008F7r 1  8A           	txa
-0008F8r 1  ED rr rr     	sbc     _ray_height+1
-0008FBr 1  AA           	tax
-0008FCr 1  68           	pla
-0008FDr 1  20 rr rr     	jsr     shrax1
-000900r 1  8D rr rr     	sta     _ray_top
-000903r 1               ;
-000903r 1               ; ray_bottom = (unsigned char)(ray_top + ray_height - 1);
-000903r 1               ;
-000903r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 184
-000903r 1  18           	clc
-000904r 1  6D rr rr     	adc     _ray_height
-000907r 1  38           	sec
-000908r 1  E9 01        	sbc     #$01
-00090Ar 1  8D rr rr     L000C:	sta     _ray_bottom
-00090Dr 1               ;
-00090Dr 1               ; draw_wall_column(col, ray_top, ray_bottom, ray_wall);
-00090Dr 1               ;
-00090Dr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 186
-00090Dr 1  A0 06        	ldy     #$06
-00090Fr 1  B1 rr        	lda     (c_sp),y
-000911r 1  20 rr rr     	jsr     pusha
-000914r 1  AD rr rr     	lda     _ray_top
-000917r 1  20 rr rr     	jsr     pusha
-00091Ar 1  AD rr rr     	lda     _ray_bottom
-00091Dr 1  20 rr rr     	jsr     pusha
-000920r 1  AD rr rr     	lda     _ray_wall
-000923r 1  20 rr rr     	jsr     _draw_wall_column
-000926r 1               ;
-000926r 1               ; }
-000926r 1               ;
-000926r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 187
-000926r 1  4C rr rr     	jmp     incsp7
-000929r 1               
-000929r 1               	.dbg	line
-000929r 1               .endproc
-000929r 1               
-000929r 1               ; ---------------------------------------------------------------
-000929r 1               ; void __near__ set_floor_dlis (void)
-000929r 1               ; ---------------------------------------------------------------
-000929r 1               
-000929r 1               .segment	"CODE"
-000929r 1               
-000929r 1               .proc	_set_floor_dlis: near
-000929r 1               
-000929r 1               	.dbg	func, "set_floor_dlis", "00", static, "_set_floor_dlis"
-000929r 1               	.dbg	sym, "i", "00", auto, -1
-000929r 1               	.dbg	sym, "row", "00", auto, -2
-000929r 1               
-000929r 1               .segment	"CODE"
-000929r 1               
-000929r 1               ;
-000929r 1               ; for (row = HORIZON - 1; row < VIEW_ROWS; ++row)
-000929r 1               ;
-000929r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 203
-000929r 1  20 rr rr     	jsr     decsp2
-00092Cr 1  A9 2D        	lda     #$2D
-00092Er 1  A0 00        	ldy     #$00
-000930r 1  91 rr        L000A:	sta     (c_sp),y
-000932r 1  C9 5C        	cmp     #$5C
-000934r 1  B0 21        	bcs     L000C
-000936r 1               ;
-000936r 1               ; view_dlist[5 + row] &= 0x7F;
-000936r 1               ;
-000936r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 204
-000936r 1  A2 00        	ldx     #$00
-000938r 1  B1 rr        	lda     (c_sp),y
-00093Ar 1  20 rr rr     	jsr     incax5
-00093Dr 1  18           	clc
-00093Er 1  69 rr        	adc     #<(_view_dlist)
-000940r 1  85 rr        	sta     ptr1
-000942r 1  8A           	txa
-000943r 1  69 rr        	adc     #>(_view_dlist)
-000945r 1  85 rr        	sta     ptr1+1
-000947r 1  A0 00        	ldy     #$00
-000949r 1  B1 rr        	lda     (ptr1),y
-00094Br 1  29 7F        	and     #$7F
-00094Dr 1  91 rr        	sta     (ptr1),y
-00094Fr 1               ;
-00094Fr 1               ; for (row = HORIZON - 1; row < VIEW_ROWS; ++row)
-00094Fr 1               ;
-00094Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 203
-00094Fr 1  18           	clc
-000950r 1  A9 01        	lda     #$01
-000952r 1  71 rr        	adc     (c_sp),y
-000954r 1  4C rr rr     	jmp     L000A
-000957r 1               ;
-000957r 1               ; for (i = 0; i < FLOOR_BANDS; ++i) {
-000957r 1               ;
-000957r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 205
-000957r 1  98           L000C:	tya
-000958r 1  C8           	iny
-000959r 1  91 rr        L000B:	sta     (c_sp),y
-00095Br 1  C9 06        	cmp     #$06
-00095Dr 1  B0 43        	bcs     L000D
-00095Fr 1               ;
-00095Fr 1               ; row = (unsigned char)(HORIZON + floor_phase + i * FLOOR_BAND_ROWS);
-00095Fr 1               ;
-00095Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 206
-00095Fr 1  A2 00        	ldx     #$00
-000961r 1  AD rr rr     	lda     _floor_phase
-000964r 1  A0 2E        	ldy     #$2E
-000966r 1  20 rr rr     	jsr     incaxy
-000969r 1  85 rr        	sta     sreg
-00096Br 1  86 rr        	stx     sreg+1
-00096Dr 1  A2 00        	ldx     #$00
-00096Fr 1  A0 01        	ldy     #$01
-000971r 1  B1 rr        	lda     (c_sp),y
-000973r 1  20 rr rr     	jsr     mulax7
-000976r 1  18           	clc
-000977r 1  65 rr        	adc     sreg
-000979r 1  48           	pha
-00097Ar 1  8A           	txa
-00097Br 1  65 rr        	adc     sreg+1
-00097Dr 1  68           	pla
-00097Er 1  88           	dey
-00097Fr 1  91 rr        	sta     (c_sp),y
-000981r 1               ;
-000981r 1               ; view_dlist[5 + row - 1] |= 0x80;
-000981r 1               ;
-000981r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 207
-000981r 1  A2 00        	ldx     #$00
-000983r 1  B1 rr        	lda     (c_sp),y
-000985r 1  20 rr rr     	jsr     incax4
-000988r 1  18           	clc
-000989r 1  69 rr        	adc     #<(_view_dlist)
-00098Br 1  85 rr        	sta     ptr1
-00098Dr 1  8A           	txa
-00098Er 1  69 rr        	adc     #>(_view_dlist)
-000990r 1  85 rr        	sta     ptr1+1
-000992r 1  A0 00        	ldy     #$00
-000994r 1  B1 rr        	lda     (ptr1),y
-000996r 1  09 80        	ora     #$80
-000998r 1  91 rr        	sta     (ptr1),y
-00099Ar 1               ;
-00099Ar 1               ; for (i = 0; i < FLOOR_BANDS; ++i) {
-00099Ar 1               ;
-00099Ar 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 205
-00099Ar 1  C8           	iny
-00099Br 1  18           	clc
-00099Cr 1  98           	tya
-00099Dr 1  71 rr        	adc     (c_sp),y
-00099Fr 1  4C rr rr     	jmp     L000B
-0009A2r 1               ;
-0009A2r 1               ; view_dlist[5 + VIEW_ROWS - 1] |= 0x80;
-0009A2r 1               ;
-0009A2r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 209
-0009A2r 1  AD rr rr     L000D:	lda     _view_dlist+96
-0009A5r 1  09 80        	ora     #$80
-0009A7r 1  8D rr rr     	sta     _view_dlist+96
-0009AAr 1               ;
-0009AAr 1               ; }
-0009AAr 1               ;
-0009AAr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 210
-0009AAr 1  4C rr rr     	jmp     incsp2
-0009ADr 1               
-0009ADr 1               	.dbg	line
-0009ADr 1               .endproc
-0009ADr 1               
-0009ADr 1               ; ---------------------------------------------------------------
-0009ADr 1               ; void __near__ minimap_restore_row (unsigned char row)
-0009ADr 1               ; ---------------------------------------------------------------
-0009ADr 1               
-0009ADr 1               .segment	"CODE"
-0009ADr 1               
-0009ADr 1               .proc	_minimap_restore_row: near
-0009ADr 1               
-0009ADr 1               	.dbg	func, "minimap_restore_row", "00", static, "_minimap_restore_row"
-0009ADr 1               	.dbg	sym, "row", "00", auto, 0
-0009ADr 1               	.dbg	sym, "dest", "00", auto, -2
-0009ADr 1               	.dbg	sym, "byte", "00", auto, -3
-0009ADr 1               
-0009ADr 1               .segment	"CODE"
-0009ADr 1               
-0009ADr 1               ;
-0009ADr 1               ; {
-0009ADr 1               ;
-0009ADr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 270
-0009ADr 1  20 rr rr     	jsr     pusha
-0009B0r 1               ;
-0009B0r 1               ; if (row >= MAZE_H) return;
-0009B0r 1               ;
-0009B0r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 274
-0009B0r 1  20 rr rr     	jsr     decsp3
-0009B3r 1  A0 03        	ldy     #$03
-0009B5r 1  B1 rr        	lda     (c_sp),y
-0009B7r 1  C9 3B        	cmp     #$3B
-0009B9r 1  B0 55        	bcs     L0004
-0009BBr 1               ;
-0009BBr 1               ; dest = view_buffer + (unsigned int)row * VIEW_STRIDE;
-0009BBr 1               ;
-0009BBr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 275
-0009BBr 1  B1 rr        	lda     (c_sp),y
-0009BDr 1  20 rr rr     	jsr     pusha0
-0009C0r 1  A9 28        	lda     #$28
-0009C2r 1  20 rr rr     	jsr     tosumula0
-0009C5r 1  18           	clc
-0009C6r 1  69 rr        	adc     #<(_view_buffer)
-0009C8r 1  A8           	tay
-0009C9r 1  8A           	txa
-0009CAr 1  69 rr        	adc     #>(_view_buffer)
-0009CCr 1  AA           	tax
-0009CDr 1  98           	tya
-0009CEr 1  A0 01        	ldy     #$01
-0009D0r 1  20 rr rr     	jsr     staxysp
-0009D3r 1               ;
-0009D3r 1               ; for (byte = 0; byte < MINI_BYTES; ++byte) {
-0009D3r 1               ;
-0009D3r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 276
-0009D3r 1  A9 00        	lda     #$00
-0009D5r 1  A8           	tay
-0009D6r 1  91 rr        L0007:	sta     (c_sp),y
-0009D8r 1  C9 05        	cmp     #$05
-0009DAr 1  B0 34        	bcs     L0004
-0009DCr 1               ;
-0009DCr 1               ; dest[byte] = minimap_bits[row][byte];
-0009DCr 1               ;
-0009DCr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 277
-0009DCr 1  B1 rr        	lda     (c_sp),y
-0009DEr 1  18           	clc
-0009DFr 1  C8           	iny
-0009E0r 1  71 rr        	adc     (c_sp),y
-0009E2r 1  85 rr        	sta     sreg
-0009E4r 1  A9 00        	lda     #$00
-0009E6r 1  C8           	iny
-0009E7r 1  71 rr        	adc     (c_sp),y
-0009E9r 1  85 rr        	sta     sreg+1
-0009EBr 1  A2 00        	ldx     #$00
-0009EDr 1  C8           	iny
-0009EEr 1  B1 rr        	lda     (c_sp),y
-0009F0r 1  20 rr rr     	jsr     mulax5
-0009F3r 1  18           	clc
-0009F4r 1  69 rr        	adc     #<(_minimap_bits)
-0009F6r 1  85 rr        	sta     ptr1
-0009F8r 1  8A           	txa
-0009F9r 1  69 rr        	adc     #>(_minimap_bits)
-0009FBr 1  85 rr        	sta     ptr1+1
-0009FDr 1  A0 00        	ldy     #$00
-0009FFr 1  B1 rr        	lda     (c_sp),y
-000A01r 1  A8           	tay
-000A02r 1  B1 rr        	lda     (ptr1),y
-000A04r 1  A0 00        	ldy     #$00
-000A06r 1  91 rr        	sta     (sreg),y
-000A08r 1               ;
-000A08r 1               ; for (byte = 0; byte < MINI_BYTES; ++byte) {
-000A08r 1               ;
-000A08r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 276
-000A08r 1  18           	clc
-000A09r 1  A9 01        	lda     #$01
-000A0Br 1  71 rr        	adc     (c_sp),y
-000A0Dr 1  4C rr rr     	jmp     L0007
-000A10r 1               ;
-000A10r 1               ; }
-000A10r 1               ;
-000A10r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 279
-000A10r 1  4C rr rr     L0004:	jmp     incsp4
-000A13r 1               
-000A13r 1               	.dbg	line
-000A13r 1               .endproc
-000A13r 1               
-000A13r 1               ; ---------------------------------------------------------------
-000A13r 1               ; void __near__ minimap_plot (unsigned char col, unsigned char row, unsigned char value)
-000A13r 1               ; ---------------------------------------------------------------
-000A13r 1               
-000A13r 1               .segment	"CODE"
-000A13r 1               
-000A13r 1               .proc	_minimap_plot: near
-000A13r 1               
-000A13r 1               	.dbg	func, "minimap_plot", "00", static, "_minimap_plot"
-000A13r 1               	.dbg	sym, "col", "00", auto, 2
-000A13r 1               	.dbg	sym, "row", "00", auto, 1
-000A13r 1               	.dbg	sym, "value", "00", auto, 0
-000A13r 1               	.dbg	sym, "dest", "00", auto, -2
-000A13r 1               	.dbg	sym, "shift", "00", auto, -3
-000A13r 1               
-000A13r 1               .segment	"CODE"
-000A13r 1               
-000A13r 1               ;
-000A13r 1               ; {
-000A13r 1               ;
-000A13r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 282
-000A13r 1  20 rr rr     	jsr     pusha
-000A16r 1               ;
-000A16r 1               ; if (col >= MAZE_W || row >= MAZE_H) return;
-000A16r 1               ;
-000A16r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 286
-000A16r 1  20 rr rr     	jsr     decsp3
-000A19r 1  A0 05        	ldy     #$05
-000A1Br 1  B1 rr        	lda     (c_sp),y
-000A1Dr 1  C9 14        	cmp     #$14
-000A1Fr 1  B0 7C        	bcs     L0001
-000A21r 1  88           	dey
+0007BEr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 153
+0007BEr 1  20 rr rr     	jsr     _ray_setup_and_cast
+0007C1r 1               ;
+0007C1r 1               ; if (!dda_hit) {
+0007C1r 1               ;
+0007C1r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 155
+0007C1r 1  AD rr rr     	lda     _dda_hit
+0007C4r 1  D0 26        	bne     L0002
+0007C6r 1               ;
+0007C6r 1               ; col_dist[col] = 0xFFFFu;
+0007C6r 1               ;
+0007C6r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 156
+0007C6r 1  A0 06        	ldy     #$06
+0007C8r 1  AA           	tax
+0007C9r 1  B1 rr        	lda     (c_sp),y
+0007CBr 1  0A           	asl     a
+0007CCr 1  90 02        	bcc     L000D
+0007CEr 1  E8           	inx
+0007CFr 1  18           	clc
+0007D0r 1  69 rr        L000D:	adc     #<(_col_dist)
+0007D2r 1  85 rr        	sta     ptr1
+0007D4r 1  8A           	txa
+0007D5r 1  69 rr        	adc     #>(_col_dist)
+0007D7r 1  85 rr        	sta     ptr1+1
+0007D9r 1  A9 FF        	lda     #$FF
+0007DBr 1  A0 00        	ldy     #$00
+0007DDr 1  91 rr        	sta     (ptr1),y
+0007DFr 1  C8           	iny
+0007E0r 1  91 rr        	sta     (ptr1),y
+0007E2r 1               ;
+0007E2r 1               ; draw_open_column(col);
+0007E2r 1               ;
+0007E2r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 157
+0007E2r 1  A0 06        	ldy     #$06
+0007E4r 1  B1 rr        	lda     (c_sp),y
+0007E6r 1  20 rr rr     	jsr     _draw_open_column
+0007E9r 1               ;
+0007E9r 1               ; return;
+0007E9r 1               ;
+0007E9r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 158
+0007E9r 1  4C rr rr     	jmp     incsp7
+0007ECr 1               ;
+0007ECr 1               ; if (dda_side == 0) {
+0007ECr 1               ;
+0007ECr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 161
+0007ECr 1  AD rr rr     L0002:	lda     _dda_side
+0007EFr 1  D0 18        	bne     L0003
+0007F1r 1               ;
+0007F1r 1               ; ray_dist = dda_side_x - dda_delta_x;
+0007F1r 1               ;
+0007F1r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 162
+0007F1r 1  AD rr rr     	lda     _dda_side_x
+0007F4r 1  38           	sec
+0007F5r 1  ED rr rr     	sbc     _dda_delta_x
+0007F8r 1  8D rr rr     	sta     _ray_dist
+0007FBr 1  AD rr rr     	lda     _dda_side_x+1
+0007FEr 1  ED rr rr     	sbc     _dda_delta_x+1
+000801r 1  8D rr rr     	sta     _ray_dist+1
+000804r 1               ;
+000804r 1               ; ray_wall = PIX_WALL_X;
+000804r 1               ;
+000804r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 163
+000804r 1  A9 FF        	lda     #$FF
+000806r 1               ;
+000806r 1               ; } else {
+000806r 1               ;
+000806r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 164
+000806r 1  4C rr rr     	jmp     L000B
+000809r 1               ;
+000809r 1               ; ray_dist = dda_side_y - dda_delta_y;
+000809r 1               ;
+000809r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 165
+000809r 1  AD rr rr     L0003:	lda     _dda_side_y
+00080Cr 1  38           	sec
+00080Dr 1  ED rr rr     	sbc     _dda_delta_y
+000810r 1  8D rr rr     	sta     _ray_dist
+000813r 1  AD rr rr     	lda     _dda_side_y+1
+000816r 1  ED rr rr     	sbc     _dda_delta_y+1
+000819r 1  8D rr rr     	sta     _ray_dist+1
+00081Cr 1               ;
+00081Cr 1               ; ray_wall = PIX_WALL_Y;
+00081Cr 1               ;
+00081Cr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 166
+00081Cr 1  A9 AA        	lda     #$AA
+00081Er 1  8D rr rr     L000B:	sta     _ray_wall
+000821r 1               ;
+000821r 1               ; ray_mag = cos_rel[col];
+000821r 1               ;
+000821r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 169
+000821r 1  A0 06        	ldy     #$06
+000823r 1  A2 00        	ldx     #$00
+000825r 1  B1 rr        	lda     (c_sp),y
+000827r 1  0A           	asl     a
+000828r 1  90 02        	bcc     L000E
+00082Ar 1  E8           	inx
+00082Br 1  18           	clc
+00082Cr 1  69 rr        L000E:	adc     #<(_cos_rel)
+00082Er 1  A8           	tay
+00082Fr 1  8A           	txa
+000830r 1  69 rr        	adc     #>(_cos_rel)
+000832r 1  AA           	tax
+000833r 1  98           	tya
+000834r 1  20 rr rr     	jsr     ldaxi
+000837r 1  8D rr rr     	sta     _ray_mag
+00083Ar 1  8E rr rr     	stx     _ray_mag+1
+00083Dr 1               ;
+00083Dr 1               ; ray_dist = ((ray_dist >> 8) * ray_mag)
+00083Dr 1               ;
+00083Dr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 170
+00083Dr 1  AD rr rr     	lda     _ray_dist+1
+000840r 1  20 rr rr     	jsr     pusha0
+000843r 1  AD rr rr     	lda     _ray_mag
+000846r 1  AE rr rr     	ldx     _ray_mag+1
+000849r 1  20 rr rr     	jsr     tosumulax
+00084Cr 1               ;
+00084Cr 1               ; + (((ray_dist & 0x00FFu) * ray_mag) >> 8);
+00084Cr 1               ;
+00084Cr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 171
+00084Cr 1  20 rr rr     	jsr     pushax
+00084Fr 1  AD rr rr     	lda     _ray_dist
+000852r 1  20 rr rr     	jsr     pusha0
+000855r 1  AD rr rr     	lda     _ray_mag
+000858r 1  AE rr rr     	ldx     _ray_mag+1
+00085Br 1  20 rr rr     	jsr     tosumulax
+00085Er 1  8A           	txa
+00085Fr 1  20 rr rr     	jsr     tosadda0
+000862r 1  8D rr rr     	sta     _ray_dist
+000865r 1  8E rr rr     	stx     _ray_dist+1
+000868r 1               ;
+000868r 1               ; col_dist[col] = ray_dist;
+000868r 1               ;
+000868r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 172
+000868r 1  A0 06        	ldy     #$06
+00086Ar 1  A2 00        	ldx     #$00
+00086Cr 1  B1 rr        	lda     (c_sp),y
+00086Er 1  0A           	asl     a
+00086Fr 1  90 02        	bcc     L000F
+000871r 1  E8           	inx
+000872r 1  18           	clc
+000873r 1  69 rr        L000F:	adc     #<(_col_dist)
+000875r 1  85 rr        	sta     ptr1
+000877r 1  8A           	txa
+000878r 1  69 rr        	adc     #>(_col_dist)
+00087Ar 1  85 rr        	sta     ptr1+1
+00087Cr 1  AD rr rr     	lda     _ray_dist
+00087Fr 1  A0 00        	ldy     #$00
+000881r 1  91 rr        	sta     (ptr1),y
+000883r 1  C8           	iny
+000884r 1  AD rr rr     	lda     _ray_dist+1
+000887r 1  91 rr        	sta     (ptr1),y
+000889r 1               ;
+000889r 1               ; ray_dist >>= 4;
+000889r 1               ;
+000889r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 174
+000889r 1  AD rr rr     	lda     _ray_dist
+00088Cr 1  AE rr rr     	ldx     _ray_dist+1
+00088Fr 1  20 rr rr     	jsr     shrax4
+000892r 1  8D rr rr     	sta     _ray_dist
+000895r 1  8E rr rr     	stx     _ray_dist+1
+000898r 1               ;
+000898r 1               ; if (ray_dist >= HEIGHT_STEPS) ray_dist = HEIGHT_STEPS - 1;
+000898r 1               ;
+000898r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 175
+000898r 1  C9 90        	cmp     #$90
+00089Ar 1  8A           	txa
+00089Br 1  E9 01        	sbc     #$01
+00089Dr 1  90 0A        	bcc     L0005
+00089Fr 1  A2 01        	ldx     #$01
+0008A1r 1  A9 8F        	lda     #$8F
+0008A3r 1  8D rr rr     	sta     _ray_dist
+0008A6r 1  8E rr rr     	stx     _ray_dist+1
+0008A9r 1               ;
+0008A9r 1               ; ray_height = height_table[ray_dist];
+0008A9r 1               ;
+0008A9r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 176
+0008A9r 1  AD rr rr     L0005:	lda     _ray_dist
+0008ACr 1  85 rr        	sta     ptr1
+0008AEr 1  AD rr rr     	lda     _ray_dist+1
+0008B1r 1  18           	clc
+0008B2r 1  69 rr        	adc     #>(_height_table)
+0008B4r 1  85 rr        	sta     ptr1+1
+0008B6r 1  A0 rr        	ldy     #<(_height_table)
+0008B8r 1  A2 00        	ldx     #$00
+0008BAr 1  B1 rr        	lda     (ptr1),y
+0008BCr 1  8D rr rr     	sta     _ray_height
+0008BFr 1  8E rr rr     	stx     _ray_height+1
+0008C2r 1               ;
+0008C2r 1               ; if (ray_height >= VIEW_ROWS) {
+0008C2r 1               ;
+0008C2r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 178
+0008C2r 1  C9 5C        	cmp     #$5C
+0008C4r 1  8A           	txa
+0008C5r 1  E9 00        	sbc     #$00
+0008C7r 1  90 08        	bcc     L0010
+0008C9r 1               ;
+0008C9r 1               ; ray_top = 0;
+0008C9r 1               ;
+0008C9r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 179
+0008C9r 1  8E rr rr     	stx     _ray_top
+0008CCr 1               ;
+0008CCr 1               ; ray_bottom = VIEW_ROWS - 1;
+0008CCr 1               ;
+0008CCr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 180
+0008CCr 1  A9 5B        	lda     #$5B
+0008CEr 1               ;
+0008CEr 1               ; } else {
+0008CEr 1               ;
+0008CEr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 181
+0008CEr 1  4C rr rr     	jmp     L000C
+0008D1r 1               ;
+0008D1r 1               ; ray_top = (unsigned char)((VIEW_ROWS - ray_height) >> 1);
+0008D1r 1               ;
+0008D1r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 182
+0008D1r 1  A9 5C        L0010:	lda     #$5C
+0008D3r 1  38           	sec
+0008D4r 1  ED rr rr     	sbc     _ray_height
+0008D7r 1  48           	pha
+0008D8r 1  8A           	txa
+0008D9r 1  ED rr rr     	sbc     _ray_height+1
+0008DCr 1  AA           	tax
+0008DDr 1  68           	pla
+0008DEr 1  20 rr rr     	jsr     shrax1
+0008E1r 1  8D rr rr     	sta     _ray_top
+0008E4r 1               ;
+0008E4r 1               ; ray_bottom = (unsigned char)(ray_top + ray_height - 1);
+0008E4r 1               ;
+0008E4r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 183
+0008E4r 1  18           	clc
+0008E5r 1  6D rr rr     	adc     _ray_height
+0008E8r 1  38           	sec
+0008E9r 1  E9 01        	sbc     #$01
+0008EBr 1  8D rr rr     L000C:	sta     _ray_bottom
+0008EEr 1               ;
+0008EEr 1               ; draw_wall_column(col, ray_top, ray_bottom, ray_wall);
+0008EEr 1               ;
+0008EEr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 185
+0008EEr 1  A0 06        	ldy     #$06
+0008F0r 1  B1 rr        	lda     (c_sp),y
+0008F2r 1  20 rr rr     	jsr     pusha
+0008F5r 1  AD rr rr     	lda     _ray_top
+0008F8r 1  20 rr rr     	jsr     pusha
+0008FBr 1  AD rr rr     	lda     _ray_bottom
+0008FEr 1  20 rr rr     	jsr     pusha
+000901r 1  AD rr rr     	lda     _ray_wall
+000904r 1  20 rr rr     	jsr     _draw_wall_column
+000907r 1               ;
+000907r 1               ; }
+000907r 1               ;
+000907r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 186
+000907r 1  4C rr rr     	jmp     incsp7
+00090Ar 1               
+00090Ar 1               	.dbg	line
+00090Ar 1               .endproc
+00090Ar 1               
+00090Ar 1               ; ---------------------------------------------------------------
+00090Ar 1               ; void __near__ set_floor_dlis (void)
+00090Ar 1               ; ---------------------------------------------------------------
+00090Ar 1               
+00090Ar 1               .segment	"CODE"
+00090Ar 1               
+00090Ar 1               .proc	_set_floor_dlis: near
+00090Ar 1               
+00090Ar 1               	.dbg	func, "set_floor_dlis", "00", static, "_set_floor_dlis"
+00090Ar 1               	.dbg	sym, "i", "00", auto, -1
+00090Ar 1               	.dbg	sym, "row", "00", auto, -2
+00090Ar 1               
+00090Ar 1               .segment	"CODE"
+00090Ar 1               
+00090Ar 1               ;
+00090Ar 1               ; for (row = HORIZON - 1; row < VIEW_ROWS; ++row)
+00090Ar 1               ;
+00090Ar 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 202
+00090Ar 1  20 rr rr     	jsr     decsp2
+00090Dr 1  A9 2D        	lda     #$2D
+00090Fr 1  A0 00        	ldy     #$00
+000911r 1  91 rr        L000A:	sta     (c_sp),y
+000913r 1  C9 5C        	cmp     #$5C
+000915r 1  B0 21        	bcs     L000C
+000917r 1               ;
+000917r 1               ; view_dlist[5 + row] &= 0x7F;
+000917r 1               ;
+000917r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 203
+000917r 1  A2 00        	ldx     #$00
+000919r 1  B1 rr        	lda     (c_sp),y
+00091Br 1  20 rr rr     	jsr     incax5
+00091Er 1  18           	clc
+00091Fr 1  69 rr        	adc     #<(_view_dlist)
+000921r 1  85 rr        	sta     ptr1
+000923r 1  8A           	txa
+000924r 1  69 rr        	adc     #>(_view_dlist)
+000926r 1  85 rr        	sta     ptr1+1
+000928r 1  A0 00        	ldy     #$00
+00092Ar 1  B1 rr        	lda     (ptr1),y
+00092Cr 1  29 7F        	and     #$7F
+00092Er 1  91 rr        	sta     (ptr1),y
+000930r 1               ;
+000930r 1               ; for (row = HORIZON - 1; row < VIEW_ROWS; ++row)
+000930r 1               ;
+000930r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 202
+000930r 1  18           	clc
+000931r 1  A9 01        	lda     #$01
+000933r 1  71 rr        	adc     (c_sp),y
+000935r 1  4C rr rr     	jmp     L000A
+000938r 1               ;
+000938r 1               ; for (i = 0; i < FLOOR_BANDS; ++i) {
+000938r 1               ;
+000938r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 204
+000938r 1  98           L000C:	tya
+000939r 1  C8           	iny
+00093Ar 1  91 rr        L000B:	sta     (c_sp),y
+00093Cr 1  C9 06        	cmp     #$06
+00093Er 1  B0 43        	bcs     L000D
+000940r 1               ;
+000940r 1               ; row = (unsigned char)(HORIZON + floor_phase + i * FLOOR_BAND_ROWS);
+000940r 1               ;
+000940r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 205
+000940r 1  A2 00        	ldx     #$00
+000942r 1  AD rr rr     	lda     _floor_phase
+000945r 1  A0 2E        	ldy     #$2E
+000947r 1  20 rr rr     	jsr     incaxy
+00094Ar 1  85 rr        	sta     sreg
+00094Cr 1  86 rr        	stx     sreg+1
+00094Er 1  A2 00        	ldx     #$00
+000950r 1  A0 01        	ldy     #$01
+000952r 1  B1 rr        	lda     (c_sp),y
+000954r 1  20 rr rr     	jsr     mulax7
+000957r 1  18           	clc
+000958r 1  65 rr        	adc     sreg
+00095Ar 1  48           	pha
+00095Br 1  8A           	txa
+00095Cr 1  65 rr        	adc     sreg+1
+00095Er 1  68           	pla
+00095Fr 1  88           	dey
+000960r 1  91 rr        	sta     (c_sp),y
+000962r 1               ;
+000962r 1               ; view_dlist[5 + row - 1] |= 0x80;
+000962r 1               ;
+000962r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 206
+000962r 1  A2 00        	ldx     #$00
+000964r 1  B1 rr        	lda     (c_sp),y
+000966r 1  20 rr rr     	jsr     incax4
+000969r 1  18           	clc
+00096Ar 1  69 rr        	adc     #<(_view_dlist)
+00096Cr 1  85 rr        	sta     ptr1
+00096Er 1  8A           	txa
+00096Fr 1  69 rr        	adc     #>(_view_dlist)
+000971r 1  85 rr        	sta     ptr1+1
+000973r 1  A0 00        	ldy     #$00
+000975r 1  B1 rr        	lda     (ptr1),y
+000977r 1  09 80        	ora     #$80
+000979r 1  91 rr        	sta     (ptr1),y
+00097Br 1               ;
+00097Br 1               ; for (i = 0; i < FLOOR_BANDS; ++i) {
+00097Br 1               ;
+00097Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 204
+00097Br 1  C8           	iny
+00097Cr 1  18           	clc
+00097Dr 1  98           	tya
+00097Er 1  71 rr        	adc     (c_sp),y
+000980r 1  4C rr rr     	jmp     L000B
+000983r 1               ;
+000983r 1               ; view_dlist[5 + VIEW_ROWS - 1] |= 0x80;
+000983r 1               ;
+000983r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 208
+000983r 1  AD rr rr     L000D:	lda     _view_dlist+96
+000986r 1  09 80        	ora     #$80
+000988r 1  8D rr rr     	sta     _view_dlist+96
+00098Br 1               ;
+00098Br 1               ; }
+00098Br 1               ;
+00098Br 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 209
+00098Br 1  4C rr rr     	jmp     incsp2
+00098Er 1               
+00098Er 1               	.dbg	line
+00098Er 1               .endproc
+00098Er 1               
+00098Er 1               ; ---------------------------------------------------------------
+00098Er 1               ; void __near__ minimap_restore_row (unsigned char row)
+00098Er 1               ; ---------------------------------------------------------------
+00098Er 1               
+00098Er 1               .segment	"CODE"
+00098Er 1               
+00098Er 1               .proc	_minimap_restore_row: near
+00098Er 1               
+00098Er 1               	.dbg	func, "minimap_restore_row", "00", static, "_minimap_restore_row"
+00098Er 1               	.dbg	sym, "row", "00", auto, 0
+00098Er 1               	.dbg	sym, "dest", "00", auto, -2
+00098Er 1               	.dbg	sym, "byte", "00", auto, -3
+00098Er 1               
+00098Er 1               .segment	"CODE"
+00098Er 1               
+00098Er 1               ;
+00098Er 1               ; {
+00098Er 1               ;
+00098Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 269
+00098Er 1  20 rr rr     	jsr     pusha
+000991r 1               ;
+000991r 1               ; if (row >= MAZE_H) return;
+000991r 1               ;
+000991r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 273
+000991r 1  20 rr rr     	jsr     decsp3
+000994r 1  A0 03        	ldy     #$03
+000996r 1  B1 rr        	lda     (c_sp),y
+000998r 1  C9 3B        	cmp     #$3B
+00099Ar 1  B0 55        	bcs     L0004
+00099Cr 1               ;
+00099Cr 1               ; dest = view_buffer + (unsigned int)row * VIEW_STRIDE;
+00099Cr 1               ;
+00099Cr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 274
+00099Cr 1  B1 rr        	lda     (c_sp),y
+00099Er 1  20 rr rr     	jsr     pusha0
+0009A1r 1  A9 28        	lda     #$28
+0009A3r 1  20 rr rr     	jsr     tosumula0
+0009A6r 1  18           	clc
+0009A7r 1  69 rr        	adc     #<(_view_buffer)
+0009A9r 1  A8           	tay
+0009AAr 1  8A           	txa
+0009ABr 1  69 rr        	adc     #>(_view_buffer)
+0009ADr 1  AA           	tax
+0009AEr 1  98           	tya
+0009AFr 1  A0 01        	ldy     #$01
+0009B1r 1  20 rr rr     	jsr     staxysp
+0009B4r 1               ;
+0009B4r 1               ; for (byte = 0; byte < MINI_BYTES; ++byte) {
+0009B4r 1               ;
+0009B4r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 275
+0009B4r 1  A9 00        	lda     #$00
+0009B6r 1  A8           	tay
+0009B7r 1  91 rr        L0007:	sta     (c_sp),y
+0009B9r 1  C9 05        	cmp     #$05
+0009BBr 1  B0 34        	bcs     L0004
+0009BDr 1               ;
+0009BDr 1               ; dest[byte] = minimap_bits[row][byte];
+0009BDr 1               ;
+0009BDr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 276
+0009BDr 1  B1 rr        	lda     (c_sp),y
+0009BFr 1  18           	clc
+0009C0r 1  C8           	iny
+0009C1r 1  71 rr        	adc     (c_sp),y
+0009C3r 1  85 rr        	sta     sreg
+0009C5r 1  A9 00        	lda     #$00
+0009C7r 1  C8           	iny
+0009C8r 1  71 rr        	adc     (c_sp),y
+0009CAr 1  85 rr        	sta     sreg+1
+0009CCr 1  A2 00        	ldx     #$00
+0009CEr 1  C8           	iny
+0009CFr 1  B1 rr        	lda     (c_sp),y
+0009D1r 1  20 rr rr     	jsr     mulax5
+0009D4r 1  18           	clc
+0009D5r 1  69 rr        	adc     #<(_minimap_bits)
+0009D7r 1  85 rr        	sta     ptr1
+0009D9r 1  8A           	txa
+0009DAr 1  69 rr        	adc     #>(_minimap_bits)
+0009DCr 1  85 rr        	sta     ptr1+1
+0009DEr 1  A0 00        	ldy     #$00
+0009E0r 1  B1 rr        	lda     (c_sp),y
+0009E2r 1  A8           	tay
+0009E3r 1  B1 rr        	lda     (ptr1),y
+0009E5r 1  A0 00        	ldy     #$00
+0009E7r 1  91 rr        	sta     (sreg),y
+0009E9r 1               ;
+0009E9r 1               ; for (byte = 0; byte < MINI_BYTES; ++byte) {
+0009E9r 1               ;
+0009E9r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 275
+0009E9r 1  18           	clc
+0009EAr 1  A9 01        	lda     #$01
+0009ECr 1  71 rr        	adc     (c_sp),y
+0009EEr 1  4C rr rr     	jmp     L0007
+0009F1r 1               ;
+0009F1r 1               ; }
+0009F1r 1               ;
+0009F1r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 278
+0009F1r 1  4C rr rr     L0004:	jmp     incsp4
+0009F4r 1               
+0009F4r 1               	.dbg	line
+0009F4r 1               .endproc
+0009F4r 1               
+0009F4r 1               ; ---------------------------------------------------------------
+0009F4r 1               ; void __near__ minimap_plot (unsigned char col, unsigned char row, unsigned char value)
+0009F4r 1               ; ---------------------------------------------------------------
+0009F4r 1               
+0009F4r 1               .segment	"CODE"
+0009F4r 1               
+0009F4r 1               .proc	_minimap_plot: near
+0009F4r 1               
+0009F4r 1               	.dbg	func, "minimap_plot", "00", static, "_minimap_plot"
+0009F4r 1               	.dbg	sym, "col", "00", auto, 2
+0009F4r 1               	.dbg	sym, "row", "00", auto, 1
+0009F4r 1               	.dbg	sym, "value", "00", auto, 0
+0009F4r 1               	.dbg	sym, "dest", "00", auto, -2
+0009F4r 1               	.dbg	sym, "shift", "00", auto, -3
+0009F4r 1               
+0009F4r 1               .segment	"CODE"
+0009F4r 1               
+0009F4r 1               ;
+0009F4r 1               ; {
+0009F4r 1               ;
+0009F4r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 281
+0009F4r 1  20 rr rr     	jsr     pusha
+0009F7r 1               ;
+0009F7r 1               ; if (col >= MAZE_W || row >= MAZE_H) return;
+0009F7r 1               ;
+0009F7r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 285
+0009F7r 1  20 rr rr     	jsr     decsp3
+0009FAr 1  A0 05        	ldy     #$05
+0009FCr 1  B1 rr        	lda     (c_sp),y
+0009FEr 1  C9 14        	cmp     #$14
+000A00r 1  B0 7C        	bcs     L0001
+000A02r 1  88           	dey
+000A03r 1  B1 rr        	lda     (c_sp),y
+000A05r 1  C9 3B        	cmp     #$3B
+000A07r 1  B0 75        	bcs     L0001
+000A09r 1               ;
+000A09r 1               ; shift = (unsigned char)(6 - ((col & 3) << 1));
+000A09r 1               ;
+000A09r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 286
+000A09r 1  A9 06        	lda     #$06
+000A0Br 1  20 rr rr     	jsr     pusha0
+000A0Er 1  A0 07        	ldy     #$07
+000A10r 1  B1 rr        	lda     (c_sp),y
+000A12r 1  29 03        	and     #$03
+000A14r 1  0A           	asl     a
+000A15r 1  90 02        	bcc     L0005
+000A17r 1  A2 01        	ldx     #$01
+000A19r 1  20 rr rr     L0005:	jsr     tossubax
+000A1Cr 1  A0 00        	ldy     #$00
+000A1Er 1  91 rr        	sta     (c_sp),y
+000A20r 1               ;
+000A20r 1               ; dest = view_buffer + (unsigned int)row * VIEW_STRIDE + (col >> 2);
+000A20r 1               ;
+000A20r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 287
+000A20r 1  A0 04        	ldy     #$04
 000A22r 1  B1 rr        	lda     (c_sp),y
-000A24r 1  C9 3B        	cmp     #$3B
-000A26r 1  B0 75        	bcs     L0001
-000A28r 1               ;
-000A28r 1               ; shift = (unsigned char)(6 - ((col & 3) << 1));
-000A28r 1               ;
-000A28r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 287
-000A28r 1  A9 06        	lda     #$06
-000A2Ar 1  20 rr rr     	jsr     pusha0
-000A2Dr 1  A0 07        	ldy     #$07
-000A2Fr 1  B1 rr        	lda     (c_sp),y
-000A31r 1  29 03        	and     #$03
-000A33r 1  0A           	asl     a
-000A34r 1  90 02        	bcc     L0005
-000A36r 1  A2 01        	ldx     #$01
-000A38r 1  20 rr rr     L0005:	jsr     tossubax
-000A3Br 1  A0 00        	ldy     #$00
-000A3Dr 1  91 rr        	sta     (c_sp),y
-000A3Fr 1               ;
-000A3Fr 1               ; dest = view_buffer + (unsigned int)row * VIEW_STRIDE + (col >> 2);
-000A3Fr 1               ;
-000A3Fr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 288
-000A3Fr 1  A0 04        	ldy     #$04
-000A41r 1  B1 rr        	lda     (c_sp),y
-000A43r 1  20 rr rr     	jsr     pusha0
-000A46r 1  A9 28        	lda     #$28
-000A48r 1  20 rr rr     	jsr     tosumula0
-000A4Br 1  18           	clc
-000A4Cr 1  69 rr        	adc     #<(_view_buffer)
-000A4Er 1  85 rr        	sta     ptr1
-000A50r 1  8A           	txa
-000A51r 1  69 rr        	adc     #>(_view_buffer)
-000A53r 1  85 rr        	sta     ptr1+1
-000A55r 1  A0 05        	ldy     #$05
-000A57r 1  B1 rr        	lda     (c_sp),y
-000A59r 1  4A           	lsr     a
-000A5Ar 1  4A           	lsr     a
-000A5Br 1  18           	clc
-000A5Cr 1  65 rr        	adc     ptr1
-000A5Er 1  A6 rr        	ldx     ptr1+1
-000A60r 1  90 01        	bcc     L0006
-000A62r 1  E8           	inx
-000A63r 1  A0 01        L0006:	ldy     #$01
-000A65r 1  20 rr rr     	jsr     staxysp
-000A68r 1               ;
-000A68r 1               ; *dest = (unsigned char)((*dest & ~(0x03 << shift)) | (value << shift));
-000A68r 1               ;
-000A68r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 289
-000A68r 1  85 rr        	sta     ptr2
-000A6Ar 1  86 rr        	stx     ptr2+1
-000A6Cr 1  A0 02        	ldy     #$02
-000A6Er 1  20 rr rr     	jsr     ldptr1ysp
-000A71r 1  A0 00        	ldy     #$00
-000A73r 1  B1 rr        	lda     (ptr1),y
-000A75r 1  85 rr        	sta     ptr1
-000A77r 1  B1 rr        	lda     (c_sp),y
-000A79r 1  A8           	tay
-000A7Ar 1  A9 03        	lda     #$03
-000A7Cr 1  A2 00        	ldx     #$00
-000A7Er 1  20 rr rr     	jsr     aslaxy
-000A81r 1  49 FF        	eor     #$FF
-000A83r 1  25 rr        	and     ptr1
-000A85r 1  85 rr        	sta     sreg
-000A87r 1  A2 00        	ldx     #$00
-000A89r 1  A0 03        	ldy     #$03
-000A8Br 1  B1 rr        	lda     (c_sp),y
-000A8Dr 1  85 rr        	sta     ptr1
-000A8Fr 1  A1 rr        	lda     (c_sp,x)
-000A91r 1  A8           	tay
-000A92r 1  A5 rr        	lda     ptr1
-000A94r 1  20 rr rr     	jsr     aslaxy
-000A97r 1  05 rr        	ora     sreg
-000A99r 1  A0 00        	ldy     #$00
-000A9Br 1  91 rr        	sta     (ptr2),y
-000A9Dr 1               ;
-000A9Dr 1               ; }
-000A9Dr 1               ;
-000A9Dr 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 290
-000A9Dr 1  4C rr rr     L0001:	jmp     incsp6
-000AA0r 1               
-000AA0r 1               	.dbg	line
-000AA0r 1               .endproc
-000AA0r 1               
-000AA0r 1               
+000A24r 1  20 rr rr     	jsr     pusha0
+000A27r 1  A9 28        	lda     #$28
+000A29r 1  20 rr rr     	jsr     tosumula0
+000A2Cr 1  18           	clc
+000A2Dr 1  69 rr        	adc     #<(_view_buffer)
+000A2Fr 1  85 rr        	sta     ptr1
+000A31r 1  8A           	txa
+000A32r 1  69 rr        	adc     #>(_view_buffer)
+000A34r 1  85 rr        	sta     ptr1+1
+000A36r 1  A0 05        	ldy     #$05
+000A38r 1  B1 rr        	lda     (c_sp),y
+000A3Ar 1  4A           	lsr     a
+000A3Br 1  4A           	lsr     a
+000A3Cr 1  18           	clc
+000A3Dr 1  65 rr        	adc     ptr1
+000A3Fr 1  A6 rr        	ldx     ptr1+1
+000A41r 1  90 01        	bcc     L0006
+000A43r 1  E8           	inx
+000A44r 1  A0 01        L0006:	ldy     #$01
+000A46r 1  20 rr rr     	jsr     staxysp
+000A49r 1               ;
+000A49r 1               ; *dest = (unsigned char)((*dest & ~(0x03 << shift)) | (value << shift));
+000A49r 1               ;
+000A49r 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 288
+000A49r 1  85 rr        	sta     ptr2
+000A4Br 1  86 rr        	stx     ptr2+1
+000A4Dr 1  A0 02        	ldy     #$02
+000A4Fr 1  20 rr rr     	jsr     ldptr1ysp
+000A52r 1  A0 00        	ldy     #$00
+000A54r 1  B1 rr        	lda     (ptr1),y
+000A56r 1  85 rr        	sta     ptr1
+000A58r 1  B1 rr        	lda     (c_sp),y
+000A5Ar 1  A8           	tay
+000A5Br 1  A9 03        	lda     #$03
+000A5Dr 1  A2 00        	ldx     #$00
+000A5Fr 1  20 rr rr     	jsr     aslaxy
+000A62r 1  49 FF        	eor     #$FF
+000A64r 1  25 rr        	and     ptr1
+000A66r 1  85 rr        	sta     sreg
+000A68r 1  A2 00        	ldx     #$00
+000A6Ar 1  A0 03        	ldy     #$03
+000A6Cr 1  B1 rr        	lda     (c_sp),y
+000A6Er 1  85 rr        	sta     ptr1
+000A70r 1  A1 rr        	lda     (c_sp,x)
+000A72r 1  A8           	tay
+000A73r 1  A5 rr        	lda     ptr1
+000A75r 1  20 rr rr     	jsr     aslaxy
+000A78r 1  05 rr        	ora     sreg
+000A7Ar 1  A0 00        	ldy     #$00
+000A7Cr 1  91 rr        	sta     (ptr2),y
+000A7Er 1               ;
+000A7Er 1               ; }
+000A7Er 1               ;
+000A7Er 1               	.dbg	line, "C:\Users\Alex\Chased3D\view3d.c", 289
+000A7Er 1  4C rr rr     L0001:	jmp     incsp6
+000A81r 1               
+000A81r 1               	.dbg	line
+000A81r 1               .endproc
+000A81r 1               
+000A81r 1               

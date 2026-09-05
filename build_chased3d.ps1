@@ -57,7 +57,7 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw "ca65 failed with exit code $LASTEXITCODE."
     }
-    & .\convert_splash_mono.ps1
+    & python .\gen_splash_redraw.py
     if ($LASTEXITCODE -ne 0) {
         throw "Splash artwork conversion failed with exit code $LASTEXITCODE."
     }

@@ -10,7 +10,7 @@
 	.importzp	c_sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
-	.dbg		file, "C:\Users\Alex\Chased3D\sprite3d.c", 18667, 1788472272
+	.dbg		file, "C:\Users\Alex\Chased3D\sprite3d.c", 18555, 1788558670
 	.dbg		file, "C:\tools\cc65\include/atari.h", 22152, 1786840064
 	.dbg		file, "C:\tools\cc65\include/_atarios.h", 40084, 1786840064
 	.dbg		file, "C:\tools\cc65\include/_gtia.h", 13839, 1786840064
@@ -21,7 +21,7 @@
 	.dbg		file, "C:\tools\cc65\include/stdlib.h", 6948, 1786840065
 	.dbg		file, "C:\Users\Alex\Chased3D/maze.h", 550, 1787868964
 	.dbg		file, "C:\Users\Alex\Chased3D/trig3d.h", 333, 1787781160
-	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1410, 1788473348
+	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1356, 1788475720
 	.dbg		file, "C:\Users\Alex\Chased3D/sprite3d.h", 910, 1787954059
 	.dbg		sym, "maze_map", "00", extern, "_maze_map"
 	.dbg		sym, "maze_exit_col", "00", extern, "_maze_exit_col"
@@ -95,14 +95,22 @@ _pursuer_sprite:
 	.byte	$00
 	.byte	$00
 _decoy_sprite:
-	.byte	$12
-	.byte	$16
 	.byte	$18
-	.byte	$3C
-	.byte	$3C
+	.byte	$24
+	.byte	$42
+	.byte	$81
 	.byte	$18
-	.byte	$68
-	.byte	$48
+	.byte	$24
+	.byte	$42
+	.byte	$00
+	.byte	$18
+	.byte	$24
+	.byte	$42
+	.byte	$18
+	.byte	$24
+	.byte	$81
+	.byte	$FF
+	.byte	$FF
 _exit_sprite:
 	.byte	$18
 	.byte	$3C
@@ -1393,7 +1401,7 @@ L0008:	jsr     tosicmp
 	dex
 L000A:	jsr     pushax
 	ldy     #$0D
-	jmp     L0052
+	jmp     L0050
 L0009:	ldy     #$0B
 	ldx     #$00
 	lda     (c_sp),y
@@ -1401,7 +1409,7 @@ L0009:	ldy     #$0B
 	dex
 L000D:	jsr     pushax
 	ldy     #$0B
-L0052:	ldx     #$00
+L0050:	ldx     #$00
 	lda     (c_sp),y
 	bpl     L000E
 	dex
@@ -1434,7 +1442,7 @@ L0011:	jsr     tosicmp
 	dex
 L0013:	jsr     pushax
 	ldy     #$0A
-	jmp     L0053
+	jmp     L0051
 L0012:	ldy     #$08
 	ldx     #$00
 	lda     (c_sp),y
@@ -1442,7 +1450,7 @@ L0012:	ldy     #$08
 	dex
 L0016:	jsr     pushax
 	ldy     #$0C
-L0053:	ldx     #$00
+L0051:	ldx     #$00
 	lda     (c_sp),y
 	bpl     L0017
 	dex
@@ -1468,9 +1476,9 @@ L0019:	jsr     pushax
 L001A:	jsr     tosicmp
 	bpl     L001B
 	lda     #$01
-	jmp     L0045
+	jmp     L0044
 L001B:	lda     #$FF
-L0045:	cmp     #$80
+L0044:	cmp     #$80
 	ldy     #$05
 	sta     (c_sp),y
 ;
@@ -1491,9 +1499,9 @@ L001E:	jsr     pushax
 L001F:	jsr     tosicmp
 	bpl     L0020
 	lda     #$01
-	jmp     L0046
+	jmp     L0045
 L0020:	lda     #$FF
-L0046:	cmp     #$80
+L0045:	cmp     #$80
 	ldy     #$04
 	sta     (c_sp),y
 ;
@@ -1579,13 +1587,13 @@ L0033:	jsr     pushw0sp
 	bpl     L0035
 	dex
 L0035:	jsr     tosicmp
-	beq     L0044
+	beq     L0043
 	bpl     L0039
 ;
 ; error += dx;
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 547
-L0044:	ldy     #$07
+L0043:	ldy     #$07
 	ldx     #$00
 	lda     (c_sp),y
 	bpl     L0036
@@ -1632,7 +1640,7 @@ L003E:	jsr     pushax
 	bpl     L003F
 	dex
 L003F:	jsr     tosicmp
-	beq     L0049
+	beq     L0048
 ;
 ; if (maze_solid((unsigned char)col, (unsigned char)row)) return;
 ;
@@ -1676,31 +1684,11 @@ L002B:	jsr     pushax
 L002C:	jsr     tosicmp
 	jne     L0025
 ;
-; if (projected_height > 32) {
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 554
-L0049:	lda     _projected_height
-	cmp     #$21
-	lda     #$00
-	bcc     L004B
-;
-; projected_height = 32;
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 555
-	lda     #$20
-	sta     _projected_height
-;
-; projected_top = (VIEW_ROWS - 32) >> 1;
-;
-	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 556
-	lda     #$1E
-	sta     _projected_top
-;
 ; draw_billboard(0, projected_x, projected_top, projected_height,
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 558
-	lda     #$00
-L004B:	jsr     pusha
+	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 554
+L0048:	lda     #$00
+	jsr     pusha
 	lda     _projected_x
 	jsr     pusha
 	lda     _projected_top
@@ -1710,7 +1698,7 @@ L004B:	jsr     pusha
 ;
 ; pursuer_sprite, 22);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 559
+	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 555
 	lda     #<(_pursuer_sprite)
 	ldx     #>(_pursuer_sprite)
 	jsr     pushax
@@ -1719,7 +1707,7 @@ L004B:	jsr     pusha
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 560
+	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 556
 L0001:	ldy     #$16
 	jmp     addysp
 
@@ -1797,7 +1785,7 @@ L0001:	ldy     #$16
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 425
 	cmp     #$21
-	bcc     L001D
+	bcc     L001E
 ;
 ; height = 32;
 ;
@@ -1814,10 +1802,10 @@ L0001:	ldy     #$16
 ; if (height >= 24) {
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 429
-L001D:	lda     (c_sp),y
+L001E:	lda     (c_sp),y
 	cmp     #$18
 	lda     #$00
-	bcc     L001F
+	bcc     L0020
 ;
 ; size = 0x55;
 ;
@@ -1841,12 +1829,12 @@ L001D:	lda     (c_sp),y
 ; } else {
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 433
-	jmp     L0021
+	jmp     L0022
 ;
 ; size = 0;
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 434
-L001F:	dey
+L0020:	dey
 	sta     (c_sp),y
 ;
 ; missile_width = 2;
@@ -1860,7 +1848,7 @@ L001F:	dey
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 436
 	lda     #$08
-L0021:	dey
+L0022:	dey
 	sta     (c_sp),y
 ;
 ; left = (int)projected_x - (width >> 1);
@@ -1933,10 +1921,10 @@ L000A:	lda     #<(_pmg_ram+402)
 L000C:	ldy     #$0B
 	jsr     staxysp
 ;
-; step = ((unsigned int)8 << 8) / height;
+; step = ((unsigned int)16 << 8) / height;
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 445
-	ldx     #$08
+	ldx     #$10
 	lda     #$00
 	jsr     pushax
 	ldy     #$0B
@@ -1957,12 +1945,12 @@ L000C:	ldy     #$0B
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 447
 	ldy     #$0A
-L0018:	sta     (c_sp),y
+L0019:	sta     (c_sp),y
 	ldx     #$00
 	lda     (c_sp),y
 	dey
 	cmp     (c_sp),y
-	bcs     L0020
+	bcs     L0021
 ;
 ; dest[i] = decoy_sprite[acc >> 8];
 ;
@@ -2003,12 +1991,12 @@ L0018:	sta     (c_sp),y
 	clc
 	lda     #$01
 	adc     (c_sp),y
-	jmp     L0018
+	jmp     L0019
 ;
 ; decoy_clear_top = (unsigned char)(PMG_TOP_OFFSET + projected_top);
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 451
-L0020:	lda     _projected_top
+L0021:	lda     _projected_top
 	ldy     #$12
 	jsr     incaxy
 	sta     _decoy_clear_top
@@ -2032,7 +2020,7 @@ L0020:	lda     _projected_top
 	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 455
 	lda     #$00
 	ldy     #$0A
-L0019:	sta     (c_sp),y
+L001A:	sta     (c_sp),y
 	cmp     #$04
 	bcs     L0012
 ;
@@ -2046,7 +2034,7 @@ L0019:	sta     (c_sp),y
 	bcc     L0015
 	inx
 ;
-; (unsigned char)(48 + left + i * missile_width);
+; (unsigned char)(48 + left + (3 - i) * missile_width);
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\sprite3d.c", 457
 L0015:	jsr     pushax
@@ -2055,12 +2043,17 @@ L0015:	jsr     pushax
 	ldy     #$30
 	jsr     incaxy
 	jsr     pushax
+	lda     #$03
+	sec
 	ldy     #$0E
-	lda     (c_sp),y
-	jsr     pusha0
+	sbc     (c_sp),y
+	ldx     #$00
+	bcs     L0017
+	dex
+L0017:	jsr     pushax
 	ldy     #$0D
 	lda     (c_sp),y
-	jsr     tosumula0
+	jsr     tosmula0
 	jsr     tosaddax
 	ldy     #$00
 	jsr     staspidx
@@ -2072,7 +2065,7 @@ L0015:	jsr     pushax
 	clc
 	lda     #$01
 	adc     (c_sp),y
-	jmp     L0019
+	jmp     L001A
 ;
 ; }
 ;

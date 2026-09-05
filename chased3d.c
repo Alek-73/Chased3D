@@ -12,6 +12,7 @@
 #define KBD_KBCODE 0xD209
 #define POKEY_RANDOM 0xD20A
 #define JOYSTICK_FIRE0 0xD010
+#define JOYSTICK_DIRECTIONS0 0xD300
 #define PORTB 0xD301
 #define PBCTL 0xD303
 #define NOCLIK 0x02DB   /* non-zero silences the OS key click */
@@ -35,13 +36,11 @@
 #define SCORE_PER_TARGET 100u
 #define SCORE_PER_DECOY 50u
 
-extern unsigned char startup_portb;
-extern unsigned char startup_memtop[2];
-
 /* Same triplet string the original BASIC game plays when the pursuer catches
  * the player (line 305 of chased1V3.BAS). */
 #define CAUGHT_MELODY "A14C28B18A14G14A11"
-#define STARTING_LIVES 3
+//#define STARTING_LIVES 3
+#define STARTING_LIVES 1
 
 #define PLAYER_START_X ((6u << 8) | 0x80u)
 #define PLAYER_START_Y ((1u << 8) | 0x80u)
@@ -422,6 +421,9 @@ static void start_new_game(void)
     start_life();
     update_game_hud();
     melody_play(LEVEL_LOAD_MELODY);
+    view3d_render(player_x, player_y, player_angle);
+    OS.sdmctl = 0x2E;
+    ANTIC.dmactl = 0x2E;
 }
 
 static unsigned char restart_pressed(void)
@@ -444,6 +446,8 @@ static void show_end_screen(const char *message, unsigned char size,
 
     while (restart_pressed()) wait_frame();
     while (!restart_pressed()) wait_frame();
+    OS.sdmctl = 0;
+    ANTIC.dmactl = 0;
 }
 
 static void game_over(void)
@@ -544,10 +548,12 @@ static void handle_level_clear(void)
 int main(void)
 {
     unsigned char key;
+    unsigned char joystick;
     unsigned char ticks_per_second;
     unsigned char prev_tick;
     unsigned char now;
     unsigned char previous_key;
+    unsigned char previous_trigger;
 #ifdef DEBUG_HUD
     unsigned char last_tick;
     unsigned char frames;
@@ -596,6 +602,7 @@ int main(void)
     frames = 0;
 #endif
     previous_key = 0xFF;
+    previous_trigger = 1;
 
     for (;;) {
         now = *(volatile unsigned char *)RTCLOK_LOW;
@@ -605,13 +612,18 @@ int main(void)
         prev_tick = now;
 
         key = read_key();
-        if (key == KEY_ESC) break;
-        if (key == KEY_W) step_forward(1);
-        else if (key == KEY_S) step_forward(-1);
-        else if (key == KEY_A) player_angle -= TURN_PER_TICK * frame_ticks;
-        else if (key == KEY_D) player_angle += TURN_PER_TICK * frame_ticks;
-        else if (key == KEY_SPACE && previous_key != KEY_SPACE) deploy_decoy();
+        joystick = (unsigned char)~*(volatile unsigned char *)JOYSTICK_DIRECTIONS0;
+        if (key == KEY_W || (joystick & JOY_UP_MASK)) step_forward(1);
+        else if (key == KEY_S || (joystick & JOY_DOWN_MASK)) step_forward(-1);
+        if (key == KEY_A || (joystick & JOY_LEFT_MASK))
+            player_angle -= TURN_PER_TICK * frame_ticks;
+        else if (key == KEY_D || (joystick & JOY_RIGHT_MASK))
+            player_angle += TURN_PER_TICK * frame_ticks;
+        if ((key == KEY_SPACE && previous_key != KEY_SPACE)
+            || (*(volatile unsigned char *)JOYSTICK_FIRE0 == 0
+                && previous_trigger != 0)) deploy_decoy();
         previous_key = key;
+        previous_trigger = *(volatile unsigned char *)JOYSTICK_FIRE0;
 
         update_decoy_recharge();
         update_laser();
@@ -652,8 +664,4 @@ int main(void)
 #endif
         wait_frame();
     }
-    *(volatile unsigned char *)0x02E5 = startup_memtop[0];
-    *(volatile unsigned char *)0x02E6 = startup_memtop[1];
-    *(volatile unsigned char *)PORTB = startup_portb;
-    return 0;
 }

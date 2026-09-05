@@ -10,9 +10,9 @@
 	.importzp	c_sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
-	.dbg		file, "C:\Users\Alex\Chased3D\textplot.c", 5912, 1788473040
-	.dbg		file, "C:\Users\Alex\Chased3D/textplot.h", 440, 1788473040
-	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1410, 1788473348
+	.dbg		file, "C:\Users\Alex\Chased3D\textplot.c", 5912, 1788474193
+	.dbg		file, "C:\Users\Alex\Chased3D/textplot.h", 440, 1788474191
+	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1356, 1788475720
 	.dbg		file, "C:\Users\Alex\Chased3D/maze.h", 550, 1787868964
 	.dbg		sym, "view_buffer", "00", extern, "_view_buffer"
 	.export		_textplot_print_fullscreen

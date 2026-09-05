@@ -103,9 +103,9 @@ Current file: C:\Users\Alex\Chased3D\debug\textplot.s
 000000r 2                       .endif
 000000r 2               .endmacro
 000000r 2               
-000000r 1               	.dbg		file, "C:\Users\Alex\Chased3D\textplot.c", 5912, 1788473040
-000000r 1               	.dbg		file, "C:\Users\Alex\Chased3D/textplot.h", 440, 1788473040
-000000r 1               	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1410, 1788473348
+000000r 1               	.dbg		file, "C:\Users\Alex\Chased3D\textplot.c", 5912, 1788474193
+000000r 1               	.dbg		file, "C:\Users\Alex\Chased3D/textplot.h", 440, 1788474191
+000000r 1               	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1356, 1788475720
 000000r 1               	.dbg		file, "C:\Users\Alex\Chased3D/maze.h", 550, 1787868964
 000000r 1               	.dbg		sym, "view_buffer", "00", extern, "_view_buffer"
 000000r 1               	.export		_textplot_print_fullscreen

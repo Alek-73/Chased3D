@@ -48,92 +48,60 @@ def ellipse(center_x, center_y, radius_x, radius_y, color):
                 pixel(x, y, color)
 
 
-# Pixel codes: 0 black, 1 red maze/pursuer, 2 pink Ugug/target/highlights.
-# Code 3 is reserved exclusively for the CHASED 3D title at runtime.
-# The composition follows the supplied artwork but is redrawn at native size.
-rectangle(0, 0, WIDTH, 2, 1)
-rectangle(0, HEIGHT - 2, WIDTH, 2, 1)
-rectangle(0, 0, 2, HEIGHT, 1)
-rectangle(WIDTH - 2, 0, 2, HEIGHT, 1)
+def bitmap(x, y, rows, scale, color):
+    for row, bits in enumerate(rows):
+        for column in range(8):
+            if bits & (0x80 >> column):
+                rectangle(x + column * scale, y + row * scale,
+                          scale, scale, color)
 
-# Dungeon architecture with large black openings and sparse brick joints.
-rectangle(8, 2, 11, 42, 1)
-rectangle(12, 2, 4, 42, 0)
-rectangle(55, 2, 58, 12, 1)
-rectangle(59, 5, 54, 7, 0)
-rectangle(18, 39, 112, 5, 1)
-rectangle(23, 39, 45, 2, 0)
-rectangle(88, 39, 38, 2, 0)
-rectangle(126, 2, 30, 42, 1)
-rectangle(129, 4, 24, 37, 0)
-for x0, y, x1 in (
-        (56, 5, 67), (72, 5, 84), (89, 5, 101),
-        (61, 9, 76), (81, 9, 94), (99, 9, 111),
-        (20, 42, 42), (49, 42, 69), (94, 42, 116),
-        (130, 7, 140), (143, 7, 152), (131, 36, 145)):
-    line(x0, y, x1, y, 0)
 
-# Pink Ugug: one triangular silhouette, worried face, and running pose.
-for y in range(13, 35):
-    half_width = (y - 9) // 2
-    rectangle(37 - half_width, y, half_width * 2 + 1, 1, 2)
-ellipse(37, 14, 3, 3, 2)
-rectangle(32, 21, 3, 3, 2)
-rectangle(39, 21, 3, 3, 2)
-pixel(33, 22, 0)
-pixel(40, 22, 0)
-line(34, 28, 40, 28, 0)
-line(28, 27, 22, 23, 2)
-line(46, 27, 52, 31, 2)
-line(33, 34, 27, 40, 2)
-line(41, 34, 49, 39, 2)
-line(27, 40, 23, 39, 2)
-line(49, 39, 54, 39, 2)
-for x, y in ((26, 17), (23, 20), (28, 12)):
-    line(x, y, x - 2, y - 2, 2)
-
-# Red pursuer: round body, mechanical eye, and four rotor pods.
-ellipse(89, 24, 15, 13, 1)
-ellipse(89, 24, 10, 9, 0)
-ellipse(89, 24, 7, 7, 1)
-ellipse(89, 24, 4, 4, 2)
-ellipse(89, 24, 2, 2, 0)
-pixel(88, 23, 2)
+# Pixel codes 0 and 1 are the only colors used. The frame shows the maze from
+# the player's viewpoint, with the decoy between the viewer and the pursuer.
+# Main corridor: three sparse wall outlines establish depth.
 for x0, y0, x1, y1 in (
-        (76, 17, 67, 11), (102, 17, 111, 11),
-        (76, 31, 66, 36), (102, 31, 112, 36)):
+        (0, 2, 52, 13), (0, 44, 52, 32),
+        (159, 2, 108, 13), (159, 44, 108, 32),
+        (52, 13, 52, 32), (108, 13, 108, 32),
+        (52, 13, 108, 13), (52, 32, 108, 32),
+        (65, 17, 95, 17), (65, 28, 95, 28),
+        (65, 17, 65, 28), (95, 17, 95, 28),
+        (73, 20, 87, 20), (73, 26, 87, 26),
+        (73, 20, 73, 26), (87, 20, 87, 26)):
     line(x0, y0, x1, y1, 1)
-    line(x0, y0 + 1, x1, y1 + 1, 1)
-for rotor_x, rotor_y in ((62, 9), (116, 9), (61, 38), (117, 38)):
-    ellipse(rotor_x, rotor_y, 9, 3, 1)
-    ellipse(rotor_x, rotor_y, 6, 1, 0)
-    line(rotor_x - 3, rotor_y, rotor_x + 3, rotor_y, 2)
 
-# Restrained comic speed lines.
-for x0, y, x1 in (
-        (18, 10, 35), (16, 12, 31), (50, 20, 67),
-        (48, 23, 64), (106, 5, 122), (109, 7, 125)):
-    line(x0, y, x1, y, 2)
+# Keep each sprite's local background dark so the wall outlines do not cut
+# through it, while preserving the corridor between the three objects.
+rectangle(47, 10, 18, 34, 0)
+rectangle(74, 16, 12, 20, 0)
+rectangle(95, 10, 18, 34, 0)
 
-# Locked door and a bright collectible target beside it.
-rectangle(133, 10, 17, 29, 1)
-rectangle(135, 12, 13, 25, 0)
-rectangle(137, 14, 9, 8, 1)
-rectangle(137, 25, 9, 10, 1)
-ellipse(141, 27, 2, 2, 2)
-line(141, 29, 141, 32, 2)
-rectangle(119, 25, 7, 9, 2)
-rectangle(116, 27, 13, 5, 2)
-rectangle(121, 23, 3, 13, 2)
-pixel(120, 28, 0)
-pixel(125, 28, 0)
-line(120, 32, 125, 32, 0)
+# Exact in-game decoy sprite, enlarged in the left foreground.
+decoy_sprite = (
+    0x18, 0x24, 0x42, 0x81, 0x18, 0x24, 0x42, 0x00,
+    0x18, 0x24, 0x42, 0x18, 0x24, 0x81, 0xFF, 0xFF,
+)
+bitmap(48, 11, decoy_sprite, 2, 1)
+
+# Exact in-game 8x16 laser glyph, centered between the two objects.
+laser_sprite = (
+    0x00, 0x81, 0x24, 0x5A, 0x18, 0x7E, 0x3C, 0xFF,
+    0xFF, 0x3C, 0x7E, 0x18, 0x5A, 0x24, 0x81, 0x00,
+)
+bitmap(76, 18, laser_sprite, 1, 1)
+
+# Exact in-game collectible target glyph, enlarged in the right foreground.
+target_sprite = (
+    0xE1, 0x92, 0x4C, 0x4A, 0x31, 0x31, 0x4D, 0x83,
+    0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xFF, 0xFF,
+)
+bitmap(96, 11, target_sprite, 2, 1)
 
 palette = (
-    (8, 8, 12, 0),       # black
-    (32, 40, 204, 0),    # red
-    (212, 70, 184, 0),   # pink
-    (40, 220, 240, 0),   # yellow
+    (12, 8, 4, 0),
+    (220, 238, 248, 0),
+    (12, 8, 4, 0),
+    (220, 238, 248, 0),
 )
 row_bytes = WIDTH // 2
 pixel_offset = 14 + 40 + len(palette) * 4
@@ -150,3 +118,5 @@ with output_path.open("wb") as output:
     for row in reversed(pixels):
         for x in range(0, WIDTH, 2):
             output.write(bytes([(row[x] << 4) | row[x + 1]]))
+
+print(f"Generated two-color cartoon splash: {output_path}")
