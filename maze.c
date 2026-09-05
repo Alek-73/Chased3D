@@ -138,15 +138,19 @@ void maze_load_level(unsigned char requested_level)
     } else if (requested_level == 2) {
         /* Level 2 reuses level 1's data rotated 180 degrees, with target
          * tiles 3/4 swapped to keep the two-row glyph pointing the right
-         * way up - same as chased1V3.BAS lines 19700-19709. */
+         * way up. The exit remains at the common top-center location. */
         for (row = 0; row < MAZE_H; ++row) {
             for (col = 0; col < MAZE_W; ++col) {
                 tile = level1_data[row][col];
                 if (tile == 3) tile = 4;
                 else if (tile == 4) tile = 3;
+                else if (tile == 5) tile = 1;
                 maze_map[MAZE_H - 1 - row][MAZE_W - 1 - col] = tile;
             }
         }
+        maze_map[0][8] = 5;
+        maze_map[0][9] = 5;
+        maze_map[0][10] = 5;
     } else {
         if (requested_level == 3) level_name = "D:L2.CSV";
         else if (requested_level == 4) level_name = "D:L3.CSV";

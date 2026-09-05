@@ -12,7 +12,7 @@
 	.macpack	longbranch
 	.dbg		file, "C:\Users\Alex\Chased3D\textplot.c", 5912, 1788474193
 	.dbg		file, "C:\Users\Alex\Chased3D/textplot.h", 440, 1788474191
-	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1356, 1788475720
+	.dbg		file, "C:\Users\Alex\Chased3D/view3d.h", 1474, 1788645070
 	.dbg		file, "C:\Users\Alex\Chased3D/maze.h", 550, 1787868964
 	.dbg		sym, "view_buffer", "00", extern, "_view_buffer"
 	.export		_textplot_print_fullscreen

@@ -18,16 +18,20 @@
 #define COLOR4 (*(volatile unsigned char *)712)
 
 void view3d_init(void);
+void view3d_clear(void);
+void floor_dli_suspend(void);
+void floor_dli_resume(void);
 void view3d_render(unsigned int px, unsigned int py, unsigned int angle);
 void view3d_floor_motion(signed char direction);
 unsigned char view3d_wall_height(unsigned int dist);
 void minimap_build(void);
 void minimap_show(void);
+void minimap_open_exit(void);
 void minimap_update(unsigned int px, unsigned int py, unsigned int angle);
 #ifdef DEBUG_HUD
 void hud_set_fps(unsigned char fps);
-void hud_set_targets(unsigned char remaining);
 #endif
+void hud_set_targets(unsigned char remaining);
 void hud_set_game(unsigned char lives, unsigned char level,
 				  unsigned int score, unsigned int high_score);
 void hud_set_decoy(unsigned char progress, unsigned char maximum);

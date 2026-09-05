@@ -156,6 +156,7 @@ void sprite3d_build_targets(void)
         }
     }
     targets_left = target_count;
+    //targets_left=1;
 }
 
 /* Reservoir sampling chooses a uniform subset without storing every laser
@@ -202,16 +203,12 @@ void sprite3d_locate_exit(void)
 
 unsigned char sprite3d_reached_exit(unsigned int px, unsigned int py)
 {
-    int dx;
-    int dy;
+    unsigned char col;
 
     if (!maze_exit_found || targets_left != 0) return 0;
-    dx = (int)exit_px - (int)px;
-    if (dx < 0) dx = -dx;
-    if (dx >= COLLECT_RADIUS) return 0;
-    dy = (int)exit_py - (int)py;
-    if (dy < 0) dy = -dy;
-    return dy < COLLECT_RADIUS;
+    if ((unsigned char)(py >> 8) != maze_exit_row) return 0;
+    col = (unsigned char)(px >> 8);
+    return col >= maze_exit_col && col < maze_exit_col + 3;
 }
 
 /* Box test rather than a true radius: no multiply, and the difference is not

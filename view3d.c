@@ -74,7 +74,7 @@ static unsigned char ray_wall;
 
 #pragma bss-name (push, "SCREEN")
 unsigned char view_buffer[VIEW_STRIDE * VIEW_ROWS];
-static unsigned char hud_line[20];
+static unsigned char hud_line[40];
 #pragma bss-name (pop)
 
 #pragma bss-name (push, "DLIST")
@@ -112,6 +112,14 @@ static void draw_open_column(unsigned char col)
     x = (unsigned char)(MINI_BYTES + (col << 1));
     draw_open_byte(x);
     if (x + 1 < VIEW_STRIDE) draw_open_byte(x + 1);
+}
+
+void view3d_clear(void)
+{
+    unsigned int addr;
+
+    for (addr = 0; addr < VIEW_STRIDE * VIEW_ROWS; ++addr)
+        view_buffer[addr] = 0;
 }
 
 static void draw_wall_byte(unsigned char x, unsigned char top,
@@ -184,6 +192,7 @@ static void cast_column(unsigned char col, unsigned int ray_angle,
     }
     draw_wall_column(col, ray_top, ray_bottom, ray_wall);
 }
+
 
 void view3d_render(unsigned int px, unsigned int py, unsigned int angle)
 {
@@ -288,6 +297,12 @@ static void minimap_plot(unsigned char col, unsigned char row, unsigned char val
     *dest = (unsigned char)((*dest & ~(0x03 << shift)) | (value << shift));
 }
 
+void minimap_open_exit(void)
+{
+    minimap_bits[0][2] &= 0x03;
+    view_buffer[2] &= 0x03;
+}
+
 void minimap_update(unsigned int px, unsigned int py, unsigned int angle)
 {
     unsigned char col;
@@ -307,12 +322,9 @@ void minimap_update(unsigned int px, unsigned int py, unsigned int angle)
     marker_row = row;
 }
 
-/* ANTIC mode 6 uses internal character codes, not ATASCII; bits 6-7 select
- * the playfield colour register used by each character. */
-#define HUD_LABEL_COLOR 0x40
-#define HUD_NUMBER_COLOR 0x80
-#define HUD_CHAR(character) ((unsigned char)(((character) - 32) | HUD_LABEL_COLOR))
-#define HUD_DIGIT(digit) ((unsigned char)((16 + (digit)) | HUD_NUMBER_COLOR))
+/* ANTIC mode 2 uses internal character codes; bit 7 selects inverse video. */
+#define HUD_CHAR(character) ((unsigned char)(((character) - 32) | 0x80))
+#define HUD_DIGIT(digit) ((unsigned char)(16 + (digit)))
 
 #ifdef DEBUG_HUD
 void hud_set_fps(unsigned char fps)
@@ -324,17 +336,23 @@ void hud_set_fps(unsigned char fps)
     hud_line[4] = HUD_DIGIT(fps / 10);
     hud_line[5] = HUD_DIGIT(fps % 10);
 }
+#endif
 
 void hud_set_targets(unsigned char remaining)
 {
     if (remaining > 99) remaining = 99;
-    hud_line[10] = HUD_CHAR('T');
-    hud_line[11] = HUD_CHAR('G');
-    hud_line[12] = HUD_CHAR('T');
+#ifdef DEBUG_HUD
+    hud_line[16] = HUD_CHAR('T');
+    hud_line[17] = HUD_CHAR('G');
+    hud_line[18] = HUD_CHAR('T');
+    hud_line[20] = HUD_DIGIT(remaining / 10);
+    hud_line[21] = HUD_DIGIT(remaining % 10);
+#else
+    hud_line[13] = HUD_CHAR('T');
     hud_line[14] = HUD_DIGIT(remaining / 10);
     hud_line[15] = HUD_DIGIT(remaining % 10);
-}
 #endif
+}
 
 #ifndef DEBUG_HUD
 static void hud_set_number5(unsigned char offset, unsigned int value)
@@ -362,17 +380,20 @@ void hud_set_game(unsigned char lives, unsigned char level,
     if (lives > 9) lives = 9;
     if (level > 9) level = 9;
     hud_line[0] = HUD_CHAR('L');
-    hud_line[1] = HUD_DIGIT(lives);
-    hud_line[2] = 0;
-    hud_line[3] = HUD_CHAR('L');
-    hud_line[4] = HUD_CHAR('V');
-    hud_line[5] = HUD_DIGIT(level);
-    hud_line[6] = 0;
-    hud_line[7] = HUD_CHAR('S');
-    hud_set_number5(8, score);
-    hud_line[13] = 0;
-    hud_line[14] = HUD_CHAR('H');
-    hud_set_number5(15, high_score);
+    hud_line[1] = HUD_CHAR('I');
+    hud_line[2] = HUD_CHAR('F');
+    hud_line[3] = HUD_CHAR('E');
+    hud_line[4] = HUD_DIGIT(lives);
+    hud_line[6] = HUD_CHAR('L');
+    hud_line[7] = HUD_CHAR('E');
+    hud_line[8] = HUD_CHAR('V');
+    hud_line[9] = HUD_CHAR('E');
+    hud_line[10] = HUD_CHAR('L');
+    hud_line[11] = HUD_DIGIT(level);
+    hud_line[27] = HUD_CHAR('S');
+    hud_set_number5(28, score);
+    hud_line[34] = HUD_CHAR('H');
+    hud_set_number5(35, high_score);
 #endif
 }
 
@@ -416,15 +437,14 @@ void view3d_init(void)
     unsigned char i;
     unsigned char n;
 
-    for (addr = 0; addr < VIEW_STRIDE * VIEW_ROWS; ++addr)
-        view_buffer[addr] = 0;
+    view3d_clear();
 
     for (i = 0; i < sizeof(hud_line); ++i) hud_line[i] = 0;
 #ifdef DEBUG_HUD
-    hud_line[16] = HUD_CHAR('B');
-    hud_line[17] = HUD_DIGIT(BUILD_DIGIT_100);
-    hud_line[18] = HUD_DIGIT(BUILD_DIGIT_10);
-    hud_line[19] = HUD_DIGIT(BUILD_DIGIT_1);
+    hud_line[35] = HUD_CHAR('B');
+    hud_line[36] = HUD_DIGIT(BUILD_DIGIT_100);
+    hud_line[37] = HUD_DIGIT(BUILD_DIGIT_10);
+    hud_line[38] = HUD_DIGIT(BUILD_DIGIT_1);
 #endif
 
     for (addr = 0; addr < HEIGHT_STEPS; ++addr) {
@@ -446,7 +466,7 @@ void view3d_init(void)
     view_dlist[n++] = (unsigned char)(addr >> 8);
     for (i = 1; i < VIEW_ROWS; ++i) view_dlist[n++] = 0x0D;
     addr = (unsigned int)hud_line;
-    view_dlist[n++] = 0x46;                        /* mode 6 text + load memory scan */
+    view_dlist[n++] = 0x42;                        /* mode 2 text + load memory scan */
     view_dlist[n++] = (unsigned char)addr;
     view_dlist[n++] = (unsigned char)(addr >> 8);
     addr = (unsigned int)view_dlist;

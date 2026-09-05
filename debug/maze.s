@@ -10,7 +10,7 @@
 	.importzp	c_sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
-	.dbg		file, "C:\Users\Alex\Chased3D\maze.c", 7236, 1788475720
+	.dbg		file, "C:\Users\Alex\Chased3D\maze.c", 7381, 1788642337
 	.dbg		file, "C:\tools\cc65\include/fcntl.h", 3550, 1786840065
 	.dbg		file, "C:\tools\cc65\include/unistd.h", 4340, 1786840065
 	.dbg		file, "C:\Users\Alex\Chased3D/maze.h", 550, 1787868964
@@ -1299,23 +1299,23 @@ _level_buffer_len:
 	ldy     #$07
 	lda     (c_sp),y
 	cmp     #$02
-	bcs     L0064
+	bcs     L0066
 ;
 ; for (row = 0; row < MAZE_H; ++row)
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 135
 	lda     #$00
 	ldy     #$04
-L005A:	sta     (c_sp),y
+L005C:	sta     (c_sp),y
 	cmp     #$3B
-	jcs     L0076
+	jcs     L007B
 ;
 ; for (col = 0; col < MAZE_W; ++col)
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 136
 	lda     #$00
 	dey
-L0059:	sta     (c_sp),y
+L005B:	sta     (c_sp),y
 	cmp     #$14
 	bcs     L0005
 ;
@@ -1338,9 +1338,9 @@ L0059:	sta     (c_sp),y
 	clc
 	adc     ptr1
 	ldx     ptr1+1
-	bcc     L0053
+	bcc     L0055
 	inx
-L0053:	jsr     pushax
+L0055:	jsr     pushax
 	ldy     #$06
 	lda     (c_sp),y
 	jsr     pusha0
@@ -1366,7 +1366,7 @@ L0053:	jsr     pushax
 	clc
 	lda     #$01
 	adc     (c_sp),y
-	jmp     L0059
+	jmp     L005B
 ;
 ; for (row = 0; row < MAZE_H; ++row)
 ;
@@ -1375,32 +1375,32 @@ L0005:	iny
 	clc
 	lda     #$01
 	adc     (c_sp),y
-	jmp     L005A
+	jmp     L005C
 ;
 ; } else if (requested_level == 2) {
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 138
-L0064:	lda     (c_sp),y
+L0066:	lda     (c_sp),y
 	cmp     #$02
-	jne     L0069
+	jne     L006E
 ;
 ; for (row = 0; row < MAZE_H; ++row) {
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 142
 	lda     #$00
 	ldy     #$04
-L005D:	sta     (c_sp),y
+L005F:	sta     (c_sp),y
 	cmp     #$3B
-	jcs     L0076
+	jcs     L006C
 ;
 ; for (col = 0; col < MAZE_W; ++col) {
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 143
 	lda     #$00
 	dey
-L005C:	sta     (c_sp),y
+L005E:	sta     (c_sp),y
 	cmp     #$14
-	bcs     L000F
+	jcs     L000F
 ;
 ; tile = level1_data[row][col];
 ;
@@ -1427,30 +1427,39 @@ L005C:	sta     (c_sp),y
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 145
 	cmp     #$03
-	bne     L0066
+	bne     L0068
 	lda     #$04
 ;
 ; else if (tile == 4) tile = 3;
 ;
 	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 146
-	jmp     L005B
-L0066:	lda     (c_sp),y
+	jmp     L005D
+L0068:	lda     (c_sp),y
 	cmp     #$04
-	bne     L0067
+	bne     L006A
 	lda     #$03
-L005B:	sta     (c_sp),y
+;
+; else if (tile == 5) tile = 1;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 147
+	jmp     L005D
+L006A:	lda     (c_sp),y
+	cmp     #$05
+	bne     L006B
+	lda     #$01
+L005D:	sta     (c_sp),y
 ;
 ; maze_map[MAZE_H - 1 - row][MAZE_W - 1 - col] = tile;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 147
-L0067:	lda     #$3A
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 148
+L006B:	lda     #$3A
 	sec
 	ldy     #$04
 	sbc     (c_sp),y
 	ldx     #$00
-	bcs     L0051
+	bcs     L0053
 	dex
-L0051:	jsr     pushax
+L0053:	jsr     pushax
 	lda     #$14
 	jsr     tosmula0
 	clc
@@ -1464,9 +1473,9 @@ L0051:	jsr     pushax
 	ldy     #$03
 	sbc     (c_sp),y
 	ldx     #$00
-	bcs     L0052
+	bcs     L0054
 	dex
-L0052:	clc
+L0054:	clc
 	adc     ptr1
 	sta     ptr1
 	txa
@@ -1484,7 +1493,7 @@ L0052:	clc
 	clc
 	lda     #$01
 	adc     (c_sp),y
-	jmp     L005C
+	jmp     L005E
 ;
 ; for (row = 0; row < MAZE_H; ++row) {
 ;
@@ -1493,49 +1502,70 @@ L000F:	iny
 	clc
 	lda     #$01
 	adc     (c_sp),y
-	jmp     L005D
+	jmp     L005F
+;
+; maze_map[0][8] = 5;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 151
+L006C:	lda     #$05
+	sta     _maze_map+8
+;
+; maze_map[0][9] = 5;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 152
+	sta     _maze_map+9
+;
+; maze_map[0][10] = 5;
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 153
+	sta     _maze_map+10
+;
+; } else {
+;
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 154
+	jmp     L007B
 ;
 ; if (requested_level == 3) level_name = "D:L2.CSV";
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 151
-L0069:	lda     (c_sp),y
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 155
+L006E:	lda     (c_sp),y
 	cmp     #$03
-	bne     L006B
+	bne     L0070
 	lda     #<(S0005)
 	ldx     #>(S0005)
 ;
 ; else if (requested_level == 4) level_name = "D:L3.CSV";
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 152
-	jmp     L007D
-L006B:	lda     (c_sp),y
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 156
+	jmp     L0082
+L0070:	lda     (c_sp),y
 	cmp     #$04
-	bne     L006D
+	bne     L0072
 	lda     #<(S0006)
 	ldx     #>(S0006)
 ;
 ; else if (requested_level == 5) level_name = "D:L4.CSV";
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 153
-	jmp     L007D
-L006D:	lda     (c_sp),y
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 157
+	jmp     L0082
+L0072:	lda     (c_sp),y
 	cmp     #$05
-	bne     L001D
+	bne     L001F
 	lda     #<(S0007)
 	ldx     #>(S0007)
 ;
 ; else level_name = "D:L5.CSV";
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 154
-	jmp     L007D
-L001D:	lda     #<(S0008)
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 158
+	jmp     L0082
+L001F:	lda     #<(S0008)
 	ldx     #>(S0008)
-L007D:	ldy     #$05
+L0082:	ldy     #$05
 	jsr     staxysp
 ;
 ; level_file = open(level_name, O_RDONLY);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 155
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 159
 	jsr     pushax
 	lda     #$01
 	jsr     pusha0
@@ -1546,87 +1576,87 @@ L007D:	ldy     #$05
 ;
 ; if (level_file < 0) return;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 156
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 160
 	cpx     #$80
-	jcs     L0046
+	jcs     L0048
 ;
 ; level_buffer_pos = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 157
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 161
 	lda     #$00
 	sta     _level_buffer_pos
 ;
 ; level_buffer_len = 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 158
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 162
 	sta     _level_buffer_len
 ;
 ; do { ch = read_level_byte(); } while (ch >= 0 && ch != '\n' && ch != '\r');
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 159
-L0020:	jsr     _read_level_byte
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 163
+L0022:	jsr     _read_level_byte
 	jsr     stax0sp
 	txa
-	bmi     L0055
+	bmi     L0057
 	ldy     #$01
 	lda     (c_sp),y
-	bne     L007E
+	bne     L0083
 	dey
 	lda     (c_sp),y
 	cmp     #$9B
-	beq     L0055
+	beq     L0057
 	iny
-L007E:	lda     (c_sp),y
-	bne     L0020
+L0083:	lda     (c_sp),y
+	bne     L0022
 	dey
 	lda     (c_sp),y
 	cmp     #$0D
-	bne     L0020
+	bne     L0022
 ;
 ; if (ch == '\r') ch = read_level_byte();
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 160
-L0055:	ldy     #$01
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 164
+L0057:	ldy     #$01
 	lda     (c_sp),y
-	bne     L006E
+	bne     L0073
 	dey
 	lda     (c_sp),y
 	cmp     #$0D
-	bne     L006E
+	bne     L0073
 	jsr     _read_level_byte
 	jsr     stax0sp
 ;
 ; for (row = 0; row < MAZE_H; ++row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 161
-L006E:	lda     #$00
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 165
+L0073:	lda     #$00
 	ldy     #$04
-L0060:	sta     (c_sp),y
+L0062:	sta     (c_sp),y
 	cmp     #$3B
-	jcs     L002B
+	jcs     L002D
 ;
 ; do { ch = read_level_byte(); } while (ch >= 0 && ch != ';');
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 162
-L002D:	jsr     _read_level_byte
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 166
+L002F:	jsr     _read_level_byte
 	jsr     stax0sp
 	txa
-	bmi     L0056
+	bmi     L0058
 	ldy     #$01
 	lda     (c_sp),y
-	bne     L002D
+	bne     L002F
 	dey
 	lda     (c_sp),y
 	cmp     #$3B
-	bne     L002D
+	bne     L002F
 ;
 ; if (ch < 0) { close(level_file); return; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 163
-L0056:	jsr     ldax0sp
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 167
+L0058:	jsr     ldax0sp
 	cpx     #$80
 	lda     #$00
-	bcc     L0070
+	bcc     L0075
 	lda     _level_file
 	ldx     _level_file+1
 	jsr     _close
@@ -1634,40 +1664,40 @@ L0056:	jsr     ldax0sp
 ;
 ; for (col = 0; col < MAZE_W; ++col) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 164
-L0070:	ldy     #$03
-L005F:	sta     (c_sp),y
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 168
+L0075:	ldy     #$03
+L0061:	sta     (c_sp),y
 	cmp     #$14
-	bcs     L002C
+	bcs     L002E
 ;
 ; do { ch = read_level_byte(); } while (ch >= 0 && (ch < '0' || ch > '6'));
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 165
-L0039:	jsr     _read_level_byte
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 169
+L003B:	jsr     _read_level_byte
 	jsr     stax0sp
 	txa
-	bmi     L0057
+	bmi     L0059
 	jsr     ldax0sp
 	cmp     #$30
 	txa
 	sbc     #$00
-	bvc     L003E
+	bvc     L0040
 	eor     #$80
-L003E:	bmi     L0039
+L0040:	bmi     L003B
 	jsr     ldax0sp
 	cmp     #$37
 	txa
 	sbc     #$00
-	bvs     L0040
+	bvs     L0042
 	eor     #$80
-L0040:	bmi     L0039
+L0042:	bmi     L003B
 ;
 ; if (ch < 0) { close(level_file); return; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 166
-L0057:	jsr     ldax0sp
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 170
+L0059:	jsr     ldax0sp
 	cpx     #$80
-	bcc     L0044
+	bcc     L0046
 	lda     _level_file
 	ldx     _level_file+1
 	jsr     _close
@@ -1675,8 +1705,8 @@ L0057:	jsr     ldax0sp
 ;
 ; maze_map[row][col] = (unsigned char)(ch - '0');
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 167
-L0044:	ldy     #$04
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 171
+L0046:	ldy     #$04
 	lda     (c_sp),y
 	jsr     pusha0
 	lda     #$14
@@ -1692,9 +1722,9 @@ L0044:	ldy     #$04
 	clc
 	adc     ptr1
 	ldx     ptr1+1
-	bcc     L0054
+	bcc     L0056
 	inx
-L0054:	sta     ptr1
+L0056:	sta     ptr1
 	stx     ptr1+1
 	jsr     ldax0sp
 	ldy     #$30
@@ -1704,51 +1734,51 @@ L0054:	sta     ptr1
 ;
 ; for (col = 0; col < MAZE_W; ++col) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 164
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 168
 	ldy     #$03
 	clc
 	lda     #$01
 	adc     (c_sp),y
-	jmp     L005F
+	jmp     L0061
 ;
 ; for (row = 0; row < MAZE_H; ++row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 161
-L002C:	iny
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 165
+L002E:	iny
 	clc
 	lda     #$01
 	adc     (c_sp),y
-	jmp     L0060
+	jmp     L0062
 ;
 ; close(level_file);
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 170
-L002B:	lda     _level_file
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 174
+L002D:	lda     _level_file
 	ldx     _level_file+1
 	jsr     _close
 ;
 ; for (row = 0; row < MAZE_H && !maze_exit_found; ++row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 173
-L0076:	lda     #$00
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 177
+L007B:	lda     #$00
 	ldy     #$04
-L0062:	sta     (c_sp),y
+L0064:	sta     (c_sp),y
 	cmp     #$3B
-	bcs     L0046
+	bcs     L0048
 	lda     _maze_exit_found
-	bne     L0046
+	bne     L0048
 ;
 ; for (col = 0; col < MAZE_W; ++col) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 174
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 178
 	dey
-L0061:	sta     (c_sp),y
+L0063:	sta     (c_sp),y
 	cmp     #$14
-	bcs     L0047
+	bcs     L0049
 ;
 ; if (maze_map[row][col] != 5) continue;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 175
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 179
 	iny
 	lda     (c_sp),y
 	jsr     pusha0
@@ -1765,55 +1795,55 @@ L0061:	sta     (c_sp),y
 	tay
 	lda     (ptr1),y
 	cmp     #$05
-	bne     L004E
+	bne     L0050
 ;
 ; maze_exit_col = col;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 176
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 180
 	ldy     #$03
 	lda     (c_sp),y
 	sta     _maze_exit_col
 ;
 ; maze_exit_row = row;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 177
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 181
 	iny
 	lda     (c_sp),y
 	sta     _maze_exit_row
 ;
 ; maze_exit_found = 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 178
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 182
 	lda     #$01
 	sta     _maze_exit_found
 ;
 ; break;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 179
-	jmp     L007B
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 183
+	jmp     L0080
 ;
 ; for (col = 0; col < MAZE_W; ++col) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 174
-L004E:	ldy     #$03
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 178
+L0050:	ldy     #$03
 	clc
 	lda     #$01
 	adc     (c_sp),y
-	jmp     L0061
+	jmp     L0063
 ;
 ; for (row = 0; row < MAZE_H && !maze_exit_found; ++row) {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 173
-L0047:	iny
-L007B:	clc
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 177
+L0049:	iny
+L0080:	clc
 	lda     #$01
 	adc     (c_sp),y
-	jmp     L0062
+	jmp     L0064
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 182
-L0046:	jmp     incsp8
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 186
+L0048:	jmp     incsp8
 
 	.dbg	line
 .endproc
@@ -1836,12 +1866,12 @@ L0046:	jmp     incsp8
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 190
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 194
 	jsr     pusha
 ;
 ; if (x >= MAZE_W || y >= MAZE_H) return 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 193
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 197
 	jsr     decsp1
 	ldy     #$02
 	lda     (c_sp),y
@@ -1857,7 +1887,7 @@ L000C:	ldx     #$00
 ;
 ; tile = maze_map[y][x];
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 194
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 198
 L000E:	lda     (c_sp),y
 	jsr     pusha0
 	lda     #$14
@@ -1877,7 +1907,7 @@ L000E:	lda     (c_sp),y
 ;
 ; if (tile == 5) return maze_exit_open ? 0 : 1;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 195
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 199
 	ldx     #$00
 	lda     (c_sp),y
 	cmp     #$05
@@ -1889,7 +1919,7 @@ L000E:	lda     (c_sp),y
 ;
 ; return (tile == 1 || tile == 2) ? 1 : 0;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 196
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 200
 L0011:	lda     (c_sp),y
 	cmp     #$01
 	beq     L0001
@@ -1901,7 +1931,7 @@ L0012:	lda     #$01
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 197
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 201
 L0001:	jmp     incsp3
 
 	.dbg	line
@@ -1923,19 +1953,19 @@ L0001:	jmp     incsp3
 ;
 ; {
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 185
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 189
 	jsr     pusha
 ;
 ; maze_exit_open = open;
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 186
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 190
 	ldy     #$00
 	lda     (c_sp),y
 	sta     _maze_exit_open
 ;
 ; }
 ;
-	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 187
+	.dbg	line, "C:\Users\Alex\Chased3D\maze.c", 191
 	jmp     incsp1
 
 	.dbg	line

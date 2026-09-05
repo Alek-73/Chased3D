@@ -6,6 +6,8 @@
 
         .export _floor_dli_install
         .export _floor_dli_set_rotation
+        .export _floor_dli_suspend
+        .export _floor_dli_resume
 
 VDSLST = $0200
 WSYNC  = $D40A
@@ -16,7 +18,6 @@ COLPF1 = $D017
 COLPF2 = $D018
 COLBK  = $D01A
 
-HUD_GREEN = $C8
 HUD_WHITE = $0E
 
 HUD_VCOUNT = 104
@@ -39,6 +40,18 @@ _floor_dli_install:
 
 _floor_dli_set_rotation:
         sta floor_dli_rotation
+        rts
+
+_floor_dli_suspend:
+        lda #$40                   ; keep VBI on while disk I/O runs
+        sta NMIEN
+        rts
+
+_floor_dli_resume:
+        lda #$00
+        sta floor_dli_stage
+        lda #$C0                   ; re-enable VBI and DLI NMIs
+        sta NMIEN
         rts
 
 floor_dli:
@@ -76,10 +89,9 @@ floor_dli_hud:
         lda #$00
         sta WSYNC
         sta COLBK
-        lda #HUD_GREEN
-        sta COLPF1
-        lda #HUD_WHITE
         sta COLPF2
+        lda #HUD_WHITE
+        sta COLPF1
         lda #$00
         sta floor_dli_stage
 floor_dli_restore:

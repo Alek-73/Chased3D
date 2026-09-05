@@ -35,12 +35,14 @@
 #define FLOOR_SCROLL_DISTANCE 256
 #define SCORE_PER_TARGET 100u
 #define SCORE_PER_DECOY 50u
+#define SCORE_PER_LEVEL 100u
+#define SCORE_PER_LIFE 200u
 
 /* Same triplet string the original BASIC game plays when the pursuer catches
  * the player (line 305 of chased1V3.BAS). */
 #define CAUGHT_MELODY "A14C28B18A14G14A11"
-//#define STARTING_LIVES 3
-#define STARTING_LIVES 1
+#define STARTING_LIVES 3
+//#define STARTING_LIVES 1
 
 #define PLAYER_START_X ((6u << 8) | 0x80u)
 #define PLAYER_START_Y ((1u << 8) | 0x80u)
@@ -51,6 +53,7 @@
  * followed by the loading tune while the next level is prepared. */
 #define LEVEL_CLEAR_MELODY "C12C14E18B08C14A14G18F14E18D18E14D14C14P01"
 #define LEVEL_LOAD_MELODY "C14C14E14C18F18C18E18C14D14P04"
+#define LIFE_BONUS_MELODY "C14E14D14E14P04"
 #define GAME_OVER_MELODY "E24D24C24B14A14G14E14C18P04"
 #define VICTORY_MELODY "C14C14C14C24C24C24B18A18G18F18E18D18C12"
 #define DECOY_DEPLOY_MELODY "C21G21C22"
@@ -64,6 +67,7 @@ static char loading_level_message[] = "LOADING LEVEL 0";
 static unsigned char frame_ticks = 1;
 static unsigned char lives = STARTING_LIVES;
 static unsigned char level = 1;
+//unsigned char level = 6;
 static unsigned int score;
 static unsigned int high_score;
 static unsigned int player_x;
@@ -415,9 +419,7 @@ static void start_new_game(void)
     minimap_show();
     sprite3d_build_targets();
     sprite3d_locate_exit();
-#ifdef DEBUG_HUD
     hud_set_targets(sprite3d_targets_left());
-#endif
     start_life();
     update_game_hud();
     melody_play(LEVEL_LOAD_MELODY);
@@ -433,32 +435,37 @@ static unsigned char restart_pressed(void)
 }
 
 static void show_end_screen(const char *message, unsigned char size,
-                            const char *melody)
+                            const char *melody, unsigned char rainbow)
 {
     if (threat_color_active) COLOR4 = threat_old_color;
     threat_color_active = 0;
     sprite3d_clear_all();
     view3d_render(player_x, player_y, player_angle);
-    textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER, message, 2, 1, size);
+    textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER, message, 2,
+                              rainbow ? 3 : 1, size);
     textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER, "Press Space or Fire",
                               20, 1, TEXTPLOT_SIZE_HALF);
     if (melody) melody_play(melody);
 
     while (restart_pressed()) wait_frame();
-    while (!restart_pressed()) wait_frame();
-    OS.sdmctl = 0;
-    ANTIC.dmactl = 0;
+    if (rainbow) {
+        splash_screen_rainbow();
+    } else {
+        while (!restart_pressed()) wait_frame();
+        OS.sdmctl = 0;
+        ANTIC.dmactl = 0;
+    }
 }
 
 static void game_over(void)
 {
-    show_end_screen("Game Over", TEXTPLOT_SIZE_DOUBLE, GAME_OVER_MELODY);
+    show_end_screen("Game Over", TEXTPLOT_SIZE_DOUBLE, GAME_OVER_MELODY, 0);
     start_new_game();
 }
 
 static void victory(void)
 {
-    show_end_screen("YOU DID IT !!!", TEXTPLOT_SIZE_NORMAL, VICTORY_MELODY);
+    show_end_screen("YOU DID IT !!!", TEXTPLOT_SIZE_NORMAL, VICTORY_MELODY, 1);
     start_new_game();
 }
 
@@ -518,8 +525,16 @@ static void update_threat_sound(void)
 static void handle_level_clear(void)
 {
     melody_set_threat_level(0);
+    add_score(SCORE_PER_LEVEL);
     melody_play(LEVEL_CLEAR_MELODY);
     while (melody_playing()) wait_frame();
+
+    while (lives != 0) {
+        --lives;
+        add_score(SCORE_PER_LIFE);
+        melody_play(LIFE_BONUS_MELODY);
+        while (melody_playing()) wait_frame();
+    }
 
     if (level >= LEVEL_MAX) {
         victory();
@@ -528,21 +543,25 @@ static void handle_level_clear(void)
     ++level;
     update_game_hud();
     loading_level_message[14] = (char)('0' + level);
+    sprite3d_clear_all();
+    view3d_clear();
     textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER, loading_level_message,
                               2, 1, TEXTPLOT_SIZE_NORMAL);
+    floor_dli_suspend();
     maze_load_level(level);
+    floor_dli_resume();
     minimap_build();
     minimap_show();
     sprite3d_build_targets();
     sprite3d_locate_exit();
-#ifdef DEBUG_HUD
     hud_set_targets(sprite3d_targets_left());
-#endif
 
     melody_play(LEVEL_LOAD_MELODY);
     while (melody_playing()) wait_frame();
 
+    lives = 3;
     start_life();
+    update_game_hud();
 }
 
 int main(void)
@@ -574,7 +593,9 @@ int main(void)
     minimap_build();
     sprite3d_build_targets();
     sprite3d_locate_exit();
-
+    
+    textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER,
+                              splash_revision, 35, 3, TEXTPLOT_SIZE_HALF);
     splash_screen_rainbow();
 
     view3d_init();
@@ -584,9 +605,7 @@ int main(void)
     melody_threat_play("A02A02E12A02A02E12");
     start_life();
     *(volatile unsigned char *)NOCLIK = 1;
-#ifdef DEBUG_HUD
     hud_set_targets(sprite3d_targets_left());
-#endif
     textplot_print_fullscreen(TEXTPLOT_ALIGN_LEFT, "DECOY",
                               DECOY_BAR_TOP + DECOY_BAR_HEIGHT, 3,
                               TEXTPLOT_SIZE_HALF);
@@ -632,12 +651,11 @@ int main(void)
         if (pursuer_caught_player() || sprite3d_hit_laser(player_x, player_y))
             handle_catch();
         if (sprite3d_collect(player_x, player_y)) {
-#ifdef DEBUG_HUD
             hud_set_targets(sprite3d_targets_left());
-#endif
             add_score(SCORE_PER_TARGET);
             if (sprite3d_targets_left() == 0) {
                 maze_set_exit_open(1);
+                minimap_open_exit();
                 melody_play(LAST_TARGET_MELODY);
             } else {
                 melody_pickup();

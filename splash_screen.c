@@ -8,8 +8,8 @@
 
 #define STRINGIFY_VALUE(value) #value
 #define STRINGIFY(value) STRINGIFY_VALUE(value)
-#define SPLASH_REVISION "Rev1." STRINGIFY(BUILD_DIGIT_100) \
-    STRINGIFY(BUILD_DIGIT_10) STRINGIFY(BUILD_DIGIT_1) " press Fire"
+const char splash_revision[] = "Rev1." STRINGIFY(BUILD_DIGIT_100) \
+    STRINGIFY(BUILD_DIGIT_10) STRINGIFY(BUILD_DIGIT_1) " press Fire";
 
 #define SPLASH_BITMAP_ROWS 46
 #define SPLASH_BITMAP_TOP (VIEW_ROWS - SPLASH_BITMAP_ROWS)
@@ -89,8 +89,7 @@ void splash_screen_show(void)
     textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER,
                               "by Alex Viroli, 2026", 18, 2,
                               TEXTPLOT_SIZE_NORMAL);
-    textplot_print_fullscreen(TEXTPLOT_ALIGN_CENTER,
-                              SPLASH_REVISION, 35, 3, TEXTPLOT_SIZE_HALF);
+
     splash_build_dlist();
 
     COLOR0 = 0x8A;
